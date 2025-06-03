@@ -34,21 +34,14 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
       >
         {/* Circular background */}
         <circle cx="16" cy="16" r="16" fill="currentColor" />
-        {/* Stylized "p" design - curved lines representing the logo symbol */}
+        {/* Stylized design elements matching the Peptok logo */}
+        <path d="M8 14 Q16 8, 24 14 Q16 18, 8 14" fill="white" opacity="0.9" />
         <path
-          d="M10 12 C10 10, 12 8, 16 8 C20 8, 22 10, 22 12 C22 14, 20 16, 16 16 L12 16 L12 24"
-          stroke="white"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
+          d="M10 16 Q16 12, 22 16 Q16 20, 10 16"
+          fill="white"
+          opacity="0.7"
         />
-        <path
-          d="M10 20 L16 20"
-          stroke="white"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
+        <circle cx="16" cy="16" r="3" fill="white" opacity="0.8" />
       </svg>
     </div>
   );

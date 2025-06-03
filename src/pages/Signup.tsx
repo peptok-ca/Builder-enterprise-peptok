@@ -49,11 +49,8 @@ const Signup = () => {
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <Link to="/" className="inline-flex items-center space-x-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-lg">
-              P
-            </div>
-            <span className="text-2xl font-bold text-primary">Peptok</span>
+          <Link to="/" className="inline-flex justify-center">
+            <Logo size="lg" />
           </Link>
           <h1 className="text-3xl font-bold">Create your account</h1>
           <p className="text-muted-foreground">

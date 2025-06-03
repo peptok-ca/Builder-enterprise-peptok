@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Logo from "@/components/ui/logo";
 import { Bell, Search, Menu, User, Settings, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,11 +43,8 @@ const Header = ({ userType = "employee" }: HeaderProps) => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-            P
-          </div>
-          <span className="text-xl font-bold text-primary">Peptok</span>
+        <Link to="/">
+          <Logo size="md" />
         </Link>
 
         {/* Navigation */}

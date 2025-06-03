@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import Logo from "@/components/ui/logo";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 const Login = () => {

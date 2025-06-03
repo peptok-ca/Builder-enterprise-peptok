@@ -20,10 +20,12 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
   };
 
   const LogoIcon = () => (
-    <div className={cn(
-      "rounded-full bg-primary flex items-center justify-center relative",
-      sizeClasses[size]
-    )}>
+    <div
+      className={cn(
+        "rounded-full bg-primary flex items-center justify-center relative",
+        sizeClasses[size],
+      )}
+    >
       <svg
         viewBox="0 0 32 32"
         fill="none"
@@ -31,12 +33,7 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
         className="w-full h-full"
       >
         {/* Circular background */}
-        <circle
-          cx="16"
-          cy="16"
-          r="16"
-          fill="currentColor"
-        />
+        <circle cx="16" cy="16" r="16" fill="currentColor" />
         {/* Stylized "p" design - curved lines representing the logo symbol */}
         <path
           d="M10 12 C10 10, 12 8, 16 8 C20 8, 22 10, 22 12 C22 14, 20 16, 16 16 L12 16 L12 24"
@@ -64,10 +61,15 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
     <div className={cn("flex items-center space-x-2", className)}>
       <LogoIcon />
       <span
-      <span className={cn(
-        "font-medium text-primary tracking-normal",
-        textSizeClasses[size]
-      )} style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
+        className={cn(
+          "font-medium text-primary tracking-normal",
+          textSizeClasses[size],
+        )}
+        style={{
+          fontFamily:
+            'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        }}
+      >
         peptok
       </span>
     </div>

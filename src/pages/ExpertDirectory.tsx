@@ -86,8 +86,6 @@ const ExpertDirectory = () => {
                 {filteredExperts.length} expert
                 {filteredExperts.length !== 1 ? "s" : ""} found
               </p>
-
-              {/* Sort options could go here */}
             </div>
 
             {filteredExperts.length === 0 ? (

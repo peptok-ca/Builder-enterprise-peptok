@@ -34,16 +34,11 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
       >
         {/* Circular background */}
         <circle cx="16" cy="16" r="16" fill="currentColor" />
-        {/* Clean abstract design element */}
+        {/* Simple elegant design matching Peptok logo */}
         <g fill="white">
-          <path
-            d="M9 12 C9 9, 12 7, 16 9 C20 11, 23 9, 23 12 C23 15, 20 17, 16 15 C12 13, 9 15, 9 12"
-            fillOpacity="0.9"
-          />
-          <path
-            d="M11 19 C13 17, 19 17, 21 19 C19 21, 13 21, 11 19"
-            fillOpacity="0.8"
-          />
+          <circle cx="16" cy="13" r="4" fillOpacity="0.9" />
+          <ellipse cx="16" cy="20" rx="5" ry="2" fillOpacity="0.8" />
+          <rect x="14" y="16" width="4" height="2" rx="1" fillOpacity="0.7" />
         </g>
       </svg>
     </div>

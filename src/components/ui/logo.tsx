@@ -22,7 +22,7 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
   const LogoIcon = () => (
     <div
       className={cn(
-        "rounded-full bg-primary flex items-center justify-center relative",
+        "rounded-full bg-primary flex items-center justify-center relative overflow-hidden",
         sizeClasses[size],
       )}
     >
@@ -34,17 +34,26 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
       >
         {/* Circular background */}
         <circle cx="16" cy="16" r="16" fill="currentColor" />
-        {/* Peptok logo symbol - flowing organic design */}
-        <path
-          d="M8 12 Q12 8, 16 12 Q20 16, 24 12 Q20 18, 16 14 Q12 10, 8 12"
-          fill="white"
-          fillOpacity="0.9"
-        />
-        <path
-          d="M10 16 Q14 14, 18 16 Q22 18, 18 20 Q14 18, 10 16"
-          fill="white"
-          fillOpacity="0.8"
-        />
+        {/* Simplified flowing design element */}
+        <g fill="white">
+          <ellipse
+            cx="16"
+            cy="12"
+            rx="8"
+            ry="3"
+            transform="rotate(-15 16 12)"
+            opacity="0.9"
+          />
+          <ellipse
+            cx="16"
+            cy="18"
+            rx="6"
+            ry="2.5"
+            transform="rotate(15 16 18)"
+            opacity="0.8"
+          />
+          <circle cx="16" cy="15" r="2" opacity="0.7" />
+        </g>
       </svg>
     </div>
   );
@@ -56,12 +65,7 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
   return (
     <div className={cn("flex items-center space-x-2", className)}>
       <LogoIcon />
-      <span
-        className={cn(
-          "font-normal text-primary tracking-wide",
-          textSizeClasses[size],
-        )}
-      >
+      <span className={cn("font-normal text-primary", textSizeClasses[size])}>
         peptok
       </span>
     </div>

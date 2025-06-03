@@ -34,14 +34,16 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
       >
         {/* Circular background */}
         <circle cx="16" cy="16" r="16" fill="currentColor" />
-        {/* Simple "p" letter design matching the Peptok logo */}
-        <path
-          d="M12 10 L12 22 M12 10 L18 10 C20 10, 21 11, 21 13 C21 15, 20 16, 18 16 L12 16"
-          stroke="white"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
+        {/* Clean minimalist design element */}
+        <circle cx="16" cy="13" r="4" fill="white" opacity="0.9" />
+        <rect
+          x="13"
+          y="17"
+          width="6"
+          height="2"
+          rx="1"
+          fill="white"
+          opacity="0.9"
         />
       </svg>
     </div>
@@ -56,13 +58,9 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
       <LogoIcon />
       <span
         className={cn(
-          "font-medium text-primary tracking-normal",
+          "font-normal text-primary tracking-wide",
           textSizeClasses[size],
         )}
-        style={{
-          fontFamily:
-            'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-        }}
       >
         peptok
       </span>

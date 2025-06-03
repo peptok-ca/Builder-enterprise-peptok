@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Logo from "@/components/ui/logo";
 import { Eye, EyeOff, Mail, Lock, User, Building } from "lucide-react";
 
 const Signup = () => {

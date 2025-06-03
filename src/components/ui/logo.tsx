@@ -22,45 +22,29 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
   const LogoIcon = () => (
     <div
       className={cn(
-        "rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold",
+        "rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium",
         sizeClasses[size],
       )}
     >
       <svg
-        viewBox="0 0 24 24"
+        viewBox="0 0 32 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-3/5 h-3/5"
+        className="w-4/5 h-4/5"
       >
-        <path
-          d="M6 8V6C6 4.89543 6.89543 4 8 4H16C17.1046 4 18 4.89543 18 6V8"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M8 12H16"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M12 8V16"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle
-          cx="12"
-          cy="12"
-          r="9"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          fill="none"
-        />
+        {/* Simple circular logo with "p" letter */}
+        <circle cx="16" cy="16" r="14" fill="currentColor" stroke="none" />
+        <text
+          x="16"
+          y="22"
+          textAnchor="middle"
+          fill="white"
+          fontSize="18"
+          fontWeight="600"
+          fontFamily="system-ui, -apple-system, sans-serif"
+        >
+          p
+        </text>
       </svg>
     </div>
   );
@@ -72,7 +56,12 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
   return (
     <div className={cn("flex items-center space-x-2", className)}>
       <LogoIcon />
-      <span className={cn("font-bold text-primary", textSizeClasses[size])}>
+      <span
+        className={cn(
+          "font-semibold text-primary tracking-tight",
+          textSizeClasses[size],
+        )}
+      >
         peptok
       </span>
     </div>

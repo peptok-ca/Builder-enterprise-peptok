@@ -13,138 +13,128 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
     lg: "h-12",
   };
 
-  const textSizeClasses = {
-    sm: "text-sm",
-    md: "text-xl",
-    lg: "text-2xl",
-  };
-
-  const LogoIcon = () => (
-    <div className={cn("flex items-center", sizeClasses[size])}>
-      <svg
-        viewBox="0 0 200 80"
+  const LogoSvg = () => (
+    <svg
+      viewBox="0 0 240 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn("h-full w-auto", sizeClasses[size])}
+    >
+      {/* Curved arc above the text */}
+      <path
+        d="M40 20 Q120 5 200 20"
+        stroke="#1d4ed8"
+        strokeWidth="6"
+        strokeLinecap="round"
         fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-full w-auto"
-      >
-        {/* Curved arc above the text */}
+      />
+
+      {/* peptok text */}
+      <g fill="#1d4ed8" className="font-bold">
+        {/* p */}
         <path
-          d="M20 25 Q100 5 180 25"
-          stroke="#2563eb"
+          d="M20 40 L20 85 M20 40 L35 40 C42 40 48 46 48 53 C48 60 42 66 35 66 L20 66"
+          stroke="#1d4ed8"
+          strokeWidth="8"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        {/* e with diagonal strikethrough */}
+        <circle
+          cx="68"
+          cy="60"
+          r="13"
+          stroke="#1d4ed8"
+          strokeWidth="8"
+          fill="none"
+        />
+        <path
+          d="M58 67 L78 53"
+          stroke="#1d4ed8"
           strokeWidth="8"
           strokeLinecap="round"
+        />
+        <path
+          d="M58 60 L75 60"
+          stroke="#1d4ed8"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+
+        {/* p */}
+        <path
+          d="M98 40 L98 85 M98 40 L113 40 C120 40 126 46 126 53 C126 60 120 66 113 66 L98 66"
+          stroke="#1d4ed8"
+          strokeWidth="8"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        {/* t */}
+        <path
+          d="M146 45 L146 70 C146 75 148 77 153 77"
+          stroke="#1d4ed8"
+          strokeWidth="8"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M136 50 L156 50"
+          stroke="#1d4ed8"
+          strokeWidth="8"
+          strokeLinecap="round"
+        />
+
+        {/* o */}
+        <circle
+          cx="176"
+          cy="60"
+          r="13"
+          stroke="#1d4ed8"
+          strokeWidth="8"
           fill="none"
         />
 
-        {/* Text "peptok" */}
-        <g fill="#2563eb">
-          {/* p */}
-          <path
-            d="M20 35 L20 70 M20 35 L35 35 Q45 35 45 45 Q45 55 35 55 L20 55"
-            strokeWidth="6"
-            stroke="#2563eb"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-
-          {/* e with strikethrough */}
-          <circle
-            cx="60"
-            cy="50"
-            r="10"
-            fill="none"
-            stroke="#2563eb"
-            strokeWidth="6"
-          />
-          <path
-            d="M50 50 L70 50"
-            stroke="#2563eb"
-            strokeWidth="6"
-            strokeLinecap="round"
-          />
-          <path
-            d="M50 45 L65 45"
-            stroke="#2563eb"
-            strokeWidth="4"
-            strokeLinecap="round"
-          />
-
-          {/* p */}
-          <path
-            d="M85 35 L85 70 M85 35 L100 35 Q110 35 110 45 Q110 55 100 55 L85 55"
-            strokeWidth="6"
-            stroke="#2563eb"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-
-          {/* t */}
-          <path
-            d="M125 40 L125 65 Q125 70 130 70"
-            strokeWidth="6"
-            stroke="#2563eb"
-            fill="none"
-            strokeLinecap="round"
-          />
-          <path
-            d="M115 45 L135 45"
-            stroke="#2563eb"
-            strokeWidth="6"
-            strokeLinecap="round"
-          />
-
-          {/* o */}
-          <circle
-            cx="150"
-            cy="50"
-            r="10"
-            fill="none"
-            stroke="#2563eb"
-            strokeWidth="6"
-          />
-
-          {/* k */}
-          <path
-            d="M170 35 L170 70"
-            strokeWidth="6"
-            stroke="#2563eb"
-            strokeLinecap="round"
-          />
-          <path
-            d="M170 50 L180 40"
-            strokeWidth="6"
-            stroke="#2563eb"
-            strokeLinecap="round"
-          />
-          <path
-            d="M170 50 L180 60"
-            strokeWidth="6"
-            stroke="#2563eb"
-            strokeLinecap="round"
-          />
-        </g>
-      </svg>
-    </div>
+        {/* k */}
+        <path
+          d="M200 40 L200 85"
+          stroke="#1d4ed8"
+          strokeWidth="8"
+          strokeLinecap="round"
+        />
+        <path
+          d="M200 60 L215 45"
+          stroke="#1d4ed8"
+          strokeWidth="8"
+          strokeLinecap="round"
+        />
+        <path
+          d="M200 60 L215 75"
+          stroke="#1d4ed8"
+          strokeWidth="8"
+          strokeLinecap="round"
+        />
+      </g>
+    </svg>
   );
 
   if (variant === "icon-only") {
-    // For icon-only, just show the arc
+    // For icon-only, show just the arc
     return (
-      <div
-        className={cn("flex items-center justify-center", sizeClasses[size])}
-      >
+      <div className="flex items-center justify-center">
         <svg
-          viewBox="0 0 40 20"
+          viewBox="0 0 80 30"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="h-full w-auto"
+          className={cn("h-full w-auto", sizeClasses[size])}
         >
           <path
-            d="M5 15 Q20 2 35 15"
-            stroke="#2563eb"
-            strokeWidth="3"
+            d="M10 20 Q40 5 70 20"
+            stroke="#1d4ed8"
+            strokeWidth="4"
             strokeLinecap="round"
             fill="none"
           />
@@ -154,8 +144,8 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
   }
 
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
-      <LogoIcon />
+    <div className={cn("flex items-center", className)}>
+      <LogoSvg />
     </div>
   );
 };

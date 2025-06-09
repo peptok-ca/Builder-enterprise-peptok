@@ -67,12 +67,8 @@ const CompanyDashboard = () => {
         setIsLoading(true);
 
         // Fetch company's mentorship requests
-        const requestsResponse = await apiClient.request<MentorshipRequest[]>(
-          "/mentorship-requests",
-        );
-        if (requestsResponse.success) {
-          setMentorshipRequests(requestsResponse.data);
-        }
+        const requests = await api.getMentorshipRequests();
+        setMentorshipRequests(requests || []);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
         toast.error("Failed to load dashboard data");

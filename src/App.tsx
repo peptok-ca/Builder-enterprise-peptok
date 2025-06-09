@@ -60,11 +60,21 @@ const App = () => (
               }
             />
             <Route
-              path="/mentorship/new"
-              element={
-                <ProtectedRoute>
-                  <CreateMentorshipRequest />
-                </ProtectedRoute>
+            <Route path="/mentorship/new" element={
+              <ProtectedRoute allowedRoles={['admin', 'employee']}>
+                <CreateMentorshipRequest />
+              </ProtectedRoute>
+            } />
+            <Route path="/mentorship/matching" element={
+              <ProtectedRoute allowedRoles={['admin', 'employee']}>
+                <MentorMatching />
+              </ProtectedRoute>
+            } />
+            <Route path="/mentor/dashboard" element={
+              <ProtectedRoute allowedRoles={['expert']}>
+                <MentorDashboard />
+              </ProtectedRoute>
+            } />
               }
             />
 

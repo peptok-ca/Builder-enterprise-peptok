@@ -5,25 +5,41 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import Logo from "@/components/ui/logo";
-import { Bell, Search, Menu, User, Settings, LogOut } from "lucide-react";
+import {
+  Bell,
+  Search,
+  Menu,
+  User,
+  Settings,
+  LogOut,
+  Shield,
+  Users,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
   userType?: "employee" | "expert" | "admin";
 }
 
-const Header = ({ userType = "employee" }: HeaderProps) => {
+const Header = ({ userType: propUserType }: HeaderProps) => {
   const location = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  // Use auth context user type if available, otherwise fall back to prop
+  const userType = user?.userType || propUserType || "employee";
 
   const isActive = (path: string) => location.pathname === path;
 
   const navigationItems = [
     {
       label: "Dashboard",
-      path: "/dashboard",
+      path: userType === "admin" ? "/admin" : "/dashboard",
       roles: ["employee", "expert", "admin"],
     },
     { label: "Experts", path: "/experts", roles: ["employee", "admin"] },
@@ -32,12 +48,33 @@ const Header = ({ userType = "employee" }: HeaderProps) => {
       path: "/connections",
       roles: ["employee", "expert"],
     },
-    { label: "Metrics", path: "/admin", roles: ["admin"] },
+    { label: "Company", path: "/admin", roles: ["admin"] },
   ];
 
   const filteredItems = navigationItems.filter((item) =>
     item.roles.includes(userType),
   );
+
+  const getUserInitials = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+    if (user?.name) {
+      const nameParts = user.name.split(" ");
+      return nameParts.length > 1
+        ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
+        : nameParts[0].substring(0, 2).toUpperCase();
+    }
+    return user?.email ? user.email.substring(0, 2).toUpperCase() : "U";
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -65,48 +102,115 @@ const Header = ({ userType = "employee" }: HeaderProps) => {
 
         {/* Actions */}
         <div className="flex items-center space-x-4">
-          {/* Search */}
-          <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-            <Search className="h-4 w-4" />
-          </Button>
-
-          {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-4 w-4" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 text-xs"></span>
-          </Button>
-
-          {/* User Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" />
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar>
+          {isAuthenticated ? (
+            <>
+              {/* Search */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden sm:inline-flex"
+              >
+                <Search className="h-4 w-4" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuItem asChild>
-                <Link to="/profile" className="flex items-center">
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/settings" className="flex items-center">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/login" className="flex items-center">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+
+              {/* Notifications */}
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-4 w-4" />
+                <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 text-xs"></span>
+              </Button>
+
+              {/* User Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={
+                          user?.picture ||
+                          `https://api.dicebear.com/7.x/initials/svg?seed=${user?.name || user?.email}`
+                        }
+                      />
+                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-64" align="end" forceMount>
+                  {/* User Info */}
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{user?.name || "User"}</p>
+                        <Badge variant="secondary" className="text-xs">
+                          {userType === "admin" ? (
+                            <>
+                              <Shield className="w-3 h-3 mr-1" />
+                              Admin
+                            </>
+                          ) : userType === "expert" ? (
+                            <>
+                              <Users className="w-3 h-3 mr-1" />
+                              Expert
+                            </>
+                          ) : (
+                            <>
+                              <User className="w-3 h-3 mr-1" />
+                              Employee
+                            </>
+                          )}
+                        </Badge>
+                      </div>
+                      <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        {user?.email}
+                      </p>
+                      {user?.provider && user.provider !== "email" && (
+                        <p className="text-xs text-muted-foreground">
+                          via{" "}
+                          {user.provider === "google" ? "Google" : "Microsoft"}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings" className="flex items-center">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem
+                    className="text-red-600 focus:text-red-600 cursor-pointer"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            /* Not authenticated - show login/signup buttons */
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" asChild>
+                <Link to="/login">Sign in</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/signup">Sign up</Link>
+              </Button>
+            </div>
+          )}
 
           {/* Mobile menu */}
           <Button variant="ghost" size="icon" className="md:hidden">

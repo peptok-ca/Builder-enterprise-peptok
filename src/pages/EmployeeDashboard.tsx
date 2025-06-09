@@ -60,6 +60,9 @@ const EmployeeDashboard = () => {
         // Fetch mentorship requests for the user's company
         const requests = await api.getMentorshipRequests();
         const connections = [];
+
+        setMentorshipRequests(requests || []);
+        setConnections(connections || []);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
         toast.error("Failed to load dashboard data");

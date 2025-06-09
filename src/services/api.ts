@@ -229,6 +229,49 @@ class ApiClient {
 // Create and export a singleton instance
 export const apiClient = new ApiClient();
 
+  // Mentorship Requests API
+  async getMentorshipRequests(filters: {
+    companyId?: string;
+    status?: string;
+  } = {}): Promise<any[]> {
+    const queryParams = new URLSearchParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, String(value));
+      }
+    });
+
+    const endpoint = `/mentorship-requests${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await this.request<any[]>(endpoint);
+    return response.data;
+  }
+
+  async getMentorshipRequest(id: string): Promise<any> {
+    const response = await this.request<any>(`/mentorship-requests/${id}`);
+    return response.data;
+  }
+
+  async createMentorshipRequest(data: any): Promise<any> {
+    const response = await this.request<any>('/mentorship-requests', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  }
+
+  async updateMentorshipRequest(id: string, data: any): Promise<any> {
+    const response = await this.request<any>(`/mentorship-requests/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  }
+}
+
+// Create and export a singleton instance
+export const apiClient = new ApiClient();
+
 // Export individual API functions for easier importing
 export const {
   getSkills,
@@ -246,6 +289,10 @@ export const {
   getRecentActivities,
   search,
   healthCheck,
+  getMentorshipRequests,
+  getMentorshipRequest,
+  createMentorshipRequest,
+  updateMentorshipRequest,
 } = apiClient;
 
 // Export types for external use

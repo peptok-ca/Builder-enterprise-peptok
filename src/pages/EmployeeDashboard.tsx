@@ -58,20 +58,8 @@ const EmployeeDashboard = () => {
         setIsLoading(true);
 
         // Fetch mentorship requests for the user's company
-        const requestsResponse = await apiClient.request<MentorshipRequest[]>(
-          "/mentorship-requests?status=active",
-        );
-        if (requestsResponse.success) {
-          setMentorshipRequests(requestsResponse.data);
-        }
-
-        // Fetch user's connections
-        const connectionsResponse = await apiClient.request<Connection[]>(
-          `/connections?employeeId=${user?.id}`,
-        );
-        if (connectionsResponse.success) {
-          setConnections(connectionsResponse.data);
-        }
+        const requests = await api.getMentorshipRequests();
+        const connections = [];
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
         toast.error("Failed to load dashboard data");

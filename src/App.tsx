@@ -15,6 +15,8 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import BusinessOnboarding from "./pages/onboarding/BusinessOnboarding";
 import CreateMentorshipRequest from "./pages/mentorship/CreateMentorshipRequest";
+import { MentorMatching } from "./pages/mentor/MentorMatching";
+import { MentorDashboard } from "./pages/mentor/MentorDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,21 +62,27 @@ const App = () => (
               }
             />
             <Route
-            <Route path="/mentorship/new" element={
-              <ProtectedRoute allowedRoles={['admin', 'employee']}>
-                <CreateMentorshipRequest />
-              </ProtectedRoute>
-            } />
-            <Route path="/mentorship/matching" element={
-              <ProtectedRoute allowedRoles={['admin', 'employee']}>
-                <MentorMatching />
-              </ProtectedRoute>
-            } />
-            <Route path="/mentor/dashboard" element={
-              <ProtectedRoute allowedRoles={['expert']}>
-                <MentorDashboard />
-              </ProtectedRoute>
-            } />
+              path="/mentorship/new"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "employee"]}>
+                  <CreateMentorshipRequest />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/mentorship/matching"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "employee"]}>
+                  <MentorMatching />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/mentor/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={["expert"]}>
+                  <MentorDashboard />
+                </ProtectedRoute>
               }
             />
 

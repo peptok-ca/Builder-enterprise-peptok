@@ -35,10 +35,18 @@ const Signup = () => {
     agreeToTerms: false,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log("Signup submitted:", formData);
+    // Here you would typically handle the signup logic
+    console.log("Signup attempt with:", { email, password, userType });
+
+    if (userType === "employee") {
+      // Individual employee signup - direct to dashboard
+      navigate("/dashboard");
+    } else {
+      // Business/company signup - redirect to business onboarding
+      navigate("/onboarding");
+    }
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {

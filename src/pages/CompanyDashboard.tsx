@@ -292,6 +292,13 @@ const CompanyDashboard = () => {
                     <SelectItem value="365">Last year</SelectItem>
                   </SelectContent>
                 </Select>
+                <Button
+                  onClick={() => navigate("/mentorship/new")}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Mentorship Request
+                </Button>
                 <Button variant="outline">
                   <Download className="h-4 w-4 mr-2" />
                   Export Report

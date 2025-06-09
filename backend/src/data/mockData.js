@@ -338,3 +338,223 @@ export const mockRecentActivities = [
     impact: "medium",
   },
 ];
+
+export const mockSubscriptionTiers = [
+  {
+    id: "starter",
+    name: "Starter",
+    description: "Perfect for small teams getting started with mentorship",
+    price: 49,
+    billingPeriod: "monthly",
+    userCap: 10,
+    supportLevel: "basic",
+    customizations: false,
+    analytics: "basic",
+    features: [
+      "Up to 10 team members",
+      "Basic mentor matching",
+      "Email support",
+      "Core analytics",
+      "Monthly progress reports",
+      "Basic goal tracking",
+    ],
+    metricsIncluded: [
+      "Employee satisfaction",
+      "Session completion rate",
+      "Basic engagement metrics",
+    ],
+  },
+  {
+    id: "growth",
+    name: "Growth",
+    description: "Ideal for growing companies with expanding mentorship needs",
+    price: 99,
+    billingPeriod: "monthly",
+    userCap: 50,
+    supportLevel: "premium",
+    customizations: true,
+    analytics: "advanced",
+    features: [
+      "Up to 50 team members",
+      "AI-powered mentor matching",
+      "Priority email & chat support",
+      "Advanced analytics dashboard",
+      "Weekly progress reports",
+      "Goal tracking with milestones",
+      "Custom mentorship programs",
+      "Team performance insights",
+      "Skills assessment tools",
+    ],
+    metricsIncluded: [
+      "Employee satisfaction",
+      "Session completion rate",
+      "Skill development progress",
+      "Team collaboration metrics",
+      "ROI tracking",
+      "Department comparisons",
+    ],
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    description: "Comprehensive solution for large organizations",
+    price: 0,
+    billingPeriod: "monthly",
+    userCap: 999999,
+    supportLevel: "enterprise",
+    customizations: true,
+    analytics: "enterprise",
+    features: [
+      "Unlimited team members",
+      "Dedicated success manager",
+      "24/7 priority support",
+      "Enterprise analytics suite",
+      "Real-time reporting",
+      "Advanced goal management",
+      "Custom integrations",
+      "White-label options",
+      "API access",
+      "SSO integration",
+      "Advanced security features",
+      "Custom mentor vetting",
+    ],
+    metricsIncluded: [
+      "All Growth metrics plus:",
+      "Custom KPI tracking",
+      "Predictive analytics",
+      "Benchmark comparisons",
+      "Executive dashboards",
+      "Multi-department insights",
+    ],
+  },
+];
+
+export const mockCompanyProfiles = [
+  {
+    id: "company-1",
+    name: "TechCorp",
+    industry: "Technology",
+    size: "medium",
+    website: "https://techcorp.com",
+    description: "Leading software development company",
+    adminUser: {
+      firstName: "Sarah",
+      lastName: "Johnson",
+      email: "sarah.johnson@techcorp.com",
+      phone: "+1 (555) 123-4567",
+      title: "Chief People Officer",
+    },
+    address: {
+      street: "123 Tech Street",
+      city: "San Francisco",
+      state: "CA",
+      zipCode: "94105",
+      country: "United States",
+    },
+    subscription: {
+      tierId: "growth",
+      status: "active",
+      currentPeriodStart: "2024-01-01T00:00:00Z",
+      currentPeriodEnd: "2024-02-01T00:00:00Z",
+      teamSize: 25,
+    },
+  },
+];
+
+export const mockMentorshipRequests = [
+  {
+    id: "request-1",
+    companyId: "company-1",
+    title: "Leadership Development for Senior Engineers",
+    description:
+      "We need to develop leadership skills in our senior engineering team to prepare them for management roles.",
+    goals: [
+      {
+        id: "goal-1",
+        title: "Improve team leadership skills",
+        description:
+          "Help senior engineers develop skills to lead technical teams effectively",
+        category: "leadership",
+        priority: "high",
+      },
+      {
+        id: "goal-2",
+        title: "Enhance communication abilities",
+        description:
+          "Improve cross-functional communication and stakeholder management",
+        category: "personal",
+        priority: "medium",
+      },
+    ],
+    metricsToTrack: [
+      "employee_satisfaction",
+      "skill_development",
+      "leadership_growth",
+    ],
+    teamMembers: [
+      {
+        id: "member-1",
+        email: "alex.chen@techcorp.com",
+        name: "Alex Chen",
+        role: "participant",
+        status: "accepted",
+        invitedAt: "2024-01-15T10:00:00Z",
+        acceptedAt: "2024-01-15T14:30:00Z",
+      },
+      {
+        id: "member-2",
+        email: "jordan.smith@techcorp.com",
+        name: "Jordan Smith",
+        role: "participant",
+        status: "invited",
+        invitedAt: "2024-01-16T09:00:00Z",
+      },
+    ],
+    preferredExpertise: [
+      "Leadership & Management",
+      "Technical Skills",
+      "Team Building",
+    ],
+    budget: {
+      min: 150,
+      max: 250,
+    },
+    timeline: {
+      startDate: "2024-02-01T00:00:00Z",
+      endDate: "2024-05-01T00:00:00Z",
+      sessionFrequency: "bi-weekly",
+    },
+    status: "active",
+    createdAt: "2024-01-15T08:00:00Z",
+    updatedAt: "2024-01-16T09:00:00Z",
+  },
+];
+
+export const mockTeamMembers = [
+  {
+    id: "member-1",
+    email: "alex.chen@techcorp.com",
+    name: "Alex Chen",
+    role: "participant",
+    status: "accepted",
+    invitedAt: "2024-01-15T10:00:00Z",
+    acceptedAt: "2024-01-15T14:30:00Z",
+  },
+  {
+    id: "member-2",
+    email: "jordan.smith@techcorp.com",
+    name: "Jordan Smith",
+    role: "participant",
+    status: "invited",
+    invitedAt: "2024-01-16T09:00:00Z",
+  },
+  {
+    id: "member-3",
+    email: "taylor.wilson@techcorp.com",
+    name: "Taylor Wilson",
+    role: "observer",
+    status: "accepted",
+    invitedAt: "2024-01-14T15:00:00Z",
+    acceptedAt: "2024-01-14T16:00:00Z",
+  },
+];

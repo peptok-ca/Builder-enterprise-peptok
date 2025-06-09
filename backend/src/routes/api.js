@@ -8,6 +8,10 @@ import {
   mockDashboardStats,
   mockDepartmentMetrics,
   mockRecentActivities,
+  mockSubscriptionTiers,
+  mockCompanyProfiles,
+  mockMentorshipRequests,
+  mockTeamMembers,
 } from "../data/mockData.js";
 
 const router = express.Router();
@@ -419,6 +423,330 @@ router.get("/search", async (req, res) => {
       success: true,
       data: results,
       query: q,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Subscription Tiers endpoints
+router.get("/subscription-tiers", async (req, res) => {
+  try {
+    await simulateDelay();
+    res.json({
+      success: true,
+      data: mockSubscriptionTiers,
+      total: mockSubscriptionTiers.length,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get("/subscription-tiers/:id", async (req, res) => {
+  try {
+    await simulateDelay();
+    const tier = mockSubscriptionTiers.find((t) => t.id === req.params.id);
+    if (!tier) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Subscription tier not found" });
+    }
+    res.json({ success: true, data: tier });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Company Profile endpoints
+router.get("/companies", async (req, res) => {
+  try {
+    await simulateDelay();
+    res.json({
+      success: true,
+      data: mockCompanyProfiles,
+      total: mockCompanyProfiles.length,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get("/companies/:id", async (req, res) => {
+  try {
+    await simulateDelay();
+    const company = mockCompanyProfiles.find((c) => c.id === req.params.id);
+    if (!company) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Company not found" });
+    }
+    res.json({ success: true, data: company });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Create company profile
+router.post("/companies", async (req, res) => {
+  try {
+    await simulateDelay();
+    const companyData = req.body;
+
+    const newCompany = {
+      id: `company-${Date.now()}`,
+      ...companyData,
+      subscription: {
+        ...companyData.subscription,
+        currentPeriodStart: new Date().toISOString(),
+        currentPeriodEnd: new Date(
+          Date.now() + 14 * 24 * 60 * 60 * 1000,
+        ).toISOString(), // 14 days trial
+        teamSize: 0,
+      },
+    };
+
+    mockCompanyProfiles.push(newCompany);
+
+    res.status(201).json({
+      success: true,
+      data: newCompany,
+      message: "Company profile created successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Mentorship Requests endpoints
+router.get("/mentorship-requests", async (req, res) => {
+  try {
+    await simulateDelay();
+    const { companyId, status } = req.query;
+    let filteredRequests = [...mockMentorshipRequests];
+
+    if (companyId) {
+      filteredRequests = filteredRequests.filter(
+        (req) => req.companyId === companyId,
+      );
+    }
+
+    if (status) {
+      filteredRequests = filteredRequests.filter(
+        (req) => req.status === status,
+      );
+    }
+
+    res.json({
+      success: true,
+      data: filteredRequests,
+      total: filteredRequests.length,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get("/mentorship-requests/:id", async (req, res) => {
+  try {
+    await simulateDelay();
+    const request = mockMentorshipRequests.find((r) => r.id === req.params.id);
+    if (!request) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Mentorship request not found" });
+    }
+    res.json({ success: true, data: request });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Create mentorship request
+router.post("/mentorship-requests", async (req, res) => {
+  try {
+    await simulateDelay();
+    const requestData = req.body;
+
+    const newRequest = {
+      id: `request-${Date.now()}`,
+      ...requestData,
+      status: "submitted",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockMentorshipRequests.push(newRequest);
+
+    res.status(201).json({
+      success: true,
+      data: newRequest,
+      message: "Mentorship request created successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update mentorship request
+router.put("/mentorship-requests/:id", async (req, res) => {
+  try {
+    await simulateDelay();
+    const requestIndex = mockMentorshipRequests.findIndex(
+      (r) => r.id === req.params.id,
+    );
+
+    if (requestIndex === -1) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Mentorship request not found" });
+    }
+
+    const updatedRequest = {
+      ...mockMentorshipRequests[requestIndex],
+      ...req.body,
+      updatedAt: new Date().toISOString(),
+    };
+
+    mockMentorshipRequests[requestIndex] = updatedRequest;
+
+    res.json({
+      success: true,
+      data: updatedRequest,
+      message: "Mentorship request updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Team Members endpoints
+router.get("/team-members", async (req, res) => {
+  try {
+    await simulateDelay();
+    const { companyId, requestId, status } = req.query;
+    let filteredMembers = [...mockTeamMembers];
+
+    if (status) {
+      filteredMembers = filteredMembers.filter(
+        (member) => member.status === status,
+      );
+    }
+
+    // In a real app, you'd filter by companyId or requestId
+
+    res.json({
+      success: true,
+      data: filteredMembers,
+      total: filteredMembers.length,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Invite team member
+router.post("/team-members/invite", async (req, res) => {
+  try {
+    await simulateDelay();
+    const { email, role, requestId } = req.body;
+
+    if (!email || !role) {
+      return res.status(400).json({
+        success: false,
+        error: "Email and role are required",
+      });
+    }
+
+    // Check if already invited
+    const existingMember = mockTeamMembers.find(
+      (m) => m.email.toLowerCase() === email.toLowerCase(),
+    );
+    if (existingMember) {
+      return res.status(400).json({
+        success: false,
+        error: "This email is already invited",
+      });
+    }
+
+    const newMember = {
+      id: `member-${Date.now()}`,
+      email: email.toLowerCase(),
+      role,
+      status: "invited",
+      invitedAt: new Date().toISOString(),
+    };
+
+    mockTeamMembers.push(newMember);
+
+    // Simulate sending invitation email
+    console.log(`Invitation email sent to ${email}`);
+
+    res.status(201).json({
+      success: true,
+      data: newMember,
+      message: `Invitation sent to ${email}`,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update team member
+router.put("/team-members/:id", async (req, res) => {
+  try {
+    await simulateDelay();
+    const memberIndex = mockTeamMembers.findIndex(
+      (m) => m.id === req.params.id,
+    );
+
+    if (memberIndex === -1) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Team member not found" });
+    }
+
+    const updatedMember = {
+      ...mockTeamMembers[memberIndex],
+      ...req.body,
+    };
+
+    if (req.body.status === "accepted" && !updatedMember.acceptedAt) {
+      updatedMember.acceptedAt = new Date().toISOString();
+    }
+
+    mockTeamMembers[memberIndex] = updatedMember;
+
+    res.json({
+      success: true,
+      data: updatedMember,
+      message: "Team member updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Remove team member
+router.delete("/team-members/:id", async (req, res) => {
+  try {
+    await simulateDelay();
+    const memberIndex = mockTeamMembers.findIndex(
+      (m) => m.id === req.params.id,
+    );
+
+    if (memberIndex === -1) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Team member not found" });
+    }
+
+    const removedMember = mockTeamMembers.splice(memberIndex, 1)[0];
+
+    res.json({
+      success: true,
+      data: removedMember,
+      message: "Team member removed successfully",
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

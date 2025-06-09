@@ -39,7 +39,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiClient } from "@/services/api";
+import { api } from "@/services/api";
 import { MentorshipRequest, Connection } from "@/types";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";

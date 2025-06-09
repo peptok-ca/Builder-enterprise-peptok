@@ -1,6 +1,8 @@
+import { useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import MetricsOverview from "@/components/metrics/MetricsOverview";
+import { MentorshipRequestProgress } from "@/components/mentorship/MentorshipRequestProgress";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -41,25 +43,57 @@ import {
   Globe,
   Shield,
   Zap,
+  Building2,
+  UserCheck,
+  BookOpen,
+  Activity,
 } from "lucide-react";
-import {
-  mockMetrics,
-  mockDashboardStats,
-  mockConnections,
-  mockExperts,
-} from "@/data/mockData";
+import { useAuth } from "@/contexts/AuthContext";
+import { apiClient } from "@/services/api";
+import { MentorshipRequest } from "@/types";
+import { toast } from "sonner";
 
 const CompanyDashboard = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [mentorshipRequests, setMentorshipRequests] = useState<
+    MentorshipRequest[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Fetch company's mentorship requests
+        const requestsResponse = await apiClient.request<MentorshipRequest[]>(
+          "/mentorship-requests",
+        );
+        if (requestsResponse.success) {
+          setMentorshipRequests(requestsResponse.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+        toast.error("Failed to load dashboard data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
 
   // Enhanced mock data
   const recentActivities = [
     {
       id: "1",
-      type: "new_connection",
-      user: "Alex Johnson",
-      expert: "Sarah Chen",
-      message: "New mentorship connection established",
+      type: "mentorship_request_created",
+      user: "Sarah Johnson",
+      message:
+        "Created new mentorship request: Leadership Development for Senior Engineers",
       timestamp: "2 hours ago",
       status: "success",
       impact: "high",
@@ -67,41 +101,39 @@ const CompanyDashboard = () => {
     {
       id: "2",
       type: "session_completed",
-      user: "Emily Davis",
-      expert: "Michael Rodriguez",
-      message: "Completed advanced data analysis session",
+      user: "Alex Johnson",
+      expert: "Sarah Chen",
+      message: "Completed leadership development session",
       timestamp: "4 hours ago",
       status: "success",
       impact: "medium",
     },
     {
       id: "3",
-      type: "goal_achieved",
-      user: "Alex Johnson",
-      expert: "Sarah Chen",
-      message: "Leadership Development milestone reached",
+      type: "team_member_invited",
+      user: "Maria Garcia",
+      message: "Invited 5 team members to mentorship program",
       timestamp: "1 day ago",
+      status: "success",
+      impact: "medium",
+    },
+    {
+      id: "4",
+      type: "goal_achieved",
+      user: "David Kim",
+      message: "Achieved quarterly development milestone",
+      timestamp: "2 days ago",
       status: "success",
       impact: "high",
     },
     {
-      id: "4",
-      type: "session_missed",
-      user: "Michael Park",
-      expert: "Jennifer Park",
-      message: "Scheduled session missed - follow-up required",
-      timestamp: "2 days ago",
-      status: "warning",
-      impact: "medium",
-    },
-    {
       id: "5",
-      type: "new_expert",
-      expert: "David Kim",
-      message: "New expert joined the platform",
+      type: "expert_matched",
+      expert: "Michael Rodriguez",
+      message: "New expert matched to data analytics program",
       timestamp: "3 days ago",
       status: "success",
-      impact: "low",
+      impact: "medium",
     },
   ];
 
@@ -116,6 +148,7 @@ const CompanyDashboard = () => {
         "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop&crop=face",
       trend: "up",
       points: 1850,
+      currentMentorship: "Leadership Development",
     },
     {
       name: "Emily Davis",
@@ -127,6 +160,7 @@ const CompanyDashboard = () => {
         "https://images.unsplash.com/photo-1494790108755-2616b9d3cc57?w=400&h=400&fit=crop&crop=face",
       trend: "up",
       points: 1650,
+      currentMentorship: "Data Science Mastery",
     },
     {
       name: "Michael Park",
@@ -136,8 +170,9 @@ const CompanyDashboard = () => {
       goals: 5,
       avatar:
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
-      trend: "down",
+      trend: "stable",
       points: 1200,
+      currentMentorship: "Product Strategy",
     },
     {
       name: "Sarah Williams",
@@ -149,6 +184,7 @@ const CompanyDashboard = () => {
         "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
       trend: "up",
       points: 1400,
+      currentMentorship: "Design Leadership",
     },
   ];
 
@@ -156,94 +192,80 @@ const CompanyDashboard = () => {
     {
       department: "Engineering",
       employees: 45,
-      engagement: 89,
+      activeConnections: 32,
+      completedSessions: 128,
       avgProgress: 78,
-      color: "from-blue-500 to-blue-600",
-    },
-    {
-      department: "Product",
-      employees: 23,
       engagement: 92,
-      avgProgress: 82,
-      color: "from-green-500 to-green-600",
-    },
-    {
-      department: "Design",
-      employees: 18,
-      engagement: 87,
-      avgProgress: 75,
-      color: "from-purple-500 to-purple-600",
+      requestsActive: 3,
     },
     {
       department: "Marketing",
-      employees: 32,
-      engagement: 85,
-      avgProgress: 71,
-      color: "from-pink-500 to-pink-600",
+      employees: 28,
+      activeConnections: 22,
+      completedSessions: 89,
+      avgProgress: 83,
+      engagement: 88,
+      requestsActive: 2,
     },
     {
       department: "Sales",
-      employees: 28,
-      engagement: 90,
-      avgProgress: 79,
-      color: "from-orange-500 to-orange-600",
+      employees: 35,
+      activeConnections: 28,
+      completedSessions: 145,
+      avgProgress: 71,
+      engagement: 85,
+      requestsActive: 2,
+    },
+    {
+      department: "Product",
+      employees: 22,
+      activeConnections: 18,
+      completedSessions: 76,
+      avgProgress: 89,
+      engagement: 94,
+      requestsActive: 1,
+    },
+    {
+      department: "Design",
+      employees: 12,
+      activeConnections: 9,
+      completedSessions: 42,
+      avgProgress: 91,
+      engagement: 96,
+      requestsActive: 1,
     },
   ];
 
-  const expertPerformance = [
-    {
-      name: "Sarah Chen",
-      specialty: "Leadership",
-      rating: 4.9,
-      sessions: 35,
-      students: 12,
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b9d3cc57?w=400&h=400&fit=crop&crop=face",
-      satisfaction: 98,
-      revenue: 12500,
-    },
-    {
-      name: "Michael Rodriguez",
-      specialty: "Data Science",
-      rating: 4.8,
-      sessions: 28,
-      students: 9,
-      avatar:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
-      satisfaction: 96,
-      revenue: 9800,
-    },
-    {
-      name: "Jennifer Park",
-      specialty: "Marketing",
-      rating: 4.9,
-      sessions: 42,
-      students: 15,
-      avatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
-      satisfaction: 97,
-      revenue: 15200,
-    },
-  ];
+  const companyMetrics = {
+    totalEmployees: 142,
+    activeConnections: 109,
+    totalRequests: mentorshipRequests.length,
+    activeRequests: mentorshipRequests.filter((r) => r.status === "active")
+      .length,
+    completedSessions: 480,
+    averageProgress: 83,
+    engagementRate: 91,
+    successRate: 94,
+  };
 
   const getActivityIcon = (type: string, status: string) => {
     if (status === "warning")
       return <AlertCircle className="h-4 w-4 text-yellow-500" />;
-    if (status === "success") {
-      switch (type) {
-        case "new_connection":
-          return <Users className="h-4 w-4 text-blue-500" />;
-        case "session_completed":
-          return <CheckCircle className="h-4 w-4 text-green-500" />;
-        case "goal_achieved":
-          return <Award className="h-4 w-4 text-purple-500" />;
-        case "new_expert":
-          return <Plus className="h-4 w-4 text-teal-500" />;
-        default:
-          return <CheckCircle className="h-4 w-4 text-green-500" />;
-      }
+
+    switch (type) {
+      case "mentorship_request_created":
+        return <Target className="h-4 w-4 text-blue-500" />;
+      case "session_completed":
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "team_member_invited":
+        return <Users className="h-4 w-4 text-purple-500" />;
+      case "goal_achieved":
+        return <Award className="h-4 w-4 text-orange-500" />;
+      case "expert_matched":
+        return <UserCheck className="h-4 w-4 text-teal-500" />;
+      default:
+        return <Activity className="h-4 w-4 text-blue-500" />;
     }
-    return <Clock className="h-4 w-4 text-blue-500" />;
   };
 
   const getImpactBadge = (impact: string) => {
@@ -310,28 +332,138 @@ const CompanyDashboard = () => {
               </div>
             </div>
 
-            {/* Enhanced Metrics Overview */}
-            <MetricsOverview metrics={mockMetrics} stats={mockDashboardStats} />
+            {/* Key Metrics Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Total Employees
+                      </p>
+                      <p className="text-3xl font-bold text-blue-600">
+                        {companyMetrics.totalEmployees}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        <span className="text-green-600">↗ 12%</span> vs last
+                        month
+                      </p>
+                    </div>
+                    <div className="p-3 bg-blue-100 rounded-full">
+                      <Building2 className="h-6 w-6 text-blue-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Active Mentorships
+                      </p>
+                      <p className="text-3xl font-bold text-green-600">
+                        {companyMetrics.activeConnections}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        <span className="text-green-600">↗ 8%</span> vs last
+                        month
+                      </p>
+                    </div>
+                    <div className="p-3 bg-green-100 rounded-full">
+                      <Users className="h-6 w-6 text-green-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Active Requests
+                      </p>
+                      <p className="text-3xl font-bold text-purple-600">
+                        {companyMetrics.activeRequests}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {companyMetrics.totalRequests} total created
+                      </p>
+                    </div>
+                    <div className="p-3 bg-purple-100 rounded-full">
+                      <Target className="h-6 w-6 text-purple-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Success Rate
+                      </p>
+                      <p className="text-3xl font-bold text-orange-600">
+                        {companyMetrics.successRate}%
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        <span className="text-green-600">↗ 3%</span> vs last
+                        month
+                      </p>
+                    </div>
+                    <div className="p-3 bg-orange-100 rounded-full">
+                      <Award className="h-6 w-6 text-orange-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Main Dashboard Tabs */}
             <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="employees">Employees</TabsTrigger>
-                <TabsTrigger value="experts">Experts</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                <TabsTrigger value="insights">Insights</TabsTrigger>
+              <TabsList className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+                <TabsTrigger
+                  value="overview"
+                  className="flex items-center gap-2"
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger
+                  value="requests"
+                  className="flex items-center gap-2"
+                >
+                  <Target className="w-4 h-4" />
+                  Mentorship Requests
+                </TabsTrigger>
+                <TabsTrigger
+                  value="departments"
+                  className="flex items-center gap-2"
+                >
+                  <Building2 className="w-4 h-4" />
+                  Departments
+                </TabsTrigger>
+                <TabsTrigger
+                  value="analytics"
+                  className="flex items-center gap-2"
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  Analytics
+                </TabsTrigger>
               </TabsList>
 
+              {/* Overview Tab */}
               <TabsContent value="overview" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Recent Activity */}
                   <div className="lg:col-span-2">
-                    <Card>
-                      <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle className="flex items-center space-x-2">
-                          <Clock className="h-5 w-5 text-blue-600" />
-                          <span>Recent Activity</span>
+                    <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg h-full">
+                      <CardHeader className="flex flex-row items-center justify-between pb-4">
+                        <CardTitle className="text-xl">
+                          Recent Activity
                         </CardTitle>
                         <Button variant="outline" size="sm">
                           <Filter className="h-4 w-4 mr-2" />
@@ -361,8 +493,8 @@ const CompanyDashboard = () => {
                               </div>
                               {activity.user && (
                                 <p className="text-xs text-muted-foreground mt-1">
-                                  {activity.user}{" "}
-                                  {activity.expert && `• ${activity.expert}`}
+                                  {activity.user}
+                                  {activity.expert && ` • ${activity.expert}`}
                                 </p>
                               )}
                               <p className="text-xs text-muted-foreground">
@@ -379,31 +511,25 @@ const CompanyDashboard = () => {
                   </div>
 
                   {/* Top Performers */}
-                  <Card>
+                  <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
                     <CardHeader>
                       <CardTitle className="flex items-center space-x-2">
                         <Award className="h-5 w-5 text-yellow-600" />
                         <span>Top Performers</span>
                       </CardTitle>
-                      <CardDescription>
-                        Employees with highest engagement this month
-                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {topPerformers.slice(0, 5).map((performer, index) => (
+                      {topPerformers.map((performer, index) => (
                         <div
                           key={performer.name}
-                          className="flex items-center space-x-3"
+                          className="flex items-center justify-between space-x-3"
                         >
-                          <div className="flex items-center space-x-2 flex-1">
-                            <span className="text-sm font-medium text-muted-foreground w-6">
+                          <div className="flex items-center space-x-3">
+                            <div className="text-sm font-bold text-muted-foreground w-4">
                               #{index + 1}
-                            </span>
-                            <Avatar className="h-10 w-10">
-                              <AvatarImage
-                                src={performer.avatar}
-                                alt={performer.name}
-                              />
+                            </div>
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={performer.avatar} />
                               <AvatarFallback>
                                 {performer.name
                                   .split(" ")
@@ -417,6 +543,9 @@ const CompanyDashboard = () => {
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {performer.department}
+                              </p>
+                              <p className="text-xs text-blue-600">
+                                {performer.currentMentorship}
                               </p>
                             </div>
                           </div>
@@ -442,7 +571,7 @@ const CompanyDashboard = () => {
                 </div>
 
                 {/* Department Performance */}
-                <Card>
+                <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <BarChart3 className="h-5 w-5 text-purple-600" />
@@ -466,6 +595,7 @@ const CompanyDashboard = () => {
                                   {dept.employees}
                                 </Badge>
                               </div>
+
                               <div className="space-y-2">
                                 <div className="flex justify-between text-xs">
                                   <span>Engagement</span>
@@ -476,6 +606,7 @@ const CompanyDashboard = () => {
                                   className="h-1"
                                 />
                               </div>
+
                               <div className="space-y-2">
                                 <div className="flex justify-between text-xs">
                                   <span>Avg Progress</span>
@@ -486,6 +617,13 @@ const CompanyDashboard = () => {
                                   className="h-1"
                                 />
                               </div>
+
+                              <div className="flex items-center justify-between text-xs">
+                                <span>Active Requests</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {dept.requestsActive}
+                                </Badge>
+                              </div>
                             </div>
                           </CardContent>
                         </Card>
@@ -495,335 +633,124 @@ const CompanyDashboard = () => {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="employees" className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-semibold">
-                    Employee Management
-                  </h3>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Employee
-                  </Button>
-                </div>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Employee Overview</CardTitle>
-                    <CardDescription>
-                      Manage employee participation and track individual
-                      progress
-                    </CardDescription>
+              {/* Mentorship Requests Tab */}
+              <TabsContent value="requests" className="space-y-6">
+                <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Target className="w-5 h-5" />
+                        Mentorship Requests Management
+                      </CardTitle>
+                      <CardDescription>
+                        Create and manage mentorship programs for your
+                        organization
+                      </CardDescription>
+                    </div>
+                    <Button onClick={() => navigate("/mentorship/new")}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create New Request
+                    </Button>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {topPerformers.map((employee) => (
-                        <div
-                          key={employee.name}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition-all duration-200"
-                        >
-                          <div className="flex items-center space-x-4">
-                            <Avatar className="h-12 w-12">
-                              <AvatarImage
-                                src={employee.avatar}
-                                alt={employee.name}
-                              />
-                              <AvatarFallback>
-                                {employee.name
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-medium">{employee.name}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {employee.department}
-                              </p>
-                              <div className="flex items-center space-x-4 mt-1 text-xs text-muted-foreground">
-                                <span>{employee.sessions} sessions</span>
-                                <span>{employee.goals} goals</span>
-                                <span>{employee.points} points</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-4">
-                            <div className="text-right">
-                              <p className="text-sm font-medium">
-                                {employee.progress}% complete
-                              </p>
-                              <div className="flex items-center space-x-1 mt-1">
-                                <Progress
-                                  value={employee.progress}
-                                  className="w-20 h-2"
-                                />
-                                {employee.trend === "up" ? (
-                                  <ArrowUpRight className="h-3 w-3 text-green-500" />
-                                ) : (
-                                  <ArrowDownRight className="h-3 w-3 text-red-500" />
-                                )}
-                              </div>
-                            </div>
-                            <Button variant="outline" size="sm">
-                              View Details
-                            </Button>
+                    {isLoading ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                        <p className="text-muted-foreground mt-2">
+                          Loading mentorship requests...
+                        </p>
+                      </div>
+                    ) : (
+                      <MentorshipRequestProgress
+                        requests={mentorshipRequests}
+                        showCreateButton={mentorshipRequests.length === 0}
+                        viewMode="admin"
+                      />
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Departments Tab */}
+              <TabsContent value="departments" className="space-y-6">
+                <div className="grid gap-6">
+                  {departmentStats.map((dept) => (
+                    <Card
+                      key={dept.department}
+                      className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg"
+                    >
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="flex items-center gap-2">
+                            <Building2 className="w-5 h-5" />
+                            {dept.department} Department
+                          </CardTitle>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline">
+                              {dept.employees} employees
+                            </Badge>
+                            <Badge variant="secondary">
+                              {dept.activeConnections} active mentorships
+                            </Badge>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="experts" className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-semibold">Expert Network</h3>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Invite Expert
-                  </Button>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              Engagement Rate
+                            </p>
+                            <p className="text-2xl font-bold text-green-600">
+                              {dept.engagement}%
+                            </p>
+                            <Progress
+                              value={dept.engagement}
+                              className="mt-2 h-2"
+                            />
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              Average Progress
+                            </p>
+                            <p className="text-2xl font-bold text-blue-600">
+                              {dept.avgProgress}%
+                            </p>
+                            <Progress
+                              value={dept.avgProgress}
+                              className="mt-2 h-2"
+                            />
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              Sessions Completed
+                            </p>
+                            <p className="text-2xl font-bold text-purple-600">
+                              {dept.completedSessions}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              Active Requests
+                            </p>
+                            <p className="text-2xl font-bold text-orange-600">
+                              {dept.requestsActive}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Expert Performance</CardTitle>
-                    <CardDescription>
-                      Monitor expert availability, performance, and student
-                      satisfaction
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {expertPerformance.map((expert) => (
-                        <Card
-                          key={expert.name}
-                          className="hover:shadow-lg transition-all duration-200"
-                        >
-                          <CardContent className="p-6">
-                            <div className="flex items-center space-x-4 mb-4">
-                              <Avatar className="h-16 w-16">
-                                <AvatarImage
-                                  src={expert.avatar}
-                                  alt={expert.name}
-                                />
-                                <AvatarFallback>
-                                  {expert.name
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <h4 className="font-semibold">{expert.name}</h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {expert.specialty}
-                                </p>
-                                <div className="flex items-center space-x-1 mt-1">
-                                  <div className="flex space-x-1">
-                                    {Array.from({ length: 5 }).map((_, i) => (
-                                      <div
-                                        key={i}
-                                        className={`h-2 w-2 rounded-full ${i < Math.floor(expert.rating) ? "bg-yellow-400" : "bg-gray-200"}`}
-                                      />
-                                    ))}
-                                  </div>
-                                  <span className="text-xs font-medium">
-                                    {expert.rating}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="space-y-3">
-                              <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                  Sessions
-                                </span>
-                                <span className="font-medium">
-                                  {expert.sessions}
-                                </span>
-                              </div>
-                              <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                  Students
-                                </span>
-                                <span className="font-medium">
-                                  {expert.students}
-                                </span>
-                              </div>
-                              <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                  Satisfaction
-                                </span>
-                                <span className="font-medium">
-                                  {expert.satisfaction}%
-                                </span>
-                              </div>
-                              <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                  Revenue
-                                </span>
-                                <span className="font-medium">
-                                  ${expert.revenue.toLocaleString()}
-                                </span>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
               </TabsContent>
 
+              {/* Analytics Tab */}
               <TabsContent value="analytics" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Engagement Trends</CardTitle>
-                      <CardDescription>
-                        Employee participation over time
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-64">
-                      <div className="h-full flex items-center justify-center text-muted-foreground">
-                        <div className="text-center space-y-2">
-                          <TrendingUp className="h-12 w-12 mx-auto" />
-                          <p>Analytics chart would be rendered here</p>
-                          <p className="text-sm">
-                            Integration with charting library needed
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Skill Development</CardTitle>
-                      <CardDescription>
-                        Progress across different skill areas
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-64">
-                      <div className="h-full flex items-center justify-center text-muted-foreground">
-                        <div className="text-center space-y-2">
-                          <BarChart3 className="h-12 w-12 mx-auto" />
-                          <p>Skill development chart would be rendered here</p>
-                          <p className="text-sm">
-                            Integration with charting library needed
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>ROI Analysis</CardTitle>
-                      <CardDescription>
-                        Return on investment metrics
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-64">
-                      <div className="h-full flex items-center justify-center text-muted-foreground">
-                        <div className="text-center space-y-2">
-                          <Target className="h-12 w-12 mx-auto" />
-                          <p>ROI analysis chart would be rendered here</p>
-                          <p className="text-sm">
-                            Financial impact visualization
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Global Reach</CardTitle>
-                      <CardDescription>
-                        Geographic distribution of users
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-64">
-                      <div className="h-full flex items-center justify-center text-muted-foreground">
-                        <div className="text-center space-y-2">
-                          <Globe className="h-12 w-12 mx-auto" />
-                          <p>World map visualization would be rendered here</p>
-                          <p className="text-sm">Geographic analytics</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="insights" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-blue-200 rounded-full">
-                          <Zap className="h-6 w-6 text-blue-700" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-blue-900 mb-2">
-                            AI Insight
-                          </h4>
-                          <p className="text-sm text-blue-800">
-                            Engineering department shows 23% higher engagement
-                            when paired with technical experts vs. general
-                            leadership mentors.
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-green-200 rounded-full">
-                          <TrendingUp className="h-6 w-6 text-green-700" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-green-900 mb-2">
-                            Growth Opportunity
-                          </h4>
-                          <p className="text-sm text-green-800">
-                            Adding 3 more marketing experts could improve
-                            marketing team engagement by an estimated 15%.
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-purple-200 rounded-full">
-                          <Award className="h-6 w-6 text-purple-700" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-purple-900 mb-2">
-                            Success Pattern
-                          </h4>
-                          <p className="text-sm text-purple-800">
-                            Employees with 2+ mentors show 40% better goal
-                            completion rates compared to single-mentor
-                            relationships.
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                <MetricsOverview />
               </TabsContent>
             </Tabs>
           </div>
         </main>
-
-        <Footer />
       </div>
     </div>
   );

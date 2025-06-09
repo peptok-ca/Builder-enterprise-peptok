@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import ConnectionCard from "@/components/connection/ConnectionCard";
+import { MentorshipRequestProgress } from "@/components/mentorship/MentorshipRequestProgress";
 import {
   Card,
   CardContent,
@@ -13,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Calendar,
   Users,
@@ -31,17 +33,59 @@ import {
   Bell,
   Filter,
   ArrowRight,
+  AlertCircle,
+  Zap,
+  BookMarked,
+  UserCheck,
 } from "lucide-react";
-import { mockConnections, mockEmployees } from "@/data/mockData";
+import { useAuth } from "@/contexts/AuthContext";
+import { apiClient } from "@/services/api";
+import { MentorshipRequest, Connection } from "@/types";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const EmployeeDashboard = () => {
-  const employee = mockEmployees[0]; // Mock current user
-  const userConnections = mockConnections.filter(
-    (conn) => conn.employee.id === employee.id,
-  );
+  const { user } = useAuth();
+  const [mentorshipRequests, setMentorshipRequests] = useState<
+    MentorshipRequest[]
+  >([]);
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data for enhanced dashboard
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Fetch mentorship requests for the user's company
+        const requestsResponse = await apiClient.request<MentorshipRequest[]>(
+          "/mentorship-requests?status=active",
+        );
+        if (requestsResponse.success) {
+          setMentorshipRequests(requestsResponse.data);
+        }
+
+        // Fetch user's connections
+        const connectionsResponse = await apiClient.request<Connection[]>(
+          `/connections?employeeId=${user?.id}`,
+        );
+        if (connectionsResponse.success) {
+          setConnections(connectionsResponse.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+        toast.error("Failed to load dashboard data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
+
+  // Mock data for enhanced dashboard features
   const upcomingSessions = [
     {
       id: "1",
@@ -53,6 +97,7 @@ const EmployeeDashboard = () => {
       type: "video",
       duration: "60 min",
       status: "confirmed",
+      mentorshipRequestId: "request-1",
     },
     {
       id: "2",
@@ -61,20 +106,10 @@ const EmployeeDashboard = () => {
         "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
       date: "Tomorrow, 10:00 AM",
       topic: "Data Analysis Best Practices",
-      type: "in-person",
+      type: "video",
       duration: "45 min",
       status: "pending",
-    },
-    {
-      id: "3",
-      expertName: "Jennifer Park",
-      expertAvatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
-      date: "Friday, 3:00 PM",
-      topic: "Marketing Strategy Review",
-      type: "video",
-      duration: "30 min",
-      status: "confirmed",
+      mentorshipRequestId: "request-1",
     },
   ];
 
@@ -99,549 +134,604 @@ const EmployeeDashboard = () => {
     },
     {
       id: "3",
-      title: "Skill Assessment Completed",
-      description: "Scored 85% on advanced data analysis assessment",
+      title: "Goal Achievement",
+      description: "Reached leadership development milestone",
       date: "2 weeks ago",
-      type: "assessment",
+      type: "goal",
       points: 150,
-      icon: BarChart3,
+      icon: Target,
     },
   ];
 
   const learningPaths = [
     {
       id: "1",
-      title: "Advanced Leadership",
-      description: "Develop executive leadership skills",
+      title: "Leadership Excellence",
+      description: "Develop essential leadership skills",
       progress: 75,
-      totalModules: 12,
-      completedModules: 9,
-      estimatedTime: "3 weeks",
-      difficulty: "Advanced",
-      mentor: "Sarah Chen",
+      totalModules: 8,
+      completedModules: 6,
+      estimatedTime: "2 weeks remaining",
+      category: "Management",
+      difficulty: "Intermediate",
     },
     {
       id: "2",
-      title: "Data Science Mastery",
-      description: "Master data analysis and visualization",
+      title: "Data-Driven Decision Making",
+      description: "Master analytics and data interpretation",
       progress: 45,
-      totalModules: 15,
-      completedModules: 7,
-      estimatedTime: "6 weeks",
-      difficulty: "Intermediate",
-      mentor: "Michael Rodriguez",
+      totalModules: 6,
+      completedModules: 3,
+      estimatedTime: "3 weeks remaining",
+      category: "Analytics",
+      difficulty: "Advanced",
     },
   ];
 
-  const skillProgress = [
-    { skill: "Leadership", current: 78, target: 85, trend: "+8%" },
-    { skill: "Data Analysis", current: 65, target: 80, trend: "+12%" },
-    { skill: "Communication", current: 82, target: 90, trend: "+5%" },
-    { skill: "Project Management", current: 70, target: 85, trend: "+15%" },
-  ];
-
-  const totalPoints = recentAchievements.reduce(
-    (sum, achievement) => sum + achievement.points,
-    0,
-  );
-  const totalSessions = userConnections.reduce(
-    (sum, conn) => sum + conn.sessionsCompleted,
-    0,
-  );
-  const avgProgress =
-    userConnections.length > 0
-      ? userConnections.reduce((sum, conn) => sum + conn.progress, 0) /
-        userConnections.length
-      : 0;
+  const quickStats = {
+    totalSessions: connections.reduce(
+      (acc, conn) => acc + (conn.totalSessions || 0),
+      0,
+    ),
+    completedGoals: 3,
+    currentPoints: 1250,
+    currentLevel: "Advanced",
+    activeConnections: connections.filter((conn) => conn.status === "active")
+      .length,
+    upcomingSessionsCount: upcomingSessions.length,
+  };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Enhanced Background */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-white to-blue-100/30"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-600/5 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-blue-100/30">
+      {/* Floating Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-cyan-200/30 rounded-full blur-2xl transform -translate-x-1/2 -translate-y-1/2"></div>
       </div>
 
-      <div className="relative z-10">
-        <Header userType="employee" />
+      <Header />
 
-        <main className="container py-8">
-          <div className="space-y-8">
-            {/* Enhanced Welcome Header */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-                    Welcome back, {employee.name}!
-                  </h1>
-                  <div className="flex items-center space-x-1">
-                    <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                    <span className="text-sm font-medium text-yellow-600">
-                      {totalPoints} pts
-                    </span>
-                  </div>
+      <div className="relative container mx-auto px-4 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Welcome back,{" "}
+                {user?.firstName || user?.name?.split(" ")[0] || "there"}!
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Track your mentorship progress and continue your learning
+                journey
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="backdrop-blur-sm bg-white/80"
+              >
+                <Bell className="w-4 h-4 mr-2" />
+                Notifications
+              </Button>
+              <Button className="backdrop-blur-sm bg-primary/90 hover:bg-primary shadow-lg">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Messages
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Active Mentorships
+                  </p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {quickStats.activeConnections}
+                  </p>
                 </div>
-                <p className="text-xl text-muted-foreground">
-                  Here's your mentorship journey at a glance. You're doing
-                  great!
-                </p>
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Users className="w-6 h-6 text-blue-600" />
+                </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <Button variant="outline" size="sm">
-                  <Bell className="h-4 w-4 mr-2" />
-                  Notifications
-                  <Badge
-                    variant="destructive"
-                    className="ml-2 h-5 w-5 rounded-full p-0 text-xs"
-                  >
-                    3
-                  </Badge>
-                </Button>
-                <Button asChild>
-                  <Link to="/experts">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Find Mentor
+            </CardContent>
+          </Card>
+
+          <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Sessions Completed
+                  </p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {quickStats.totalSessions}
+                  </p>
+                </div>
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Current Points
+                  </p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {quickStats.currentPoints}
+                  </p>
+                </div>
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Zap className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Current Level</p>
+                  <p className="text-2xl font-bold text-orange-600">
+                    {quickStats.currentLevel}
+                  </p>
+                </div>
+                <div className="p-2 bg-orange-100 rounded-lg">
+                  <Award className="w-6 h-6 text-orange-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Dashboard Tabs */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="mentorships"
+              className="flex items-center gap-2"
+            >
+              <Users className="w-4 h-4" />
+              My Mentorships
+            </TabsTrigger>
+            <TabsTrigger value="learning" className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              Learning Paths
+            </TabsTrigger>
+            <TabsTrigger value="sessions" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Sessions
+            </TabsTrigger>
+            <TabsTrigger
+              value="achievements"
+              className="flex items-center gap-2"
+            >
+              <Award className="w-4 h-4" />
+              Achievements
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            {/* Mentorship Requests Progress */}
+            <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="w-5 h-5" />
+                    Company Mentorship Requests
+                  </CardTitle>
+                  <CardDescription>
+                    Track progress of mentorship programs your company has
+                    initiated
+                  </CardDescription>
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/mentorship/new">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Suggest Request
                   </Link>
                 </Button>
-              </div>
-            </div>
-
-            {/* Enhanced Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-2xl font-bold text-blue-700">
-                        {userConnections.length}
-                      </p>
-                      <p className="text-sm text-blue-600">Active Mentors</p>
-                    </div>
-                    <div className="p-3 bg-blue-200 rounded-full">
-                      <Users className="h-6 w-6 text-blue-700" />
-                    </div>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                    <p className="text-muted-foreground mt-2">
+                      Loading mentorship requests...
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
+                ) : (
+                  <MentorshipRequestProgress
+                    requests={mentorshipRequests}
+                    viewMode="employee"
+                  />
+                )}
+              </CardContent>
+            </Card>
 
-              <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-2xl font-bold text-green-700">
-                        {totalSessions}
-                      </p>
-                      <p className="text-sm text-green-600">
-                        Sessions Completed
-                      </p>
-                    </div>
-                    <div className="p-3 bg-green-200 rounded-full">
-                      <Calendar className="h-6 w-6 text-green-700" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-2xl font-bold text-purple-700">
-                        {Math.round(avgProgress)}%
-                      </p>
-                      <p className="text-sm text-purple-600">Avg Progress</p>
-                    </div>
-                    <div className="p-3 bg-purple-200 rounded-full">
-                      <Target className="h-6 w-6 text-purple-700" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-2xl font-bold text-orange-700">
-                        {totalPoints}
-                      </p>
-                      <p className="text-sm text-orange-600">Total Points</p>
-                    </div>
-                    <div className="p-3 bg-orange-200 rounded-full">
-                      <Award className="h-6 w-6 text-orange-700" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Main Dashboard Content */}
-            <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="mentors">Mentors</TabsTrigger>
-                <TabsTrigger value="learning">Learning</TabsTrigger>
-                <TabsTrigger value="progress">Progress</TabsTrigger>
-                <TabsTrigger value="achievements">Achievements</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* Main Content */}
-                  <div className="lg:col-span-2 space-y-6">
-                    {/* Upcoming Sessions */}
-                    <Card>
-                      <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle className="flex items-center space-x-2">
-                          <Clock className="h-5 w-5 text-blue-600" />
-                          <span>Upcoming Sessions</span>
-                        </CardTitle>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to="/schedule">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            Schedule New
-                          </Link>
-                        </Button>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {upcomingSessions.map((session) => (
-                          <div
-                            key={session.id}
-                            className="flex items-start space-x-4 p-4 rounded-lg border bg-card hover:shadow-md transition-all duration-200"
-                          >
-                            <Avatar className="h-12 w-12">
-                              <AvatarImage
-                                src={session.expertAvatar}
-                                alt={session.expertName}
-                              />
-                              <AvatarFallback>
-                                {session.expertName
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between">
-                                <p className="font-semibold">
-                                  {session.expertName}
-                                </p>
-                                <Badge
-                                  variant={
-                                    session.status === "confirmed"
-                                      ? "default"
-                                      : "secondary"
-                                  }
-                                >
-                                  {session.status}
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-muted-foreground">
-                                {session.topic}
-                              </p>
-                              <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
-                                <span className="flex items-center space-x-1">
-                                  <Calendar className="h-3 w-3" />
-                                  <span>{session.date}</span>
-                                </span>
-                                <span className="flex items-center space-x-1">
-                                  <Clock className="h-3 w-3" />
-                                  <span>{session.duration}</span>
-                                </span>
-                                <span className="flex items-center space-x-1">
-                                  {session.type === "video" ? (
-                                    <Video className="h-3 w-3" />
-                                  ) : (
-                                    <Users className="h-3 w-3" />
-                                  )}
-                                  <span>{session.type}</span>
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                              <Button size="sm" variant="outline">
-                                <MessageSquare className="h-3 w-3 mr-1" />
-                                Message
-                              </Button>
-                              {session.type === "video" && (
-                                <Button size="sm" variant="default">
-                                  <Video className="h-3 w-3 mr-1" />
-                                  Join
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </CardContent>
-                    </Card>
-
-                    {/* Learning Paths */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center space-x-2">
-                          <BookOpen className="h-5 w-5 text-green-600" />
-                          <span>Learning Paths</span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {learningPaths.map((path) => (
-                          <div
-                            key={path.id}
-                            className="p-4 rounded-lg border bg-card hover:shadow-md transition-all duration-200"
-                          >
-                            <div className="flex items-start justify-between mb-3">
-                              <div>
-                                <h4 className="font-semibold">{path.title}</h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {path.description}
-                                </p>
-                              </div>
-                              <Badge variant="outline">{path.difficulty}</Badge>
-                            </div>
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-sm">
-                                <span>
-                                  {path.completedModules} of {path.totalModules}{" "}
-                                  modules
-                                </span>
-                                <span>{path.progress}% complete</span>
-                              </div>
-                              <Progress value={path.progress} className="h-2" />
-                            </div>
-                            <div className="flex items-center justify-between mt-3">
-                              <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                                <span>Est. {path.estimatedTime}</span>
-                                <span>Mentor: {path.mentor}</span>
-                              </div>
-                              <Button size="sm" variant="outline">
-                                Continue
-                                <ArrowRight className="h-3 w-3 ml-1" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Sidebar */}
-                  <div className="space-y-6">
-                    {/* Recent Achievements */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center space-x-2">
-                          <Award className="h-5 w-5 text-yellow-600" />
-                          <span>Recent Achievements</span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {recentAchievements.map((achievement) => {
-                          const Icon = achievement.icon;
-                          return (
-                            <div
-                              key={achievement.id}
-                              className="flex items-start space-x-3 p-3 rounded-lg bg-muted/50"
-                            >
-                              <div className="p-2 bg-yellow-100 rounded-full">
-                                <Icon className="h-4 w-4 text-yellow-600" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm">
-                                  {achievement.title}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {achievement.description}
-                                </p>
-                                <div className="flex items-center justify-between mt-1">
-                                  <span className="text-xs text-muted-foreground">
-                                    {achievement.date}
-                                  </span>
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-xs"
-                                  >
-                                    +{achievement.points} pts
-                                  </Badge>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </CardContent>
-                    </Card>
-
-                    {/* Quick Actions */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Quick Actions</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start"
-                          size="sm"
-                        >
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                          Message a Mentor
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start"
-                          size="sm"
-                        >
-                          <Calendar className="h-4 w-4 mr-2" />
-                          Schedule Session
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start"
-                          size="sm"
-                        >
-                          <BookOpen className="h-4 w-4 mr-2" />
-                          Browse Resources
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start"
-                          size="sm"
-                        >
-                          <Target className="h-4 w-4 mr-2" />
-                          Update Goals
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="mentors" className="space-y-6">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-2xl font-semibold">Your Mentors</h3>
-                    <Button asChild>
-                      <Link to="/experts">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Find New Mentor
-                      </Link>
-                    </Button>
-                  </div>
-
-                  {userConnections.length === 0 ? (
-                    <Card>
-                      <CardContent className="p-12 text-center">
-                        <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold mb-2">
-                          No active mentors yet
-                        </h3>
-                        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                          Start your mentorship journey by connecting with an
-                          expert who can help you achieve your goals.
-                        </p>
-                        <Button asChild size="lg">
-                          <Link to="/experts">Browse Experts</Link>
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {userConnections.map((connection) => (
-                        <ConnectionCard
-                          key={connection.id}
-                          connection={connection}
-                          viewType="employee"
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="progress" className="space-y-6">
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-semibold">Progress Tracking</h3>
-
-                  {/* Skill Progress */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Skill Development</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      {skillProgress.map((skill, index) => (
-                        <div key={index} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">{skill.skill}</span>
-                            <div className="flex items-center space-x-2">
-                              <Badge
-                                variant="secondary"
-                                className="text-green-700 bg-green-100"
-                              >
-                                {skill.trend}
-                              </Badge>
+            {/* Upcoming Sessions */}
+            <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5" />
+                  Upcoming Sessions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {upcomingSessions.length > 0 ? (
+                  <div className="space-y-4">
+                    {upcomingSessions.map((session) => (
+                      <div
+                        key={session.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={session.expertAvatar} />
+                            <AvatarFallback>
+                              {session.expertName
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h4 className="font-medium">{session.topic}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              with {session.expertName} • {session.duration}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Clock className="w-3 h-3 text-muted-foreground" />
                               <span className="text-sm text-muted-foreground">
-                                {skill.current}% / {skill.target}%
+                                {session.date}
                               </span>
-                            </div>
-                          </div>
-                          <div className="space-y-1">
-                            <Progress value={skill.current} className="h-2" />
-                            <div className="w-full bg-muted h-1 rounded-full relative">
-                              <div
-                                className="absolute top-0 h-1 w-0.5 bg-red-500 rounded-full"
-                                style={{ left: `${skill.target}%` }}
-                              />
+                              <Badge
+                                variant={
+                                  session.type === "video"
+                                    ? "default"
+                                    : "secondary"
+                                }
+                                className="text-xs"
+                              >
+                                {session.type === "video" ? (
+                                  <>
+                                    <Video className="w-3 h-3 mr-1" />
+                                    Video
+                                  </>
+                                ) : (
+                                  <>
+                                    <Users className="w-3 h-3 mr-1" />
+                                    In-person
+                                  </>
+                                )}
+                              </Badge>
                             </div>
                           </div>
                         </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="achievements" className="space-y-6">
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-semibold">
-                    Achievements & Rewards
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {recentAchievements.map((achievement) => {
-                      const Icon = achievement.icon;
-                      return (
-                        <Card
-                          key={achievement.id}
-                          className="hover:shadow-lg transition-all duration-300"
-                        >
-                          <CardContent className="p-6 text-center">
-                            <div className="p-4 bg-yellow-100 rounded-full w-fit mx-auto mb-4">
-                              <Icon className="h-8 w-8 text-yellow-600" />
-                            </div>
-                            <h4 className="font-semibold mb-2">
-                              {achievement.title}
-                            </h4>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              {achievement.description}
-                            </p>
-                            <Badge
-                              variant="secondary"
-                              className="text-yellow-700 bg-yellow-100"
-                            >
-                              +{achievement.points} points
-                            </Badge>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={
+                              session.status === "confirmed"
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
+                            {session.status}
+                          </Badge>
+                          <Button size="sm">Join</Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </main>
+                ) : (
+                  <div className="text-center py-8">
+                    <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">
+                      No upcoming sessions scheduled
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-        <Footer />
+            {/* Recent Achievements */}
+            <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="w-5 h-5" />
+                  Recent Achievements
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {recentAchievements.map((achievement) => {
+                    const IconComponent = achievement.icon;
+                    return (
+                      <div
+                        key={achievement.id}
+                        className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <IconComponent className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium">{achievement.title}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {achievement.description}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {achievement.date}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-primary">
+                            +{achievement.points}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            points
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Mentorships Tab */}
+          <TabsContent value="mentorships" className="space-y-6">
+            <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+              <CardHeader>
+                <CardTitle>Active Mentorship Connections</CardTitle>
+                <CardDescription>
+                  Your current mentor relationships and progress
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {connections.length > 0 ? (
+                  <div className="space-y-4">
+                    {connections
+                      .filter((conn) => conn.status === "active")
+                      .map((connection) => (
+                        <div
+                          key={connection.id}
+                          className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-4">
+                              <Avatar className="h-12 w-12">
+                                <AvatarImage src={connection.expert?.avatar} />
+                                <AvatarFallback>
+                                  {connection.expert?.name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <h4 className="font-semibold">
+                                  {connection.expert?.name}
+                                </h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {connection.expert?.title}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {connection.expert?.company}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <Badge variant="default">Active</Badge>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {connection.totalSessions || 0} sessions
+                                completed
+                              </p>
+                            </div>
+                          </div>
+
+                          {connection.goals && connection.goals.length > 0 && (
+                            <div className="mt-4">
+                              <h5 className="text-sm font-medium mb-2">
+                                Current Goals:
+                              </h5>
+                              <div className="flex flex-wrap gap-1">
+                                {connection.goals.map((goal, index) => (
+                                  <Badge
+                                    key={index}
+                                    variant="outline"
+                                    className="text-xs"
+                                  >
+                                    {goal}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {connection.progress !== undefined && (
+                            <div className="mt-4">
+                              <div className="flex items-center justify-between text-sm mb-2">
+                                <span>Progress</span>
+                                <span>{connection.progress}%</span>
+                              </div>
+                              <Progress
+                                value={connection.progress}
+                                className="h-2"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <UserCheck className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">
+                      No active mentorship connections
+                    </p>
+                    <Button asChild className="mt-4">
+                      <Link to="/experts">Find Mentors</Link>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Learning Paths Tab */}
+          <TabsContent value="learning" className="space-y-6">
+            <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookMarked className="w-5 h-5" />
+                  Learning Paths
+                </CardTitle>
+                <CardDescription>
+                  Structured learning programs to achieve your goals
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4">
+                  {learningPaths.map((path) => (
+                    <Card
+                      key={path.id}
+                      className="hover:shadow-md transition-shadow"
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="font-semibold">{path.title}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {path.description}
+                            </p>
+                          </div>
+                          <Badge variant="outline">{path.category}</Badge>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span>Progress</span>
+                            <span>
+                              {path.completedModules}/{path.totalModules}{" "}
+                              modules
+                            </span>
+                          </div>
+                          <Progress value={path.progress} className="h-2" />
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>{path.difficulty} level</span>
+                            <span>{path.estimatedTime}</span>
+                          </div>
+                        </div>
+
+                        <Button size="sm" className="w-full mt-3">
+                          Continue Learning
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Sessions Tab */}
+          <TabsContent value="sessions" className="space-y-6">
+            <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+              <CardHeader>
+                <CardTitle>Session History</CardTitle>
+                <CardDescription>
+                  View your completed and upcoming mentorship sessions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">
+                    Session history will appear here
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Achievements Tab */}
+          <TabsContent value="achievements" className="space-y-6">
+            <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+              <CardHeader>
+                <CardTitle>All Achievements</CardTitle>
+                <CardDescription>
+                  Your milestones and accomplishments
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4">
+                  {recentAchievements.map((achievement) => {
+                    const IconComponent = achievement.icon;
+                    return (
+                      <Card
+                        key={achievement.id}
+                        className="hover:shadow-md transition-shadow"
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-4">
+                            <div className="p-3 bg-primary/10 rounded-lg">
+                              <IconComponent className="w-6 h-6 text-primary" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold">
+                                {achievement.title}
+                              </h4>
+                              <p className="text-sm text-muted-foreground">
+                                {achievement.description}
+                              </p>
+                              <div className="flex items-center gap-4 mt-2">
+                                <Badge variant="secondary">
+                                  {achievement.type}
+                                </Badge>
+                                <span className="text-sm text-muted-foreground">
+                                  {achievement.date}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-primary">
+                                +{achievement.points}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                points earned
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
+
+      <Footer />
     </div>
   );
 };

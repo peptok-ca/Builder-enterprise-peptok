@@ -14,7 +14,7 @@ import {
   MentorshipRequestForm,
   MentorshipRequestFormData,
 } from "@/components/mentorship/MentorshipRequestForm";
-import { Header } from "@/components/layout/Header";
+import Header from "@/components/layout/Header";
 import {
   ArrowLeft,
   CheckCircle,

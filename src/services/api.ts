@@ -214,6 +214,45 @@ class ApiClient {
     return response.data;
   }
 
+  // Mentorship Requests API
+  async getMentorshipRequests(filters: {
+    companyId?: string;
+    status?: string;
+  } = {}): Promise<any[]> {
+    const queryParams = new URLSearchParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, String(value));
+      }
+    });
+
+    const endpoint = `/mentorship-requests${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await this.request<any[]>(endpoint);
+    return response.data;
+  }
+
+  async getMentorshipRequest(id: string): Promise<any> {
+    const response = await this.request<any>(`/mentorship-requests/${id}`);
+    return response.data;
+  }
+
+  async createMentorshipRequest(data: any): Promise<any> {
+    const response = await this.request<any>('/mentorship-requests', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  }
+
+  async updateMentorshipRequest(id: string, data: any): Promise<any> {
+    const response = await this.request<any>(`/mentorship-requests/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  }
+
   // Health check
   async healthCheck(): Promise<{
     status: string;
@@ -221,9 +260,10 @@ class ApiClient {
     uptime: number;
     environment: string;
   }> {
-    const response = await fetch(`${API_BASE_URL.replace("/api", "")}/health`);
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/health`);
     return response.json();
   }
+}
 }
 
 // Create and export a singleton instance

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Select,
   SelectContent,
@@ -20,10 +21,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Logo from "@/components/ui/logo";
-import { Eye, EyeOff, Mail, Lock, User, Building } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Building,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
+import { authService } from "@/services/auth";
+import { toast } from "sonner";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOAuthLoading, setIsOAuthLoading] = useState<
+    "google" | "microsoft" | null
+  >(null);
+  const [error, setError] = useState("");
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,26 +50,113 @@ const Signup = () => {
     password: "",
     company: "",
     role: "",
-    userType: "employee",
+    userType: "employee" as "employee" | "expert",
     agreeToTerms: false,
   });
 
-  const handleSignup = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would typically handle the signup logic
-    console.log("Signup attempt with:", { email, password, userType });
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
-    if (userType === "employee") {
-      // Individual employee signup - direct to dashboard
-      navigate("/dashboard");
-    } else {
-      // Business/company signup - redirect to business onboarding
-      navigate("/onboarding");
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.firstName.trim()) errors.firstName = "First name is required";
+    if (!formData.lastName.trim()) errors.lastName = "Last name is required";
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!formData.email.includes("@")) {
+      errors.email = "Please enter a valid email address";
+    }
+    if (!formData.password) {
+      errors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      errors.password = "Password must be at least 8 characters long";
+    }
+    if (!formData.company.trim()) errors.company = "Company is required";
+    if (!formData.role) errors.role = "Please select your role";
+    if (!formData.agreeToTerms)
+      errors.terms = "You must agree to the terms and conditions";
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!validateForm()) {
+      setError("Please correct the errors below");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await authService.signupWithEmail({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        company: formData.company,
+        role: formData.role,
+        userType: formData.userType,
+      });
+
+      if (response.success && response.user) {
+        toast.success("Account created successfully!");
+
+        // Redirect based on user type and account status
+        if (formData.userType === "employee") {
+          navigate("/dashboard");
+        } else {
+          // Business/expert signup - redirect to business onboarding
+          navigate("/onboarding");
+        }
+      } else {
+        setError(response.error || "Signup failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+
+    // Clear errors when user starts typing
+    if (error) setError("");
+    if (validationErrors[field]) {
+      setValidationErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    setIsOAuthLoading("google");
+    try {
+      await authService.loginWithGoogle();
+    } catch (error) {
+      console.error("Google signup error:", error);
+      toast.error("Failed to connect with Google. Please try again.");
+    } finally {
+      setIsOAuthLoading(null);
+    }
+  };
+
+  const handleMicrosoftSignup = async () => {
+    setIsOAuthLoading("microsoft");
+    try {
+      await authService.loginWithMicrosoft();
+    } catch (error) {
+      console.error("Microsoft signup error:", error);
+      toast.error("Failed to connect with Microsoft. Please try again.");
+    } finally {
+      setIsOAuthLoading(null);
+    }
   };
 
   return (
@@ -129,7 +235,15 @@ const Signup = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Error Alert */}
+              {error && (
+                <Alert variant="destructive" className="mb-6">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <form onSubmit={handleSignup} className="space-y-6">
                 {/* User Type Selection */}
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold">
@@ -143,7 +257,9 @@ const Signup = () => {
                       }
                       onClick={() => handleInputChange("userType", "employee")}
                       className="h-12 transition-all duration-200 hover:scale-105"
+                      disabled={isLoading}
                     >
+                      <User className="mr-2 h-4 w-4" />
                       Employee
                     </Button>
                     <Button
@@ -153,7 +269,9 @@ const Signup = () => {
                       }
                       onClick={() => handleInputChange("userType", "expert")}
                       className="h-12 transition-all duration-200 hover:scale-105"
+                      disabled={isLoading}
                     >
+                      <Building className="mr-2 h-4 w-4" />
                       Expert/Mentor
                     </Button>
                   </div>
@@ -163,7 +281,7 @@ const Signup = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName" className="text-sm font-medium">
-                      First Name
+                      First Name *
                     </Label>
                     <Input
                       id="firstName"
@@ -172,13 +290,21 @@ const Signup = () => {
                       onChange={(e) =>
                         handleInputChange("firstName", e.target.value)
                       }
-                      className="transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm"
+                      className={`transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm ${
+                        validationErrors.firstName ? "border-red-500" : ""
+                      }`}
+                      disabled={isLoading}
                       required
                     />
+                    {validationErrors.firstName && (
+                      <p className="text-xs text-red-500">
+                        {validationErrors.firstName}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName" className="text-sm font-medium">
-                      Last Name
+                      Last Name *
                     </Label>
                     <Input
                       id="lastName"
@@ -187,16 +313,24 @@ const Signup = () => {
                       onChange={(e) =>
                         handleInputChange("lastName", e.target.value)
                       }
-                      className="transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm"
+                      className={`transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm ${
+                        validationErrors.lastName ? "border-red-500" : ""
+                      }`}
+                      disabled={isLoading}
                       required
                     />
+                    {validationErrors.lastName && (
+                      <p className="text-xs text-red-500">
+                        {validationErrors.lastName}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm font-medium">
-                    Email
+                    Email *
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -208,16 +342,24 @@ const Signup = () => {
                       onChange={(e) =>
                         handleInputChange("email", e.target.value)
                       }
-                      className="pl-10 transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm"
+                      className={`pl-10 transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm ${
+                        validationErrors.email ? "border-red-500" : ""
+                      }`}
+                      disabled={isLoading}
                       required
                     />
                   </div>
+                  {validationErrors.email && (
+                    <p className="text-xs text-red-500">
+                      {validationErrors.email}
+                    </p>
+                  )}
                 </div>
 
                 {/* Company */}
                 <div className="space-y-2">
                   <Label htmlFor="company" className="text-sm font-medium">
-                    Company
+                    Company *
                   </Label>
                   <div className="relative">
                     <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -228,22 +370,35 @@ const Signup = () => {
                       onChange={(e) =>
                         handleInputChange("company", e.target.value)
                       }
-                      className="pl-10 transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm"
+                      className={`pl-10 transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm ${
+                        validationErrors.company ? "border-red-500" : ""
+                      }`}
+                      disabled={isLoading}
                       required
                     />
                   </div>
+                  {validationErrors.company && (
+                    <p className="text-xs text-red-500">
+                      {validationErrors.company}
+                    </p>
+                  )}
                 </div>
 
                 {/* Role */}
                 <div className="space-y-2">
                   <Label htmlFor="role" className="text-sm font-medium">
-                    Role
+                    Role *
                   </Label>
                   <Select
                     value={formData.role}
                     onValueChange={(value) => handleInputChange("role", value)}
+                    disabled={isLoading}
                   >
-                    <SelectTrigger className="transition-all duration-200 hover:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm">
+                    <SelectTrigger
+                      className={`transition-all duration-200 hover:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm ${
+                        validationErrors.role ? "border-red-500" : ""
+                      }`}
+                    >
                       <SelectValue placeholder="Select your role" />
                     </SelectTrigger>
                     <SelectContent className="bg-white/95 backdrop-blur-md">
@@ -265,6 +420,10 @@ const Signup = () => {
                             Sales Representative
                           </SelectItem>
                           <SelectItem value="designer">Designer</SelectItem>
+                          <SelectItem value="hr-manager">HR Manager</SelectItem>
+                          <SelectItem value="finance-manager">
+                            Finance Manager
+                          </SelectItem>
                           <SelectItem value="other">Other</SelectItem>
                         </>
                       ) : (
@@ -281,17 +440,28 @@ const Signup = () => {
                           <SelectItem value="director">
                             Former Director
                           </SelectItem>
+                          <SelectItem value="senior-manager">
+                            Former Senior Manager
+                          </SelectItem>
+                          <SelectItem value="consultant">
+                            Business Consultant
+                          </SelectItem>
                           <SelectItem value="other">Other</SelectItem>
                         </>
                       )}
                     </SelectContent>
                   </Select>
+                  {validationErrors.role && (
+                    <p className="text-xs text-red-500">
+                      {validationErrors.role}
+                    </p>
+                  )}
                 </div>
 
                 {/* Password */}
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-sm font-medium">
-                    Password
+                    Password *
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -303,13 +473,17 @@ const Signup = () => {
                       onChange={(e) =>
                         handleInputChange("password", e.target.value)
                       }
-                      className="pl-10 pr-10 transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm"
+                      className={`pl-10 pr-10 transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm ${
+                        validationErrors.password ? "border-red-500" : ""
+                      }`}
+                      disabled={isLoading}
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      disabled={isLoading}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -318,6 +492,11 @@ const Signup = () => {
                       )}
                     </button>
                   </div>
+                  {validationErrors.password && (
+                    <p className="text-xs text-red-500">
+                      {validationErrors.password}
+                    </p>
+                  )}
                   <p className="text-xs text-muted-foreground">
                     Must be at least 8 characters long
                   </p>
@@ -332,6 +511,7 @@ const Signup = () => {
                       handleInputChange("agreeToTerms", checked as boolean)
                     }
                     className="mt-1"
+                    disabled={isLoading}
                   />
                   <div className="text-sm">
                     <label htmlFor="terms" className="text-muted-foreground">
@@ -350,6 +530,11 @@ const Signup = () => {
                         Privacy Policy
                       </Link>
                     </label>
+                    {validationErrors.terms && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {validationErrors.terms}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -358,9 +543,16 @@ const Signup = () => {
                   type="submit"
                   className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 hover:scale-105 hover:shadow-lg"
                   size="lg"
-                  disabled={!formData.agreeToTerms}
+                  disabled={isLoading || !formData.agreeToTerms}
                 >
-                  Create Account
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Account...
+                    </>
+                  ) : (
+                    "Create Account"
+                  )}
                 </Button>
               </form>
 
@@ -373,25 +565,31 @@ const Signup = () => {
                     variant="outline"
                     className="w-full transition-all duration-200 hover:scale-105 hover:shadow-md bg-white/70 backdrop-blur-sm"
                     type="button"
+                    onClick={handleGoogleSignup}
+                    disabled={isLoading || isOAuthLoading !== null}
                   >
-                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      />
-                    </svg>
+                    {isOAuthLoading === "google" ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                        <path
+                          fill="currentColor"
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        />
+                        <path
+                          fill="currentColor"
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        />
+                        <path
+                          fill="currentColor"
+                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        />
+                        <path
+                          fill="currentColor"
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        />
+                      </svg>
+                    )}
                     Continue with Google
                   </Button>
 
@@ -399,14 +597,20 @@ const Signup = () => {
                     variant="outline"
                     className="w-full transition-all duration-200 hover:scale-105 hover:shadow-md bg-white/70 backdrop-blur-sm"
                     type="button"
+                    onClick={handleMicrosoftSignup}
+                    disabled={isLoading || isOAuthLoading !== null}
                   >
-                    <svg
-                      className="mr-2 h-4 w-4"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.024-.105-.949-.199-2.403.041-3.439.219-.937 1.404-5.965 1.404-5.965s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.097.118.112.223.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.748-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z" />
-                    </svg>
+                    {isOAuthLoading === "microsoft" ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <svg
+                        className="mr-2 h-4 w-4"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z" />
+                      </svg>
+                    )}
                     Continue with Microsoft
                   </Button>
                 </div>
@@ -426,6 +630,20 @@ const Signup = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Demo Info */}
+          {import.meta.env.DEV && (
+            <Card className="backdrop-blur-md bg-green-50/80 border-green-200/50">
+              <CardContent className="pt-6">
+                <h3 className="font-semibold text-green-800 mb-2">Demo Mode</h3>
+                <div className="text-sm text-green-700 space-y-1">
+                  <p>✅ Form validation is working</p>
+                  <p>✅ OAuth buttons simulate real authentication</p>
+                  <p>✅ All user types supported (Employee/Expert)</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

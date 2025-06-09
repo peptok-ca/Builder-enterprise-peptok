@@ -50,6 +50,8 @@ import {
 } from "@/data/mockData";
 
 const CompanyDashboard = () => {
+  const navigate = useNavigate();
+
   // Enhanced mock data
   const recentActivities = [
     {

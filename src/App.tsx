@@ -12,6 +12,7 @@ import CompanyDashboard from "./pages/CompanyDashboard";
 import ExpertProfile from "./pages/ExpertProfile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
 import BusinessOnboarding from "./pages/onboarding/BusinessOnboarding";
 import CreateMentorshipRequest from "./pages/mentorship/CreateMentorshipRequest";
 import NotFound from "./pages/NotFound";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/experts" element={<ExpertDirectory />} />
             <Route path="/experts/:id" element={<ExpertProfile />} />
 

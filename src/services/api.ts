@@ -11,6 +11,67 @@ const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
 class ApiService {
+  constructor() {
+    this.initializeLocalStorage();
+  }
+
+  private initializeLocalStorage(): void {
+    // Initialize localStorage with sample data if empty
+    if (!localStorage.getItem("mentorship_requests")) {
+      const sampleRequests: MentorshipRequest[] = [
+        {
+          id: "sample_request_1",
+          companyId: "default-company-id",
+          title: "React Development Training",
+          description:
+            "Help our team improve their React skills and best practices.",
+          goals: [
+            {
+              id: "goal_1",
+              title: "Master React Hooks",
+              description:
+                "Learn advanced React hooks and custom hook patterns",
+              category: "technical",
+              priority: "high",
+            },
+          ],
+          metricsToTrack: ["Code quality scores", "Development velocity"],
+          teamMembers: [
+            {
+              id: "member_1",
+              email: "john.doe@company.com",
+              name: "John Doe",
+              role: "participant",
+              status: "accepted",
+              invitedAt: new Date().toISOString(),
+            },
+          ],
+          preferredExpertise: ["React", "JavaScript", "Frontend Development"],
+          budget: {
+            min: 100,
+            max: 200,
+          },
+          timeline: {
+            startDate: new Date().toISOString(),
+            endDate: new Date(
+              Date.now() + 90 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+            sessionFrequency: "weekly",
+          },
+          status: "active",
+          createdAt: new Date(
+            Date.now() - 7 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ];
+      localStorage.setItem(
+        "mentorship_requests",
+        JSON.stringify(sampleRequests),
+      );
+    }
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {},

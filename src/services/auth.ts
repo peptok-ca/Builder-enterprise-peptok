@@ -43,7 +43,7 @@ export interface AuthResponse {
 const mockUsers: User[] = [
   {
     id: "1",
-    email: "john.doe@company.com",
+    email: "employee@company.com",
     name: "John Doe",
     firstName: "John",
     lastName: "Doe",
@@ -58,6 +58,15 @@ const mockUsers: User[] = [
     lastName: "User",
     provider: "email",
     userType: "admin",
+  },
+  {
+    id: "3",
+    email: "expert@mentor.com",
+    name: "Sarah Expert",
+    firstName: "Sarah",
+    lastName: "Expert",
+    provider: "email",
+    userType: "expert",
   },
 ];
 

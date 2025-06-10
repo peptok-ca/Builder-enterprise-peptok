@@ -25,6 +25,7 @@ import {
 import { SubscriptionTier, MentorshipRequest } from "@/types";
 import { toast } from "sonner";
 import { api } from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Mock subscription data - in real app, this would come from user context/API
 const mockSubscriptionTier: SubscriptionTier = {
@@ -43,6 +44,7 @@ const mockSubscriptionTier: SubscriptionTier = {
 
 export default function CreateMentorshipRequest() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [subscriptionTier] = useState<SubscriptionTier>(mockSubscriptionTier);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -94,8 +96,10 @@ export default function CreateMentorshipRequest() {
 
       toast.success("Mentorship request submitted successfully!");
 
-      // Navigate to dashboard or requests page with refresh flag
-      navigate("/admin", {
+      // Navigate to appropriate dashboard based on user type
+      const dashboardPath =
+        user?.userType === "admin" ? "/admin" : "/dashboard";
+      navigate(dashboardPath, {
         state: {
           newRequest: request,
           refresh: true,

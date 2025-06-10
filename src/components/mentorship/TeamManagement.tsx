@@ -126,7 +126,10 @@ export function TeamManagement({
       setNewMemberEmail("");
       setNewMemberRole("participant");
 
-      toast.success(`✅ Invitation email sent to ${newMemberEmail}!`);
+      toast.success(
+        `✅ Invitation email sent to ${newMemberEmail}! Check the browser console to see the email preview.`,
+        { duration: 5000 },
+      );
     } catch (error) {
       console.error("Failed to send invitation:", error);
       toast.error("Failed to send invitation email. Please try again.");

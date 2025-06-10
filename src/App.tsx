@@ -1,3 +1,4 @@
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,77 +29,81 @@ if (import.meta.env.DEV) {
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/experts" element={<ExpertDirectory />} />
-            <Route path="/experts/:id" element={<ExpertProfile />} />
+const App: React.FC = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/experts" element={<ExpertDirectory />} />
+              <Route path="/experts/:id" element={<ExpertProfile />} />
 
-            {/* Protected Routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute requiredUserType="employee">
-                  <EmployeeDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute requiredUserType="admin">
-                  <CompanyDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/onboarding"
-              element={
-                <ProtectedRoute>
-                  <BusinessOnboarding />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/mentorship/new"
-              element={
-                <ProtectedRoute allowedRoles={["admin", "employee"]}>
-                  <CreateMentorshipRequest />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/mentorship/matching"
-              element={
-                <ProtectedRoute allowedRoles={["admin", "employee"]}>
-                  <MentorMatching />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-            <Route path="/mentor/dashboard" element={
-              <ProtectedRoute allowedRoles={['expert']}>
-                <MentorDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/invitation/accept" element={<InvitationAccept />} />
+              {/* Protected Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute requiredUserType="employee">
+                    <EmployeeDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute requiredUserType="admin">
+                    <CompanyDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/onboarding"
+                element={
+                  <ProtectedRoute>
+                    <BusinessOnboarding />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/mentorship/new"
+                element={
+                  <ProtectedRoute allowedRoles={["admin", "employee"]}>
+                    <CreateMentorshipRequest />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/mentorship/matching"
+                element={
+                  <ProtectedRoute allowedRoles={["admin", "employee"]}>
+                    <MentorMatching />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/mentor/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={["expert"]}>
+                    <MentorDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/invitation/accept" element={<InvitationAccept />} />
 
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

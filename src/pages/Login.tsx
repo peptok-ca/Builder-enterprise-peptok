@@ -188,6 +188,20 @@ const Login = () => {
                 </Alert>
               )}
 
+              {/* Demo Credentials */}
+              <Alert className="mb-6 bg-blue-50 border-blue-200">
+                <AlertCircle className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-800">
+                  <strong>Demo Accounts:</strong>
+                  <br />
+                  <strong>Employee:</strong> employee@company.com / password123
+                  <br />
+                  <strong>Admin:</strong> admin@company.com / password123
+                  <br />
+                  <strong>Expert:</strong> expert@mentor.com / password123
+                </AlertDescription>
+              </Alert>
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email */}
                 <div className="space-y-2">

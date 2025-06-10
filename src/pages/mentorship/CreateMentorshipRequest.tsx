@@ -108,7 +108,15 @@ export default function CreateMentorshipRequest() {
         },
       });
     } catch (error) {
-      toast.error("Failed to submit request. Please try again.");
+      console.error("Failed to submit mentorship request:", error);
+
+      // More specific error message
+      let errorMessage = "Failed to submit request. Please try again.";
+      if (error instanceof Error) {
+        errorMessage = error.message || errorMessage;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

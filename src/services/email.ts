@@ -47,30 +47,46 @@ export class EmailService {
     try {
       // Example integration with EmailJS for client-side email sending
       if (import.meta.env.VITE_EMAILJS_SERVICE_ID) {
-        const emailjs = await import("emailjs-com");
-        await emailjs.send(
-          import.meta.env.VITE_EMAILJS_SERVICE_ID,
-          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          {
-            to_email: template.to,
-            subject: template.subject,
-            html_content: template.htmlContent,
-            text_content: template.textContent,
-          },
-          import.meta.env.VITE_EMAILJS_USER_ID,
-        );
-        return true;
+        try {
+          // Try new package first
+          const emailjs = await import('@emailjs/browser');
+          await emailjs.send(
+            import.meta.env.VITE_EMAILJS_SERVICE_ID,
+            import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+            {
+              to_email: template.to,
+              subject: template.subject,
+              html_content: template.htmlContent,
+              text_content: template.textContent
+            },
+            import.meta.env.VITE_EMAILJS_USER_ID
+          );
+          return true;
+        } catch {
+          // Fallback to old package
+          const emailjs = await import('emailjs-com');
+          await emailjs.send(
+            import.meta.env.VITE_EMAILJS_SERVICE_ID,
+            import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+            {
+              to_email: template.to,
+              subject: template.subject,
+              html_content: template.htmlContent,
+              text_content: template.textContent
+            },
+            import.meta.env.VITE_EMAILJS_USER_ID
+          );
+          return true;
+        }
       }
 
       // If no email service is configured, fall back to logging
-      console.warn(
-        "No email service configured. Email would be sent:",
-        template,
-      );
+      console.warn('No email service configured. Email would be sent:', template);
       return true;
     } catch (error) {
-      console.error("Failed to send email:", error);
+      console.error('Failed to send email:', error);
       return false;
+    }
     }
   }
 

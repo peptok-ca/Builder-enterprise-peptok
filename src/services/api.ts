@@ -364,27 +364,79 @@ class ApiService {
       status?: string;
     } = {},
   ): Promise<MentorshipRequest[]> {
-    const searchParams = new URLSearchParams();
-    if (filters.companyId) searchParams.append("companyId", filters.companyId);
-    if (filters.status) searchParams.append("status", filters.status);
+    try {
+      const searchParams = new URLSearchParams();
+      if (filters.companyId)
+        searchParams.append("companyId", filters.companyId);
+      if (filters.status) searchParams.append("status", filters.status);
 
-    const response = await this.request<MentorshipRequest[]>(
-      `/mentorship-requests?${searchParams}`,
-    );
-    return response.data;
+      const response = await this.request<MentorshipRequest[]>(
+        `/mentorship-requests?${searchParams}`,
+      );
+      return response.data;
+    } catch (error) {
+      // Fallback to localStorage if API is not available
+      console.warn("API not available, using localStorage fallback:", error);
+      return this.getMentorshipRequestsFromStorage(filters);
+    }
   }
 
   async createMentorshipRequest(
     request: Omit<MentorshipRequest, "id" | "createdAt" | "updatedAt">,
   ): Promise<MentorshipRequest> {
-    const response = await this.request<MentorshipRequest>(
-      "/mentorship-requests",
-      {
-        method: "POST",
-        body: JSON.stringify(request),
-      },
-    );
-    return response.data;
+    try {
+      const response = await this.request<MentorshipRequest>(
+        "/mentorship-requests",
+        {
+          method: "POST",
+          body: JSON.stringify(request),
+        },
+      );
+      return response.data;
+    } catch (error) {
+      // Fallback to localStorage if API is not available
+      console.warn("API not available, using localStorage fallback:", error);
+      return this.createMentorshipRequestInStorage(request);
+    }
+  }
+
+  // localStorage fallback methods
+  private getMentorshipRequestsFromStorage(
+    filters: {
+      companyId?: string;
+      status?: string;
+    } = {},
+  ): MentorshipRequest[] {
+    const stored = localStorage.getItem("mentorship_requests");
+    let requests: MentorshipRequest[] = stored ? JSON.parse(stored) : [];
+
+    // Apply filters
+    if (filters.companyId) {
+      requests = requests.filter((r) => r.companyId === filters.companyId);
+    }
+    if (filters.status) {
+      requests = requests.filter((r) => r.status === filters.status);
+    }
+
+    return requests;
+  }
+
+  private createMentorshipRequestInStorage(
+    request: Omit<MentorshipRequest, "id" | "createdAt" | "updatedAt">,
+  ): MentorshipRequest {
+    const newRequest: MentorshipRequest = {
+      ...request,
+      id: `request_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const stored = localStorage.getItem("mentorship_requests");
+    const requests: MentorshipRequest[] = stored ? JSON.parse(stored) : [];
+    requests.unshift(newRequest); // Add to beginning of array
+
+    localStorage.setItem("mentorship_requests", JSON.stringify(requests));
+    return newRequest;
   }
 
   async updateMentorshipRequest(

@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { SubscriptionTier, MentorshipRequest } from "@/types";
 import { toast } from "sonner";
+import { api } from "@/services/api";
 
 // Mock subscription data - in real app, this would come from user context/API
 const mockSubscriptionTier: SubscriptionTier = {
@@ -71,11 +72,8 @@ export default function CreateMentorshipRequest() {
         return;
       }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const request: MentorshipRequest = {
-        id: `request-${Date.now()}`,
+      // Create the request object
+      const requestData = {
         companyId: "current-company-id", // Would come from auth context
         title: data.title,
         description: data.description,
@@ -85,10 +83,11 @@ export default function CreateMentorshipRequest() {
         preferredExpertise: data.preferredExpertise,
         budget: data.budget,
         timeline: data.timeline,
-        status: "submitted",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        status: "submitted" as const,
       };
+
+      // Submit to API
+      const request = await api.createMentorshipRequest(requestData);
 
       // Clear saved draft
       localStorage.removeItem("mentorship-request-draft");

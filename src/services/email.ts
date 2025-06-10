@@ -32,12 +32,6 @@ export class EmailService {
       console.log(template.textContent);
       console.log("==========================================");
 
-      // In a real implementation, you would use a service like:
-      // - SendGrid: await sgMail.send(template)
-      // - AWS SES: await ses.sendEmail(template)
-      // - Nodemailer: await transporter.sendMail(template)
-      // - EmailJS (for client-side): await emailjs.send(...)
-
       // Simulate network delay
       await new Promise((resolve) => setTimeout(resolve, 800));
       return true;
@@ -49,7 +43,7 @@ export class EmailService {
       if (import.meta.env.VITE_EMAILJS_SERVICE_ID) {
         try {
           // Try new package first
-          const emailjs = await import('@emailjs/browser');
+          const emailjs = await import("@emailjs/browser");
           await emailjs.send(
             import.meta.env.VITE_EMAILJS_SERVICE_ID,
             import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
@@ -57,14 +51,14 @@ export class EmailService {
               to_email: template.to,
               subject: template.subject,
               html_content: template.htmlContent,
-              text_content: template.textContent
+              text_content: template.textContent,
             },
-            import.meta.env.VITE_EMAILJS_USER_ID
+            import.meta.env.VITE_EMAILJS_USER_ID,
           );
           return true;
         } catch {
           // Fallback to old package
-          const emailjs = await import('emailjs-com');
+          const emailjs = await import("emailjs-com");
           await emailjs.send(
             import.meta.env.VITE_EMAILJS_SERVICE_ID,
             import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
@@ -72,21 +66,23 @@ export class EmailService {
               to_email: template.to,
               subject: template.subject,
               html_content: template.htmlContent,
-              text_content: template.textContent
+              text_content: template.textContent,
             },
-            import.meta.env.VITE_EMAILJS_USER_ID
+            import.meta.env.VITE_EMAILJS_USER_ID,
           );
           return true;
         }
       }
 
       // If no email service is configured, fall back to logging
-      console.warn('No email service configured. Email would be sent:', template);
+      console.warn(
+        "No email service configured. Email would be sent:",
+        template,
+      );
       return true;
     } catch (error) {
-      console.error('Failed to send email:', error);
+      console.error("Failed to send email:", error);
       return false;
-    }
     }
   }
 
@@ -129,14 +125,14 @@ export class EmailService {
         <h1 style="color: white; margin: 0; font-size: 28px;">You're Invited!</h1>
         <p style="color: #f0f0f0; margin: 10px 0 0 0; font-size: 16px;">Join your team on Peptok</p>
     </div>
-
+    
     <div style="background: white; padding: 30px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px;">
         <p style="font-size: 16px; margin-bottom: 20px;">Hi there!</p>
-
+        
         <p style="font-size: 16px; margin-bottom: 20px;">
             <strong>${data.inviterName}</strong> has invited you to join <strong>${data.companyName}</strong>'s mentorship program on Peptok.
         </p>
-
+        
         <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin: 0 0 10px 0; color: #495057;">Your Role:</h3>
             <p style="margin: 0; font-size: 16px; color: #6c757d;">
@@ -147,29 +143,29 @@ export class EmailService {
                 }
             </p>
         </div>
-
+        
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${data.invitationLink}"
+            <a href="${data.invitationLink}" 
                style="background: #007bff; color: white; text-decoration: none; padding: 15px 30px; border-radius: 6px; font-size: 16px; font-weight: bold; display: inline-block;">
                 Accept Invitation
             </a>
         </div>
-
+        
         <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 6px; margin: 20px 0;">
             <p style="margin: 0; font-size: 14px; color: #856404;">
                 ⏰ This invitation expires on ${data.expiresAt.toLocaleDateString()} at ${data.expiresAt.toLocaleTimeString()}
             </p>
         </div>
-
+        
         <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-
+        
         <p style="font-size: 14px; color: #6c757d; margin-bottom: 20px;">
             If you can't click the button above, copy and paste this link into your browser:
         </p>
         <p style="font-size: 12px; color: #adb5bd; word-break: break-all; background: #f8f9fa; padding: 10px; border-radius: 4px;">
             ${data.invitationLink}
         </p>
-
+        
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
             <p style="font-size: 14px; color: #6c757d; margin: 0;">
                 Questions? Contact your team admin or reply to this email.
@@ -236,10 +232,10 @@ Peptok Team
       `,
       textContent: `
         Password Reset Request
-
+        
         Click the link below to reset your password:
         ${resetLink}
-
+        
         This link expires in 1 hour.
       `,
     };

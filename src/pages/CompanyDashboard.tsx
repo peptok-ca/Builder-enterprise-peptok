@@ -55,6 +55,7 @@ import { toast } from "sonner";
 
 const CompanyDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [mentorshipRequests, setMentorshipRequests] = useState<
     MentorshipRequest[]
@@ -81,6 +82,21 @@ const CompanyDashboard = () => {
       fetchDashboardData();
     }
   }, [user]);
+
+  // Handle navigation state for new requests
+  useEffect(() => {
+    if (location.state?.newRequest) {
+      const newRequest = location.state.newRequest;
+      setMentorshipRequests((prev) => [newRequest, ...prev]);
+
+      if (location.state.message) {
+        toast.success(location.state.message);
+      }
+
+      // Clear the state to prevent showing the message again
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, navigate, location.pathname]);
 
   // Enhanced mock data
   const recentActivities = [

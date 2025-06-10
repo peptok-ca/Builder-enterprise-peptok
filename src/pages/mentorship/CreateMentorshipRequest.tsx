@@ -76,7 +76,7 @@ export default function CreateMentorshipRequest() {
 
       // Create the request object
       const requestData = {
-        companyId: "current-company-id", // Would come from auth context
+        companyId: user?.companyId || "default-company-id", // Use actual user company ID
         title: data.title,
         description: data.description,
         goals: data.goals,

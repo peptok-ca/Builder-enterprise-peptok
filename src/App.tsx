@@ -19,6 +19,7 @@ import CreateMentorshipRequest from "./pages/mentorship/CreateMentorshipRequest"
 import { MentorMatching } from "./pages/mentor/MentorMatching";
 import { MentorDashboard } from "./pages/mentor/MentorDashboard";
 import InvitationAccept from "./pages/InvitationAccept";
+import Connections from "./pages/Connections";
 import NotFound from "./pages/NotFound";
 
 // Debug utilities in development
@@ -95,6 +96,14 @@ const App: React.FC = () => {
                 }
               />
               <Route path="/invitation/accept" element={<InvitationAccept />} />
+              <Route
+                path="/connections"
+                element={
+                  <ProtectedRoute allowedRoles={["employee", "expert"]}>
+                    <Connections />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />

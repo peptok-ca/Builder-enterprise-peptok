@@ -50,6 +50,7 @@ export function TeamManagement({
   onUpgradePrompt,
   maxMembers,
 }: TeamManagementProps) {
+  const { user } = useAuth();
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState<
     "participant" | "observer"
@@ -93,8 +94,25 @@ export function TeamManagement({
     setIsInviting(true);
 
     try {
-      // Simulate API call to send invitation
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Send invitation email
+      const invitationData = {
+        inviterName: user
+          ? `${user.firstName} ${user.lastName}`
+          : "Your team admin",
+        companyName: "Your Company", // TODO: Get from user context or props
+        role: newMemberRole,
+        invitationLink: "", // Will be generated in email service
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      };
+
+      const emailSent = await emailService.sendTeamInvitation(
+        newMemberEmail.toLowerCase(),
+        invitationData,
+      );
+
+      if (!emailSent) {
+        throw new Error("Failed to send email");
+      }
 
       const newMember: TeamMember = {
         id: `member-${Date.now()}`,
@@ -108,9 +126,10 @@ export function TeamManagement({
       setNewMemberEmail("");
       setNewMemberRole("participant");
 
-      toast.success(`Invitation sent to ${newMemberEmail}`);
+      toast.success(`✅ Invitation email sent to ${newMemberEmail}!`);
     } catch (error) {
-      toast.error("Failed to send invitation. Please try again.");
+      console.error("Failed to send invitation:", error);
+      toast.error("Failed to send invitation email. Please try again.");
     } finally {
       setIsInviting(false);
     }

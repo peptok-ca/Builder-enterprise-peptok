@@ -94,10 +94,11 @@ export default function CreateMentorshipRequest() {
 
       toast.success("Mentorship request submitted successfully!");
 
-      // Navigate to dashboard or requests page
+      // Navigate to dashboard or requests page with refresh flag
       navigate("/admin", {
         state: {
           newRequest: request,
+          refresh: true,
           message:
             "Your mentorship request has been submitted and is being reviewed.",
         },

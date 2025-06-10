@@ -19,6 +19,11 @@ import { MentorMatching } from "./pages/mentor/MentorMatching";
 import { MentorDashboard } from "./pages/mentor/MentorDashboard";
 import NotFound from "./pages/NotFound";
 
+// Debug utilities in development
+if (import.meta.env.DEV) {
+  import("./utils/debug");
+}
+
 const queryClient = new QueryClient();
 
 const App = () => (

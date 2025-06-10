@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 // Debug utilities in development
 if (import.meta.env.DEV) {
   import("./utils/debug");
+  import("./utils/emailDemo");
 }
 
 const queryClient = new QueryClient();

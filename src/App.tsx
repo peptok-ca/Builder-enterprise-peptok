@@ -17,6 +17,7 @@ import BusinessOnboarding from "./pages/onboarding/BusinessOnboarding";
 import CreateMentorshipRequest from "./pages/mentorship/CreateMentorshipRequest";
 import { MentorMatching } from "./pages/mentor/MentorMatching";
 import { MentorDashboard } from "./pages/mentor/MentorDashboard";
+import InvitationAccept from "./pages/InvitationAccept";
 import NotFound from "./pages/NotFound";
 
 // Debug utilities in development
@@ -83,13 +84,12 @@ const App = () => (
               }
             />
             <Route
-              path="/mentor/dashboard"
-              element={
-                <ProtectedRoute allowedRoles={["expert"]}>
-                  <MentorDashboard />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/mentor/dashboard" element={
+              <ProtectedRoute allowedRoles={['expert']}>
+                <MentorDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/invitation/accept" element={<InvitationAccept />} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

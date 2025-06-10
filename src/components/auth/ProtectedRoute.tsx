@@ -6,12 +6,14 @@ import { Loader2 } from "lucide-react";
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredUserType?: "employee" | "expert" | "admin";
+  allowedRoles?: ("employee" | "expert" | "admin")[];
   redirectTo?: string;
 }
 
 export function ProtectedRoute({
   children,
   requiredUserType,
+  allowedRoles,
   redirectTo = "/login",
 }: ProtectedRouteProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -24,7 +26,15 @@ export function ProtectedRoute({
         return;
       }
 
-      if (requiredUserType && user?.userType !== requiredUserType) {
+      // Check role permissions
+      const hasRequiredType = requiredUserType
+        ? user?.userType === requiredUserType
+        : true;
+      const hasAllowedRole = allowedRoles
+        ? allowedRoles.includes(user?.userType!)
+        : true;
+
+      if (!hasRequiredType || !hasAllowedRole) {
         // Redirect to appropriate dashboard based on user type
         const userDashboard =
           user?.userType === "admin" ? "/admin" : "/dashboard";
@@ -38,6 +48,7 @@ export function ProtectedRoute({
     isLoading,
     navigate,
     requiredUserType,
+    allowedRoles,
     redirectTo,
   ]);
 
@@ -56,7 +67,15 @@ export function ProtectedRoute({
     return null; // Will redirect via useEffect
   }
 
-  if (requiredUserType && user?.userType !== requiredUserType) {
+  // Check role permissions for rendering
+  const hasRequiredType = requiredUserType
+    ? user?.userType === requiredUserType
+    : true;
+  const hasAllowedRole = allowedRoles
+    ? allowedRoles.includes(user?.userType!)
+    : true;
+
+  if (!hasRequiredType || !hasAllowedRole) {
     return null; // Will redirect via useEffect
   }
 

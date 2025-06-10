@@ -32,6 +32,8 @@ import {
 } from "lucide-react";
 import { TeamMember, SubscriptionTier } from "@/types";
 import { toast } from "sonner";
+import { emailService } from "@/services/email";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface TeamManagementProps {
   teamMembers: TeamMember[];

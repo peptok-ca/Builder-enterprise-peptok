@@ -11,6 +11,10 @@ interface ImportMetaEnv {
   readonly VITE_ENABLE_PAYMENTS: string;
   readonly VITE_DEBUG_MODE: string;
   readonly VITE_MOCK_AUTH: string;
+  readonly VITE_MOCK_EMAIL: string;
+  readonly VITE_EMAILJS_SERVICE_ID: string;
+  readonly VITE_EMAILJS_TEMPLATE_ID: string;
+  readonly VITE_EMAILJS_USER_ID: string;
 }
 
 interface ImportMeta {

@@ -41,7 +41,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/services/api";
 import { MentorshipRequest, Connection } from "@/types";
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 
 const EmployeeDashboard = () => {

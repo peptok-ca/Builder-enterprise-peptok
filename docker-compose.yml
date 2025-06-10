@@ -1,108 +1,61 @@
 version: "3.8"
 
 services:
-  # Backend API service
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: peptok-backend
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
-      - FRONTEND_URL=http://frontend:80
-    ports:
-      - "3001:3001"
-    networks:
-      - peptok-network
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    volumes:
-      - backend-logs:/var/log
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: "0.5"
-        reservations:
-          memory: 256M
-          cpus: "0.25"
-
-  # Frontend React application
+  # Frontend Development Server
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: peptok-frontend
-    restart: unless-stopped
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - /app/node_modules
     environment:
-      - VITE_API_URL=http://backend:3001/api
-    ports:
-      - "80:80"
-    networks:
-      - peptok-network
+      - VITE_API_URL=http://localhost:3001/api
+      - VITE_MOCK_EMAIL=true
+      - VITE_DEBUG_MODE=true
     depends_on:
-      backend:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    volumes:
-      - frontend-logs:/var/log/nginx
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: "0.25"
-        reservations:
-          memory: 128M
-          cpus: "0.1"
-
-  # Nginx reverse proxy (optional, for production)
-  proxy:
-    image: nginx:alpine
-    container_name: peptok-proxy
-    restart: unless-stopped
-    ports:
-      - "8080:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    networks:
-      - peptok-network
-    depends_on:
-      - frontend
       - backend
-    profiles:
-      - proxy
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-          cpus: "0.1"
+    networks:
+      - peptok-network
+
+  # Backend API Server (Optional - app works with mock data)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - JWT_SECRET=your-dev-jwt-secret-key
+      - CORS_ORIGIN=http://localhost:8080
+    networks:
+      - peptok-network
+
+  # PostgreSQL Database (Optional)
+  database:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=peptok_dev
+      - POSTGRES_USER=peptok_user
+      - POSTGRES_PASSWORD=peptok_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - peptok-network
 
 networks:
   peptok-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
 
 volumes:
-  backend-logs:
-    driver: local
-  frontend-logs:
-    driver: local
+  postgres_data:

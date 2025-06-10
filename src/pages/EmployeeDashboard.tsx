@@ -46,6 +46,8 @@ import { toast } from "sonner";
 
 const EmployeeDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [mentorshipRequests, setMentorshipRequests] = useState<
     MentorshipRequest[]
   >([]);

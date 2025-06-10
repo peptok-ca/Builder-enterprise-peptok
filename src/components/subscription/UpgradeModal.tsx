@@ -20,7 +20,7 @@ import { SubscriptionTier } from "../../types";
 import { toast } from "react-hot-toast";
 
 const stripePromise = loadStripe(
-  process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || "pk_test_example",
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_example",
 );
 
 interface UpgradeModalProps {

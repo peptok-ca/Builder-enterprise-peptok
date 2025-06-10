@@ -109,7 +109,7 @@ export const VideoCallRoom: React.FC<VideoCallRoomProps> = ({
 
       // Join the channel
       await agoraClient.join(
-        process.env.REACT_APP_AGORA_APP_ID || "demo_app_id",
+        import.meta.env.VITE_AGORA_APP_ID || "demo_app_id",
         session.agoraChannelName!,
         agoraToken,
         userId,

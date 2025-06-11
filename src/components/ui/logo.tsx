@@ -13,6 +13,16 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
     lg: "h-12",
   };
 
+  const handleImageLoad = () => {
+    console.log("Logo image loaded successfully");
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    console.error("Logo image failed to load:", e);
+    const target = e.target as HTMLImageElement;
+    console.error("Failed image src:", target.src);
+  };
+
   if (variant === "icon-only") {
     // For icon-only, show just a cropped version focusing on the arc
     return (

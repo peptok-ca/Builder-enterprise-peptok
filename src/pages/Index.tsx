@@ -651,17 +651,24 @@ const Index = () => {
                       <p className="text-sm mt-2">Please refresh the page or try again later.</p>
                     </div>
                   </div>
+                ) : pricingPlans.length === 0 ? (
+                  <div className="col-span-3 text-center py-8">
+                    <div className="text-gray-500">
+                      <p>Unable to load pricing plans at the moment.</p>
+                      <p className="text-sm mt-2">Please refresh the page or try again later.</p>
+                    </div>
+                  </div>
                 ) : (
                   pricingPlans.map((plan, index) => {
-                      const isPopular = plan.badge === "Best Value";
-                      const price = plan.customPricing
-                        ? "Custom"
-                        : `${plan.currency || "CA"}$${plan.price}`;
-                      const period = plan.customPricing
-                        ? "pricing"
-                        : "per user/month";
+                    const isPopular = plan.badge === "Best Value";
+                    const price = plan.customPricing
+                      ? "Custom"
+                      : `${plan.currency || "CA"}$${plan.price}`;
+                    const period = plan.customPricing
+                      ? "pricing"
+                      : "per user/month";
 
-                      return (
+                    return (
                         <Card
                           key={plan.id}
                           className={`relative backdrop-blur-sm bg-white/90 border-white/20 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isPopular ? "ring-2 ring-blue-500 scale-105" : ""}`}

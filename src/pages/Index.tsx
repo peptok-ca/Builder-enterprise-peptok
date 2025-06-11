@@ -37,7 +37,7 @@ import { SubscriptionTier } from "@/types";
 const features = [
   {
     icon: Users,
-    title: "Coach Network",
+    title: "Mentor Network",
     description:
       "Access to a curated network of retired industry coaches and leaders with proven track records.",
     color: "from-blue-500 to-blue-600",
@@ -359,7 +359,7 @@ const Index = () => {
                       Connect with
                       <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
                         {" "}
-                        Retired Coaches
+                        Retired Experts
                       </span>{" "}
                       for
                       <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
@@ -478,7 +478,7 @@ const Index = () => {
                       {/* Feature Icons */}
                       <div className="flex justify-center space-x-8 pt-4">
                         {[
-                          { icon: Users, label: "Coach Network", delay: "0s" },
+                          { icon: Users, label: "Mentor Network", delay: "0s" },
                           {
                             icon: Target,
                             label: "Goal Tracking",

@@ -190,76 +190,8 @@ const Index = () => {
         setPricingPlans(plans);
       } catch (error) {
         console.error("Failed to load pricing plans:", error);
-        // Use fallback plans if API fails
-        setPricingPlans([
-          {
-            id: "starter",
-            name: "Starter Plan",
-            description:
-              "Designed for small teams launching their mentorship journey",
-            price: 99,
-            billingPeriod: "monthly",
-            userCap: 20,
-            features: [
-              "200 minutes of mentor time per month",
-              "Minimum commitment: 2 users (add up to 20 extra seats at CA$119/user/month)",
-              "Monthly progress reports",
-              "Email support",
-              "Basic metrics dashboard",
-            ],
-            metricsIncluded: [],
-            supportLevel: "basic",
-            customizations: false,
-            analytics: "basic",
-            minimumUsers: 2,
-            extraSeatPrice: 119,
-            currency: "CAD",
-          },
-          {
-            id: "growth",
-            name: "Growth Plan",
-            description: "Ideal for expanding programs and scaling impact",
-            price: 199,
-            billingPeriod: "monthly",
-            userCap: 100,
-            features: [
-              "1,200 minutes of mentor time per month",
-              "Includes all Starter features",
-              "Minimum commitment: 5 users (add up to 100 extra seats at CA$219/user/month)",
-              "Advanced metrics and analytics",
-              "Priority support",
-            ],
-            metricsIncluded: [],
-            supportLevel: "premium",
-            customizations: true,
-            analytics: "advanced",
-            minimumUsers: 5,
-            extraSeatPrice: 219,
-            badge: "Best Value",
-            currency: "CAD",
-          },
-          {
-            id: "enterprise",
-            name: "Enterprise Plan",
-            description:
-              "Tailored for large organizations with complex requirements",
-            price: 0,
-            billingPeriod: "monthly",
-            userCap: 999999,
-            features: [
-              "Unlimited user seats",
-              "Dedicated Customer Success Manager",
-              "White-labeling and integration options",
-              "SLA guarantees and priority SLAs",
-            ],
-            metricsIncluded: [],
-            supportLevel: "enterprise",
-            customizations: true,
-            analytics: "enterprise",
-            customPricing: true,
-            currency: "CAD",
-          },
-        ]);
+        // Set empty array if API fails - component will show error state
+        setPricingPlans([]);
       } finally {
         setLoadingPlans(false);
       }

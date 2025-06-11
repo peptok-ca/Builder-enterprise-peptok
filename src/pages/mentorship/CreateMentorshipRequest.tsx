@@ -237,14 +237,29 @@ export default function CreateMentorshipRequest() {
             )}
 
             {/* Main Form */}
-            <MentorshipRequestForm
-              onSubmit={handleSubmitRequest}
-              onSaveDraft={handleSaveDraft}
-              subscriptionTier={subscriptionTier}
-              onUpgradePrompt={handleUpgradePrompt}
-              initialData={savedDraft || undefined}
-              isLoading={isSubmitting}
-            />
+            {loadingTier ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center space-y-4">
+                      <Clock className="h-8 w-8 animate-spin mx-auto text-primary" />
+                      <p className="text-muted-foreground">
+                        Loading subscription information...
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <MentorshipRequestForm
+                onSubmit={handleSubmitRequest}
+                onSaveDraft={handleSaveDraft}
+                subscriptionTier={subscriptionTier}
+                onUpgradePrompt={handleUpgradePrompt}
+                initialData={savedDraft || undefined}
+                isLoading={isSubmitting}
+              />
+            )}
           </div>
         </div>
       </div>

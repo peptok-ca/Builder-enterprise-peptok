@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,8 @@ import {
   Globe,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { api } from "@/services/api";
+import { SubscriptionTier } from "@/types";
 
 const features = [
   {

@@ -486,7 +486,7 @@ const EnterpriseDashboard = () => {
                         journey
                       </p>
                       <Button asChild>
-                        <Link to="/coaches">Find Coaches</Link>
+                        <Link to="/coaches">Find Mentors</Link>
                       </Button>
                     </div>
                   )}

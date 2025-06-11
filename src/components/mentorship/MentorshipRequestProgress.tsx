@@ -120,7 +120,7 @@ export function MentorshipRequestProgress({
               <h3 className="font-semibold">No Mentorship Requests Yet</h3>
               <p className="text-sm text-muted-foreground">
                 {viewMode === "admin"
-                  ? "Create your first mentorship program to start connecting your team with coaches."
+                  ? "Create your first mentorship program to start connecting your team with mentors."
                   : "Your company hasn't created any mentorship programs yet. Contact your admin to get started."}
               </p>
             </div>

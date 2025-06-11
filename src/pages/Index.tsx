@@ -39,7 +39,7 @@ const features = [
     icon: Users,
     title: "Mentor Network",
     description:
-      "Access to a curated network of retired industry coaches and leaders with proven track records.",
+      "Access to a curated network of retired industry mentors and leaders with proven track records.",
     color: "from-blue-500 to-blue-600",
   },
   {
@@ -98,7 +98,7 @@ const testimonials = [
     avatar:
       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
     quote:
-      "The quality of coaches and the matching system exceeded our expectations. Our enterprises are developing skills faster than ever.",
+      "The quality of mentors and the matching system exceeded our expectations. Our enterprises are developing skills faster than ever.",
     rating: 5,
     impact: "+60% Skill Growth",
   },

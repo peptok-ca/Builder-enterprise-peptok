@@ -181,7 +181,7 @@ export default function CreateMentorshipRequest() {
               <h1 className="text-3xl font-bold">Create Mentorship Program</h1>
               <p className="text-muted-foreground">
                 Create a comprehensive mentorship program for your team. We'll
-                help you find the right coaches and structure your program for
+                help you find the right mentors and structure your program for
                 maximum impact.
               </p>
             </div>

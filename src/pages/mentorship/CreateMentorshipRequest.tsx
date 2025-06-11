@@ -76,7 +76,10 @@ export default function CreateMentorshipRequest() {
 
     try {
       // Validate team size against subscription tier
-      if (data.teamMembers.length > subscriptionTier.userCap) {
+      if (
+        subscriptionTier &&
+        data.teamMembers.length > subscriptionTier.userCap
+      ) {
         setShowUpgradeModal(true);
         setIsSubmitting(false);
         return;

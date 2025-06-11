@@ -99,7 +99,7 @@ export default function BusinessOnboarding() {
       setCompletedSteps((prev) => new Set([...prev, "subscription"]));
 
       if (tier.id === "enterprise") {
-        // For enterprise, redirect to sales contact
+        // For enterprise, redirect to admin dashboard for full control
         toast.success(
           "Enterprise plan selected. Our sales team will contact you shortly.",
         );
@@ -173,8 +173,15 @@ export default function BusinessOnboarding() {
   };
 
   const handleGetStarted = () => {
-    // Navigate to company dashboard
-    navigate("/admin", {
+    // Navigate to appropriate dashboard based on user type
+    // For business onboarding, this is typically admin dashboard
+    // but could be enterprise dashboard for smaller companies
+    const targetDashboard =
+      selectedTier?.id === "starter" || selectedTier?.id === "professional"
+        ? "/dashboard"
+        : "/admin";
+
+    navigate(targetDashboard, {
       state: {
         companyData,
         selectedTier,

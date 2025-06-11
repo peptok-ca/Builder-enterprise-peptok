@@ -108,11 +108,23 @@ const Signup = () => {
         toast.success("Account created successfully!");
 
         // Redirect based on user type and account status
-        if (formData.userType === "enterprise") {
-          navigate("/dashboard");
-        } else {
-          // Business/expert signup - redirect to business onboarding
+        if (response.isNewUser) {
+          // New users go through onboarding first
           navigate("/onboarding");
+        } else {
+          // Existing users go to their appropriate dashboard
+          switch (response.user.userType) {
+            case "admin":
+              navigate("/admin");
+              break;
+            case "coach":
+              navigate("/coach/dashboard");
+              break;
+            case "enterprise":
+            default:
+              navigate("/dashboard");
+              break;
+          }
         }
       } else {
         setError(response.error || "Signup failed. Please try again.");

@@ -1,6 +1,6 @@
 import {
-  Expert,
-  Employee,
+  Coach,
+  Enterprise,
   Connection,
   MetricDefinition,
   DashboardStats,
@@ -38,13 +38,13 @@ export const mockSkills: Skill[] = [
   { id: "8", name: "Product Strategy", category: "Product", level: "expert" },
 ];
 
-export const mockExperts: Expert[] = [
+export const mockCoaches: Coach[] = [
   {
     id: "1",
     name: "Sarah Chen",
     title: "Former VP of Engineering",
     company: "Ex-Google",
-    expertise: ["Leadership", "Software Development", "Team Building"],
+    coaching: ["Leadership", "Software Development", "Team Building"],
     experience: 25,
     avatar:
       "https://images.unsplash.com/photo-1494790108755-2616b9d3cc57?w=400&h=400&fit=crop&crop=face",
@@ -59,7 +59,7 @@ export const mockExperts: Expert[] = [
     name: "Michael Rodriguez",
     title: "Former Chief Data Officer",
     company: "Ex-Netflix",
-    expertise: ["Data Analysis", "Business Intelligence", "Strategy"],
+    coaching: ["Data Analysis", "Business Intelligence", "Strategy"],
     experience: 20,
     avatar:
       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
@@ -74,7 +74,7 @@ export const mockExperts: Expert[] = [
     name: "Jennifer Park",
     title: "Former CMO",
     company: "Ex-Airbnb",
-    expertise: ["Marketing Strategy", "Brand Building", "Growth"],
+    coaching: ["Marketing Strategy", "Brand Building", "Growth"],
     experience: 18,
     avatar:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
@@ -93,7 +93,7 @@ export const mockExperts: Expert[] = [
     name: "Robert Thompson",
     title: "Former CFO",
     company: "Ex-Tesla",
-    expertise: ["Financial Planning", "Strategic Finance", "Operations"],
+    coaching: ["Financial Planning", "Strategic Finance", "Operations"],
     experience: 22,
     avatar:
       "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face",
@@ -108,7 +108,7 @@ export const mockExperts: Expert[] = [
     name: "Lisa Zhang",
     title: "Former Head of Product",
     company: "Ex-Uber",
-    expertise: ["Product Strategy", "User Experience", "Innovation"],
+    coaching: ["Product Strategy", "User Experience", "Innovation"],
     experience: 15,
     avatar:
       "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop&crop=face",
@@ -123,7 +123,7 @@ export const mockExperts: Expert[] = [
     name: "David Kim",
     title: "Former VP of Sales",
     company: "Ex-Salesforce",
-    expertise: ["Sales Management", "Team Leadership", "Revenue Growth"],
+    coaching: ["Sales Management", "Team Leadership", "Revenue Growth"],
     experience: 19,
     avatar:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
@@ -135,7 +135,7 @@ export const mockExperts: Expert[] = [
   },
 ];
 
-export const mockEmployees: Employee[] = [
+export const mockEnterprises: Enterprise[] = [
   {
     id: "1",
     name: "Alex Johnson",
@@ -144,7 +144,7 @@ export const mockEmployees: Employee[] = [
     avatar:
       "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop&crop=face",
     goals: ["Improve leadership skills", "Learn system design"],
-    currentMentors: [mockExperts[0]],
+    currentCoaches: [mockCoaches[0]],
   },
   {
     id: "2",
@@ -154,15 +154,15 @@ export const mockEmployees: Employee[] = [
     avatar:
       "https://images.unsplash.com/photo-1494790108755-2616b9d3cc57?w=400&h=400&fit=crop&crop=face",
     goals: ["Advanced analytics", "Business intelligence"],
-    currentMentors: [mockExperts[1]],
+    currentCoaches: [mockCoaches[1]],
   },
 ];
 
 export const mockConnections: Connection[] = [
   {
     id: "1",
-    expert: mockExperts[0],
-    employee: mockEmployees[0],
+    coach: mockCoaches[0],
+    enterprise: mockEnterprises[0],
     startDate: "2024-01-15",
     status: "active",
     sessionsCompleted: 8,
@@ -173,8 +173,8 @@ export const mockConnections: Connection[] = [
   },
   {
     id: "2",
-    expert: mockExperts[1],
-    employee: mockEmployees[1],
+    coach: mockCoaches[1],
+    enterprise: mockEnterprises[1],
     startDate: "2024-01-10",
     status: "active",
     sessionsCompleted: 5,

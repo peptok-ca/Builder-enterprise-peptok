@@ -13,21 +13,24 @@ export interface Expert {
   skills: Skill[];
 }
 
-export interface Employee {
+export interface Coach {
   id: string;
   name: string;
   title: string;
-  department: string;
-  avatar: string;
-  goals: string[];
-  currentMentors: Expert[];
+  company: string;
+  coaching: string[];
+  rating: number;
+  experience: number;
+  totalSessions: number;
+  avatar?: string;
+  availableSlots: string[];
 }
 
 export interface Company {
   id: string;
   name: string;
   industry: string;
-  employeeCount: number;
+  enterpriseCount: number;
   activeConnections: number;
   successMetrics: MetricDefinition[];
 }
@@ -104,7 +107,7 @@ export interface MentorshipRequest {
   goals: MentorshipGoal[];
   metricsToTrack: string[];
   teamMembers: TeamMember[];
-  preferredExpertise: string[];
+  preferredCoaching: string[];
   budget?: {
     min: number;
     max: number;
@@ -135,8 +138,8 @@ export interface MentorshipGoal {
 
 export interface Connection {
   id: string;
-  expert: Expert;
-  employee: Employee;
+  coach: Coach;
+  enterprise: Enterprise;
   startDate: string;
   status: "active" | "completed" | "paused";
   sessionsCompleted: number;
@@ -150,7 +153,7 @@ export interface Skill {
   id: string;
   name: string;
   category: string;
-  level: "beginner" | "intermediate" | "advanced" | "expert";
+  level: "beginner" | "intermediate" | "advanced" | "coach";
 }
 
 export interface Session {
@@ -165,10 +168,10 @@ export interface Session {
 }
 
 export interface DashboardStats {
-  totalExperts: number;
+  totalCoaches: number;
   activeConnections: number;
   completedSessions: number;
   averageRating: number;
-  employeeEngagement: number;
+  enterpriseEngagement: number;
   skillsImproved: number;
 }

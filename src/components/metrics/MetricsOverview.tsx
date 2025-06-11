@@ -87,7 +87,85 @@ const MetricsOverview = ({ metrics = [], stats }: MetricsOverviewProps) => {
   return (
     <div className="space-y-6">
       {/* Key Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {metricsData.map((metric) => {
+          const Icon = getMetricIcon(metric.category);
+          const progress = (metric.currentValue / metric.targetValue) * 100;
+          const onTrack = isOnTrack(metric.currentValue, metric.targetValue);
+
+          return (
+            <Card key={metric.id}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="flex items-center space-x-2">
+                  <Icon className="h-4 w-4 text-muted-foreground" />
+                  <p className="text-sm font-medium">{metric.name}</p>
+                </div>
+                {onTrack ? (
+                  <TrendingUp className="h-4 w-4 text-green-600" />
+                ) : (
+                  <TrendingDown className="h-4 w-4 text-red-600" />
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-baseline space-x-1">
+                    <span className="text-2xl font-bold">
+                      {metric.currentValue}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {metric.unit}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">
+                      Target: {metric.targetValue}{metric.unit}
+                    </span>
+                    <Badge variant={onTrack ? "default" : "destructive"}>
+                      {progress.toFixed(0)}%
+                    </Badge>
+                  </div>
+                  <Progress value={progress} className="h-2" />
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Detailed Analytics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Performance Trends</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="text-center py-8">
+                <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">
+                  Analytics charts and trends will be displayed here
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Department Breakdown</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="text-center py-8">
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">
+                  Department analytics and comparisons will be displayed here
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
         <Card>
           <CardContent className="p-4">
             <div className="space-y-2">

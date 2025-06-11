@@ -12,7 +12,7 @@ const LandingHero = () => {
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
                 Connect with
-                <span className="text-primary"> Retired Coaches</span> for
+                <span className="text-primary"> Retired Experts</span> for
                 <span className="text-primary"> Enterprise Growth</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
@@ -42,7 +42,7 @@ const LandingHero = () => {
                   500+
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Coach Mentors
+                  Expert Mentors
                 </div>
               </div>
               <div className="text-center">
@@ -106,7 +106,7 @@ const LandingHero = () => {
                       <Users className="h-6 w-6 text-primary" />
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      Coach Network
+                      Mentor Network
                     </span>
                   </div>
                   <div className="flex flex-col items-center space-y-2">

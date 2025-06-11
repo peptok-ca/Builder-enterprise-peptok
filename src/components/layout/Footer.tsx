@@ -12,7 +12,7 @@ const Footer = () => {
               <Logo size="md" />
             </Link>
             <p className="text-sm text-muted-foreground">
-              Connecting enterprises with retired coaches for meaningful
+              Connecting enterprises with retired experts for meaningful
               mentorship and growth.
             </p>
           </div>

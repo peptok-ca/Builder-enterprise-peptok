@@ -39,7 +39,7 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
     return (
       <div className={cn("flex items-center", className)}>
         <img
-          src={peptokLogoPng}
+          src="/peptok-logo.png"
           alt="Peptok"
           className={cn("w-auto object-contain", sizeClasses[size])}
           style={{
@@ -56,7 +56,7 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
   return (
     <div className={cn("flex items-center", className)}>
       <img
-        src={peptokLogoPng}
+        src="/peptok-logo.png"
         alt="Peptok"
         className={cn("w-auto object-contain", sizeClasses[size])}
         onLoad={handleImageLoad}

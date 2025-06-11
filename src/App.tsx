@@ -56,6 +56,14 @@ const App: React.FC = () => {
                 }
               />
               <Route
+                path="/enterprise/dashboard"
+                element={
+                  <ProtectedRoute requiredUserType="enterprise">
+                    <EnterpriseDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/admin"
                 element={
                   <ProtectedRoute requiredUserType="admin">

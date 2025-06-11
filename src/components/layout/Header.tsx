@@ -36,10 +36,22 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const getDashboardPath = (userType: string) => {
+    switch (userType) {
+      case "admin":
+        return "/admin";
+      case "coach":
+        return "/coach/dashboard";
+      case "enterprise":
+      default:
+        return "/dashboard";
+    }
+  };
+
   const navigationItems = [
     {
       label: "Dashboard",
-      path: userType === "admin" ? "/admin" : "/dashboard",
+      path: getDashboardPath(userType),
       roles: ["enterprise", "coach", "admin"],
     },
     { label: "Coaches", path: "/coaches", roles: ["enterprise", "admin"] },

@@ -42,30 +42,33 @@ export interface AuthResponse {
 // Simulated user database for demo purposes
 const mockUsers: User[] = [
   {
-    id: "1",
-    email: "enterprise@company.com",
-    name: "John",
     id: "user-enterprise",
+    email: "enterprise@company.com",
+    name: "John Doe",
+    firstName: "John",
     lastName: "Doe",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
+    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
+    provider: "email",
     userType: "enterprise",
   },
   {
-    id: "2",
+    id: "user-admin",
     email: "admin@company.com",
     name: "Admin User",
     firstName: "Admin",
     lastName: "User",
+    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=admin",
     provider: "email",
     userType: "admin",
   },
   {
-    id: "3",
+    id: "user-coach",
     email: "coach@mentor.com",
     name: "Sarah Coach",
-    id: "user-coach",
+    firstName: "Sarah",
     lastName: "Coach",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
+    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
+    provider: "email",
     userType: "coach",
   },
 ];
@@ -363,13 +366,22 @@ class AuthService {
 
       // Trigger page reload to update UI
       setTimeout(() => {
-        if (isNewUser && user?.userType === "enterprise") {
-          window.location.href = "/dashboard";
-        } else if (isNewUser) {
+        if (isNewUser) {
           window.location.href = "/onboarding";
         } else {
-          window.location.href =
-            user?.userType === "admin" ? "/admin" : "/dashboard";
+          // Route to appropriate dashboard based on user type
+          switch (user?.userType) {
+            case "admin":
+              window.location.href = "/admin";
+              break;
+            case "coach":
+              window.location.href = "/coach/dashboard";
+              break;
+            case "enterprise":
+            default:
+              window.location.href = "/dashboard";
+              break;
+          }
         }
       }, 1000);
     } catch (error) {

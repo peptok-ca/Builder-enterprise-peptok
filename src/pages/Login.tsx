@@ -60,8 +60,19 @@ const Login = () => {
         toast.success("Successfully signed in!");
 
         // Redirect based on user type
-        const redirectPath =
-          response.user.userType === "admin" ? "/admin" : "/dashboard";
+        let redirectPath = "/dashboard"; // default for enterprise
+        switch (response.user.userType) {
+          case "admin":
+            redirectPath = "/admin";
+            break;
+          case "coach":
+            redirectPath = "/coach/dashboard";
+            break;
+          case "enterprise":
+          default:
+            redirectPath = "/dashboard";
+            break;
+        }
         navigate(redirectPath);
       } else {
         setError(response.error || "Login failed. Please try again.");

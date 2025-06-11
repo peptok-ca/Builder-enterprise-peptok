@@ -43,27 +43,6 @@ const features = [
     color: "from-blue-500 to-blue-600",
   },
   {
-    icon: Search,
-    title: "Smart Matching",
-    description:
-      "AI-powered matching algorithm connects enterprises with coaches based on goals, skills, and experience.",
-    color: "from-purple-500 to-purple-600",
-  },
-  {
-    icon: Target,
-    title: "Goal Setting",
-    description:
-      "Define clear objectives and track progress with measurable milestones and success metrics.",
-    color: "from-green-500 to-green-600",
-  },
-  {
-    icon: Calendar,
-    title: "Flexible Scheduling",
-    description:
-      "Easy-to-use scheduling system that works with both mentor and mentee availability.",
-    color: "from-orange-500 to-orange-600",
-  },
-  {
     icon: MessageSquare,
     title: "Secure Communication",
     description:

@@ -45,7 +45,7 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
   return (
     <div className={cn("flex items-center", className)}>
       <img
-        src="/peptok-logo.png"
+        src="/test-logo.svg"
         alt="Peptok"
         className={cn("w-auto object-contain", sizeClasses[size])}
         onLoad={handleImageLoad}

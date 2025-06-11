@@ -23,7 +23,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link to="/coaches" className="hover:text-primary">
-                  Coach Directory
+                  Mentor Directory
                 </Link>
               </li>
               <li>

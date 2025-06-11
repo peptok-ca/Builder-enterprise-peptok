@@ -15,8 +15,13 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     console.error("Logo image failed to load:", e);
-    // Fallback to text logo if image fails
+    // Try PNG fallback if SVG fails
     const target = e.target as HTMLImageElement;
+    if (target.src.includes(".svg")) {
+      target.src = "/peptok-logo.png";
+      return;
+    }
+    // If PNG also fails, fallback to text logo
     target.style.display = "none";
     const parent = target.parentElement;
     if (parent && !parent.querySelector(".fallback-logo")) {

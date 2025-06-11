@@ -738,7 +738,7 @@ const Index = () => {
                 <p className="text-xl text-muted-foreground leading-relaxed">
                   Join leading companies using Peptok to connect their
                   enterprises with coach mentors and drive measurable business
-                  outcomes. Start your free trial today.
+                  outcomes. Get started today.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-6 justify-center">
                   <Button
@@ -747,7 +747,7 @@ const Index = () => {
                     className="text-lg px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:scale-105 hover:shadow-xl group"
                   >
                     <Link to="/signup">
-                      Start Free Trial
+                      Get Started
                       <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>

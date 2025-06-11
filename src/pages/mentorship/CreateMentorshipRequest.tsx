@@ -187,31 +187,33 @@ export default function CreateMentorshipRequest() {
             </div>
 
             {/* Subscription Info */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Badge variant="default">
-                      {subscriptionTier.name} Plan
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      Up to{" "}
-                      {subscriptionTier.userCap === 999999
-                        ? "unlimited"
-                        : subscriptionTier.userCap}{" "}
-                      team members
-                    </span>
+            {!loadingTier && subscriptionTier && (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Badge variant="default">
+                        {subscriptionTier.name} Plan
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        Up to{" "}
+                        {subscriptionTier.userCap === 999999
+                          ? "unlimited"
+                          : subscriptionTier.userCap}{" "}
+                        team members
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowUpgradeModal(true)}
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Upgrade Plan
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowUpgradeModal(true)}
-                  >
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Upgrade Plan
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Draft Notice */}
             {savedDraft && (

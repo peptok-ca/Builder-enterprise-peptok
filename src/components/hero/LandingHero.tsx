@@ -12,11 +12,11 @@ const LandingHero = () => {
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
                 Connect with
-                <span className="text-primary"> Retired Experts</span> for
+                <span className="text-primary"> Retired Coaches</span> for
                 <span className="text-primary"> Enterprise Growth</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                Peptok bridges the gap between your employees and seasoned
+                Peptok bridges the gap between your enterprises and seasoned
                 professionals, creating meaningful mentorship connections that
                 drive measurable business outcomes.
               </p>
@@ -42,7 +42,7 @@ const LandingHero = () => {
                   500+
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Expert Mentors
+                  Coach Mentors
                 </div>
               </div>
               <div className="text-center">
@@ -68,7 +68,7 @@ const LandingHero = () => {
           <div className="relative">
             <div className="relative z-10 bg-gradient-to-br from-primary/10 to-secondary/20 rounded-2xl p-8">
               <div className="space-y-6">
-                {/* Expert Cards Preview */}
+                {/* Coach Cards Preview */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white rounded-lg p-4 shadow-sm border">
                     <div className="flex items-center space-x-3">
@@ -106,7 +106,7 @@ const LandingHero = () => {
                       <Users className="h-6 w-6 text-primary" />
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      Expert Network
+                      Coach Network
                     </span>
                   </div>
                   <div className="flex flex-col items-center space-y-2">

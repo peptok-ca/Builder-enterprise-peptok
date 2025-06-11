@@ -330,8 +330,10 @@ class ApiService {
 
   // Payment-related methods
   async getSubscriptionTiers(): Promise<SubscriptionTier[]> {
-    const response = await this.request<SubscriptionTier[]>("/payments/tiers");
-    return response.data;
+    const response = await this.request<SubscriptionTier[]>(
+      "/subscription-tiers",
+    );
+    return response;
   }
 
   async createPaymentIntent(

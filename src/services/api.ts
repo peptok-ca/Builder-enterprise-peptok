@@ -185,10 +185,10 @@ class ApiService {
 
   async sendMentorshipRequest(
     mentorshipRequestId: string,
-    mentorId: string,
+    coachId: string,
     message?: string,
-  ): Promise<any> {
-    const response = await this.request(`/mentors/${mentorId}/request`, {
+  ) {
+    const response = await this.request(`/coaches/${coachId}/request`, {
       method: "POST",
       body: JSON.stringify({ mentorshipRequestId, message }),
     });

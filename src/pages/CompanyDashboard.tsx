@@ -331,7 +331,7 @@ const CompanyDashboard = () => {
                   className="bg-primary hover:bg-primary/90"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  New Mentorship Request
+                  Create New Program
                 </Button>
                 <Button variant="outline">
                   <Download className="h-4 w-4 mr-2" />

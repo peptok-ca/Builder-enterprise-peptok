@@ -35,6 +35,8 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
             objectPosition: "left center",
             aspectRatio: "2/1",
           }}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
         />
       </div>
     );
@@ -46,6 +48,8 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
         src="/peptok-logo.png"
         alt="Peptok"
         className={cn("w-auto object-contain", sizeClasses[size])}
+        onLoad={handleImageLoad}
+        onError={handleImageError}
       />
     </div>
   );

@@ -143,21 +143,20 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
                     <div className="flex flex-col space-y-1 leading-none">
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{user?.name || "User"}</p>
-                        <Badge variant="secondary" className="text-xs">
-                          {userType === "admin" ? (
-                            <>
-                              <Shield className="w-3 h-3 mr-1" />
-                              Admin
-                            </>
-                          ) : userType === "coach" ? (
-                            <Badge variant="outline" className="text-xs">
-                              Coach
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-xs">
-                              Enterprise
-                            </Badge>
-                          )}
+                        {userType === "admin" ? (
+                          <Badge variant="secondary" className="text-xs">
+                            <Shield className="w-3 h-3 mr-1" />
+                            Admin
+                          </Badge>
+                        ) : userType === "coach" ? (
+                          <Badge variant="outline" className="text-xs">
+                            Coach
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-xs">
+                            Enterprise
+                          </Badge>
+                        )}
                       </div>
                       <p className="w-[200px] truncate text-sm text-muted-foreground">
                         {user?.email}

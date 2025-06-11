@@ -200,7 +200,7 @@ const EnterpriseDashboard = () => {
             </div>
             <Button onClick={() => navigate("/mentorship/new")} size="lg">
               <Plus className="w-5 h-5 mr-2" />
-              New Request
+              Create New Program
             </Button>
           </div>
 

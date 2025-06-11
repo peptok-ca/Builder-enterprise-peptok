@@ -644,10 +644,15 @@ const Index = () => {
                               ></div>
                             ))}
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  : pricingPlans.map((plan, index) => {
+                ) : pricingPlans.length === 0 ? (
+                  <div className="col-span-3 text-center py-8">
+                    <div className="text-gray-500">
+                      <p>Unable to load pricing plans at the moment.</p>
+                      <p className="text-sm mt-2">Please refresh the page or try again later.</p>
+                    </div>
+                  </div>
+                ) : (
+                  pricingPlans.map((plan, index) => {
                       const isPopular = plan.badge === "Best Value";
                       const price = plan.customPricing
                         ? "Custom"

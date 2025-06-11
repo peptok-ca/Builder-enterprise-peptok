@@ -58,6 +58,7 @@ const MetricsOverview = ({ metrics = [], stats }: MetricsOverviewProps) => {
   ];
 
   const metricsData = metrics.length > 0 ? metrics : defaultMetrics;
+
   const getMetricIcon = (category: MetricDefinition["category"]) => {
     switch (category) {
       case "engagement":
@@ -86,7 +87,7 @@ const MetricsOverview = ({ metrics = [], stats }: MetricsOverviewProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Key Stats */}
+      {/* Key Metrics Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {metricsData.map((metric) => {
           const Icon = getMetricIcon(metric.category);
@@ -118,7 +119,8 @@ const MetricsOverview = ({ metrics = [], stats }: MetricsOverviewProps) => {
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">
-                      Target: {metric.targetValue}{metric.unit}
+                      Target: {metric.targetValue}
+                      {metric.unit}
                     </span>
                     <Badge variant={onTrack ? "default" : "destructive"}>
                       {progress.toFixed(0)}%
@@ -132,7 +134,7 @@ const MetricsOverview = ({ metrics = [], stats }: MetricsOverviewProps) => {
         })}
       </div>
 
-      {/* Detailed Analytics */}
+      {/* Detailed Analytics Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -140,10 +142,14 @@ const MetricsOverview = ({ metrics = [], stats }: MetricsOverviewProps) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {/* Placeholder for charts */}
               <div className="text-center py-8">
                 <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
-                  Analytics charts and trends will be displayed here
+                  Performance analytics and trend charts will be displayed here
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Track mentorship program effectiveness over time
                 </p>
               </div>
             </div>
@@ -156,148 +162,67 @@ const MetricsOverview = ({ metrics = [], stats }: MetricsOverviewProps) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {/* Placeholder for department analytics */}
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
-                  Department analytics and comparisons will be displayed here
+                  Department-wise analytics and comparisons will be displayed
+                  here
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Compare engagement across different teams
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
-        <Card>
-          <CardContent className="p-4">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Total Experts</p>
-              <p className="text-2xl font-bold text-primary">
-                {stats.totalExperts}
-              </p>
+
+      {/* Analytics Filters and Controls */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Analytics Filters</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Time Period
+              </label>
+              <select className="w-full p-2 border rounded-md">
+                <option>Last 30 days</option>
+                <option>Last 3 months</option>
+                <option>Last 6 months</option>
+                <option>Last year</option>
+              </select>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Active Connections
-              </p>
-              <p className="text-2xl font-bold text-primary">
-                {stats.activeConnections}
-              </p>
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Department
+              </label>
+              <select className="w-full p-2 border rounded-md">
+                <option>All Departments</option>
+                <option>Engineering</option>
+                <option>Marketing</option>
+                <option>Sales</option>
+                <option>Product</option>
+              </select>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Sessions Completed
-              </p>
-              <p className="text-2xl font-bold text-primary">
-                {stats.completedSessions}
-              </p>
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Metric Type
+              </label>
+              <select className="w-full p-2 border rounded-md">
+                <option>All Metrics</option>
+                <option>Engagement</option>
+                <option>Skill Development</option>
+                <option>Performance</option>
+                <option>Retention</option>
+              </select>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Avg Rating</p>
-              <div className="flex items-center space-x-1">
-                <p className="text-2xl font-bold text-primary">
-                  {stats.averageRating}
-                </p>
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Engagement</p>
-              <div className="flex items-center space-x-1">
-                <p className="text-2xl font-bold text-primary">
-                  {stats.employeeEngagement}%
-                </p>
-                <TrendingUp className="h-4 w-4 text-green-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Skills Improved</p>
-              <p className="text-2xl font-bold text-primary">
-                {stats.skillsImproved}%
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Detailed Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {metrics.map((metric) => {
-          const Icon = getMetricIcon(metric.category);
-          const progress = (metric.currentValue / metric.targetValue) * 100;
-          const onTrack = isOnTrack(metric.currentValue, metric.targetValue);
-
-          return (
-            <Card key={metric.id}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium flex items-center space-x-2">
-                  <Icon className="h-4 w-4" />
-                  <span>{metric.name}</span>
-                </CardTitle>
-                <Badge
-                  variant={onTrack ? "default" : "destructive"}
-                  className="text-xs"
-                >
-                  {onTrack ? "On Track" : "Needs Attention"}
-                </Badge>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Current</span>
-                    <span className="font-medium">
-                      {metric.currentValue}
-                      {metric.unit}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Target</span>
-                    <span className="font-medium">
-                      {metric.targetValue}
-                      {metric.unit}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Progress value={progress} className="h-2" />
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Progress</span>
-                    <span>{Math.round(progress)}%</span>
-                  </div>
-                </div>
-
-                <p className="text-xs text-muted-foreground">
-                  {metric.description}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

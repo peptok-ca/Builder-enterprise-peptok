@@ -322,7 +322,7 @@ function WelcomeStep({
                 ✨ Set Up Your First Mentorship Request
               </h3>
               <p className="text-sm text-muted-foreground">
-                Create your first mentorship request and invite team members
+                Create your first mentorship program and invite team members
               </p>
             </div>
 

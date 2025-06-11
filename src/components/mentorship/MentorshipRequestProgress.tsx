@@ -120,15 +120,15 @@ export function MentorshipRequestProgress({
               <h3 className="font-semibold">No Mentorship Requests Yet</h3>
               <p className="text-sm text-muted-foreground">
                 {viewMode === "admin"
-                  ? "Create your first mentorship request to start connecting your team with experts."
-                  : "Your company hasn't created any mentorship requests yet. Contact your admin to get started."}
+                  ? "Create your first mentorship program to start connecting your team with coaches."
+                  : "Your company hasn't created any mentorship programs yet. Contact your admin to get started."}
               </p>
             </div>
             {showCreateButton && (
               <Button asChild>
                 <Link to="/mentorship/new">
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Mentorship Request
+                  Create Mentorship Program
                 </Link>
               </Button>
             )}

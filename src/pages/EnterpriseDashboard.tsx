@@ -294,7 +294,7 @@ const EnterpriseDashboard = () => {
                     <Button variant="outline" asChild>
                       <Link to="/mentorship/new">
                         <Plus className="w-4 h-4 mr-2" />
-                        Create Program
+                        Create New Program
                       </Link>
                     </Button>
                   </div>

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import DashboardRouter from "@/components/auth/DashboardRouter";
 import Index from "./pages/Index";
 import CoachDirectory from "./pages/CoachDirectory";
 import EnterpriseDashboard from "./pages/EnterpriseDashboard";
@@ -45,6 +46,9 @@ const App: React.FC = () => {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/coaches" element={<CoachDirectory />} />
               <Route path="/coaches/:id" element={<CoachProfile />} />
+
+              {/* Auto-route authenticated users to their dashboard */}
+              <Route path="/app" element={<DashboardRouter />} />
 
               {/* Protected Routes */}
               <Route

@@ -194,11 +194,12 @@ const Login = () => {
                 <AlertDescription className="text-blue-800">
                   <strong>Demo Accounts:</strong>
                   <br />
-                  <strong>Employee:</strong> employee@company.com / password123
+                  <strong>Enterprise:</strong> enterprise@company.com /
+                  password123
                   <br />
                   <strong>Admin:</strong> admin@company.com / password123
                   <br />
-                  <strong>Expert:</strong> expert@mentor.com / password123
+                  <strong>Coach:</strong> coach@mentor.com / password123
                 </AlertDescription>
               </Alert>
 
@@ -384,7 +385,7 @@ const Login = () => {
                 </h3>
                 <div className="text-sm text-yellow-700 space-y-1">
                   <p>
-                    <strong>Employee:</strong> john.doe@company.com /
+                    <strong>Enterprise:</strong> john.doe@company.com /
                     password123
                   </p>
                   <p>

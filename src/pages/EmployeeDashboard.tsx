@@ -352,7 +352,7 @@ const EmployeeDashboard = () => {
                 <Button variant="outline" size="sm" asChild>
                   <Link to="/mentorship/new">
                     <Plus className="w-4 h-4 mr-2" />
-                    Suggest Request
+                    Create New Program
                   </Link>
                 </Button>
               </CardHeader>

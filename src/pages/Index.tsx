@@ -83,7 +83,7 @@ const testimonials = [
   {
     name: "Sarah Martinez",
     role: "VP of People Operations",
-    company: "TechCorp",
+    company: "JHSC",
     avatar:
       "https://images.unsplash.com/photo-1494790108755-2616b9d3cc57?w=400&h=400&fit=crop&crop=face",
     quote:
@@ -105,7 +105,7 @@ const testimonials = [
   {
     name: "Emily Rodriguez",
     role: "Chief People Officer",
-    company: "GrowthTech",
+    company: "HarvardH2A",
     avatar:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
     quote:
@@ -575,10 +575,10 @@ const Index = () => {
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
                 {[
-                  "TechCorp",
+                  "JHSC",
                   "InnovateCo",
-                  "GrowthTech",
-                  "ScaleCorp",
+                  "HarvardH2A",
+                  "UNB",
                   "NextGen",
                   "FutureTech",
                 ].map((company, index) => (

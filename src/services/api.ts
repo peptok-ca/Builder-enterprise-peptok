@@ -1,6 +1,12 @@
 import { MentorshipRequest, SubscriptionTier } from "../types";
 import { Mentor, MatchingFilters, MatchingResult } from "../types/mentor";
 import {
+  Coach,
+  CoachMatch,
+  MatchingFilters as CoachMatchingFilters,
+  MatchingResult as CoachMatchingResult,
+} from "../types/coach";
+import {
   Session,
   SessionScheduleRequest,
   SessionStats,
@@ -101,15 +107,57 @@ class ApiService {
     return await response.json();
   }
 
-  // Mentor-related methods
-  async getAllMentors(): Promise<Mentor[]> {
-    const response = await this.request<Mentor[]>("/mentors");
+  // Coach-related methods
+  async getAllCoaches(): Promise<Coach[]> {
+    const response = await this.request<Coach[]>("/coaches");
     return response.data;
   }
 
-  async getMentorById(id: string): Promise<Mentor> {
-    const response = await this.request<Mentor>(`/mentors/${id}`);
+  async getCoachById(id: string): Promise<Coach> {
+    const response = await this.request<Coach>(`/coaches/${id}`);
     return response.data;
+  }
+
+  async findCoachMatches(
+    mentorshipRequestId: string,
+    filters: CoachMatchingFilters = {},
+    limit: number = 10,
+  ): Promise<CoachMatchingResult> {
+    const response = await this.request<CoachMatchingResult>(
+      "/coaches/matches",
+      {
+        method: "POST",
+        body: JSON.stringify({ mentorshipRequestId, filters, limit }),
+      },
+    );
+    return response.data;
+  }
+
+  async searchCoaches(
+    query: string,
+    filters: CoachMatchingFilters = {},
+  ): Promise<Coach[]> {
+    const searchParams = new URLSearchParams(filters as any);
+    const response = await this.request<Coach[]>(
+      `/coaches/search/${encodeURIComponent(query)}?${searchParams}`,
+    );
+    return response.data;
+  }
+
+  async getTopCoaches(limit: number = 5): Promise<Coach[]> {
+    const response = await this.request<Coach[]>(
+      `/coaches/featured/top?limit=${limit}`,
+    );
+    return response.data;
+  }
+
+  // Legacy Mentor-related methods (keeping for backward compatibility)
+  async getAllMentors(): Promise<Mentor[]> {
+    return this.getAllCoaches() as any;
+  }
+
+  async getMentorById(id: string): Promise<Mentor> {
+    return this.getCoachById(id) as any;
   }
 
   async findMentorMatches(
@@ -117,29 +165,22 @@ class ApiService {
     filters: MatchingFilters = {},
     limit: number = 10,
   ): Promise<MatchingResult> {
-    const response = await this.request<MatchingResult>("/mentors/matches", {
-      method: "POST",
-      body: JSON.stringify({ mentorshipRequestId, filters, limit }),
-    });
-    return response.data;
+    return this.findCoachMatches(
+      mentorshipRequestId,
+      filters as any,
+      limit,
+    ) as any;
   }
 
   async searchMentors(
     query: string,
     filters: MatchingFilters = {},
   ): Promise<Mentor[]> {
-    const searchParams = new URLSearchParams(filters as any);
-    const response = await this.request<Mentor[]>(
-      `/mentors/search/${encodeURIComponent(query)}?${searchParams}`,
-    );
-    return response.data;
+    return this.searchCoaches(query, filters as any) as any;
   }
 
   async getTopMentors(limit: number = 5): Promise<Mentor[]> {
-    const response = await this.request<Mentor[]>(
-      `/mentors/featured/top?limit=${limit}`,
-    );
-    return response.data;
+    return this.getTopCoaches(limit) as any;
   }
 
   async sendMentorshipRequest(

@@ -128,7 +128,7 @@ export function MentorshipRequestProgress({
               <Button asChild>
                 <Link to="/mentorship/new">
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Mentorship Program
+                  Create New Program
                 </Link>
               </Button>
             )}

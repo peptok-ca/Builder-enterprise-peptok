@@ -50,7 +50,7 @@ const Signup = () => {
     password: "",
     company: "",
     role: "",
-    userType: "employee" as "employee" | "expert",
+    userType: "enterprise" as "enterprise" | "coach",
     agreeToTerms: false,
   });
 
@@ -108,7 +108,7 @@ const Signup = () => {
         toast.success("Account created successfully!");
 
         // Redirect based on user type and account status
-        if (formData.userType === "employee") {
+        if (formData.userType === "enterprise") {
           navigate("/dashboard");
         } else {
           // Business/expert signup - redirect to business onboarding
@@ -219,7 +219,7 @@ const Signup = () => {
                 Create your account
               </h1>
               <p className="text-muted-foreground text-lg">
-                Join thousands of professionals growing through mentorship
+                Join thousands of professionals growing through coaching
               </p>
             </div>
           </div>
@@ -253,14 +253,11 @@ const Signup = () => {
                     <Button
                       type="button"
                       variant={
-                        formData.userType === "employee" ? "default" : "outline"
+                        formData.userType === "enterprise" ? "default" : "outline"
                       }
-                      onClick={() => handleInputChange("userType", "employee")}
-                      className="h-12 transition-all duration-200 hover:scale-105"
-                      disabled={isLoading}
+                      onClick={() => handleInputChange("userType", "enterprise")}
                     >
-                      <User className="mr-2 h-4 w-4" />
-                      Enterprise
+                      👥 Enterprise
                     </Button>
                     <Button
                       type="button"
@@ -272,7 +269,7 @@ const Signup = () => {
                       disabled={isLoading}
                     >
                       <Building className="mr-2 h-4 w-4" />
-                      Coach
+                      Expert/Mentor
                     </Button>
                   </div>
                 </div>
@@ -402,7 +399,7 @@ const Signup = () => {
                       <SelectValue placeholder="Select your role" />
                     </SelectTrigger>
                     <SelectContent className="bg-white/95 backdrop-blur-md">
-                      {formData.userType === "employee" ? (
+                      {formData.userType === "enterprise" ? (
                         <>
                           <SelectItem value="software-engineer">
                             Software Engineer
@@ -517,17 +514,11 @@ const Signup = () => {
                     <label htmlFor="terms" className="text-muted-foreground">
                       I agree to the{" "}
                       <Link
-                        to="/terms"
-                        className="text-primary hover:underline font-medium"
-                      >
-                        Terms of Service
-                      </Link>{" "}
-                      and{" "}
-                      <Link
-                        to="/privacy"
-                        className="text-primary hover:underline font-medium"
-                      >
-                        Privacy Policy
+                        formData.userType === "coach" ? "default" : "outline"
+                      }
+                      onClick={() => handleInputChange("userType", "coach")}
+                    >
+                      🎯 Coach
                       </Link>
                     </label>
                     {validationErrors.terms && (
@@ -639,7 +630,7 @@ const Signup = () => {
                 <div className="text-sm text-green-700 space-y-1">
                   <p>✅ Form validation is working</p>
                   <p>✅ OAuth buttons simulate real authentication</p>
-                  <p>✅ All user types supported (Employee/Expert)</p>
+                  <p>✅ All user types supported (Enterprise/Coach)</p>
                 </div>
               </CardContent>
             </Card>

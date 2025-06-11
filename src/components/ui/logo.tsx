@@ -1,6 +1,4 @@
 import { cn } from "@/lib/utils";
-// Try importing the logo directly
-import peptokLogoPng from "/peptok-logo.png";
 
 interface LogoProps {
   className?: string;
@@ -23,6 +21,17 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
     console.error("Logo image failed to load:", e);
     const target = e.target as HTMLImageElement;
     console.error("Failed image src:", target.src);
+
+    // Show fallback text logo
+    const parent = target.parentElement;
+    if (parent && !parent.querySelector(".fallback-logo")) {
+      target.style.display = "none";
+      const fallback = document.createElement("div");
+      fallback.className =
+        "fallback-logo font-bold text-blue-600 flex items-center";
+      fallback.innerHTML = "<span>Peptok</span>";
+      parent.appendChild(fallback);
+    }
   };
 
   if (variant === "icon-only") {

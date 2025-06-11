@@ -10,14 +10,14 @@ import Index from "./pages/Index";
 import ExpertDirectory from "./pages/ExpertDirectory";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import CompanyDashboard from "./pages/CompanyDashboard";
-import ExpertProfile from "./pages/ExpertProfile";
+import CoachProfile from "./pages/CoachProfile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import BusinessOnboarding from "./pages/onboarding/BusinessOnboarding";
 import CreateMentorshipRequest from "./pages/mentorship/CreateMentorshipRequest";
-import { MentorMatching } from "./pages/mentor/MentorMatching";
-import { MentorDashboard } from "./pages/mentor/MentorDashboard";
+import { CoachMatching } from "./pages/coach/CoachMatching";
+import { CoachDashboard } from "./pages/coach/CoachDashboard";
 import InvitationAccept from "./pages/InvitationAccept";
 import Connections from "./pages/Connections";
 import NotFound from "./pages/NotFound";
@@ -43,15 +43,15 @@ const App: React.FC = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/experts" element={<ExpertDirectory />} />
-              <Route path="/experts/:id" element={<ExpertProfile />} />
+              <Route path="/coaches" element={<CoachDirectory />} />
+              <Route path="/coaches/:id" element={<CoachProfile />} />
 
               {/* Protected Routes */}
               <Route
                 path="/dashboard"
                 element={
-                  <ProtectedRoute requiredUserType="employee">
-                    <EmployeeDashboard />
+                  <ProtectedRoute requiredUserType="enterprise">
+                    <EnterpriseDashboard />
                   </ProtectedRoute>
                 }
               />
@@ -74,7 +74,7 @@ const App: React.FC = () => {
               <Route
                 path="/mentorship/new"
                 element={
-                  <ProtectedRoute allowedRoles={["admin", "employee"]}>
+                  <ProtectedRoute allowedRoles={["admin", "enterprise"]}>
                     <CreateMentorshipRequest />
                   </ProtectedRoute>
                 }
@@ -82,16 +82,16 @@ const App: React.FC = () => {
               <Route
                 path="/mentorship/matching"
                 element={
-                  <ProtectedRoute allowedRoles={["admin", "employee"]}>
-                    <MentorMatching />
+                  <ProtectedRoute allowedRoles={["admin", "enterprise"]}>
+                    <CoachMatching />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/mentor/dashboard"
+                path="/coach/dashboard"
                 element={
-                  <ProtectedRoute allowedRoles={["expert"]}>
-                    <MentorDashboard />
+                  <ProtectedRoute allowedRoles={["coach"]}>
+                    <CoachDashboard />
                   </ProtectedRoute>
                 }
               />
@@ -99,7 +99,7 @@ const App: React.FC = () => {
               <Route
                 path="/connections"
                 element={
-                  <ProtectedRoute allowedRoles={["employee", "expert"]}>
+                  <ProtectedRoute allowedRoles={["enterprise", "coach"]}>
                     <Connections />
                   </ProtectedRoute>
                 }

@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
-  userType?: "employee" | "expert" | "admin";
+  userType?: "enterprise" | "coach" | "admin";
 }
 
 const Header = ({ userType: propUserType }: HeaderProps) => {
@@ -32,7 +32,7 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
   const { user, isAuthenticated, logout } = useAuth();
 
   // Use auth context user type if available, otherwise fall back to prop
-  const userType = user?.userType || propUserType || "employee";
+  const userType = user?.userType || propUserType || "enterprise";
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -40,13 +40,13 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
     {
       label: "Dashboard",
       path: userType === "admin" ? "/admin" : "/dashboard",
-      roles: ["employee", "expert", "admin"],
+      roles: ["enterprise", "coach", "admin"],
     },
-    { label: "Experts", path: "/experts", roles: ["employee", "admin"] },
+    { label: "Coaches", path: "/coaches", roles: ["enterprise", "admin"] },
     {
       label: "Connections",
       path: "/connections",
-      roles: ["employee", "expert"],
+      roles: ["enterprise", "coach"],
     },
     { label: "Company", path: "/admin", roles: ["admin"] },
   ];
@@ -149,18 +149,14 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
                               <Shield className="w-3 h-3 mr-1" />
                               Admin
                             </>
-                          ) : userType === "expert" ? (
-                            <>
-                              <Users className="w-3 h-3 mr-1" />
-                              Expert
-                            </>
+                          ) : userType === "coach" ? (
+                            <Badge variant="outline" className="text-xs">
+                              Coach
+                            </Badge>
                           ) : (
-                            <>
-                              <User className="w-3 h-3 mr-1" />
-                              Employee
-                            </>
-                          )}
-                        </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              Enterprise
+                            </Badge>
                       </div>
                       <p className="w-[200px] truncate text-sm text-muted-foreground">
                         {user?.email}

@@ -27,7 +27,7 @@ export interface User {
   lastName?: string;
   picture?: string;
   provider: "email" | "google" | "microsoft";
-  userType: "employee" | "expert" | "admin";
+  userType: "enterprise" | "coach" | "admin";
   isNewUser?: boolean;
 }
 
@@ -43,12 +43,12 @@ export interface AuthResponse {
 const mockUsers: User[] = [
   {
     id: "1",
-    email: "employee@company.com",
-    name: "John Doe",
-    firstName: "John",
+    email: "enterprise@company.com",
+    name: "John",
+    id: "user-enterprise",
     lastName: "Doe",
-    provider: "email",
-    userType: "employee",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
+    userType: "enterprise",
   },
   {
     id: "2",
@@ -61,12 +61,12 @@ const mockUsers: User[] = [
   },
   {
     id: "3",
-    email: "expert@mentor.com",
-    name: "Sarah Expert",
-    firstName: "Sarah",
-    lastName: "Expert",
-    provider: "email",
-    userType: "expert",
+    email: "coach@mentor.com",
+    name: "Sarah Coach",
+    id: "user-coach",
+    lastName: "Coach",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
+    userType: "coach",
   },
 ];
 
@@ -177,7 +177,7 @@ class AuthService {
     password: string;
     company?: string;
     role?: string;
-    userType: "employee" | "expert";
+    userType: "enterprise" | "coach";
   }): Promise<AuthResponse> {
     try {
       // Simulate API call delay
@@ -340,7 +340,7 @@ class AuthService {
         // Create new user from OAuth data
         user = {
           ...userData,
-          userType: "employee", // Default to employee, can be changed later
+          userType: "enterprise", // Default to enterprise, can be changed later
           isNewUser: true,
         };
         mockUsers.push(user);
@@ -363,7 +363,7 @@ class AuthService {
 
       // Trigger page reload to update UI
       setTimeout(() => {
-        if (isNewUser && user?.userType === "employee") {
+        if (isNewUser && user?.userType === "enterprise") {
           window.location.href = "/dashboard";
         } else if (isNewUser) {
           window.location.href = "/onboarding";
@@ -408,7 +408,7 @@ class AuthService {
           email: "oauth@example.com",
           name: "OAuth User",
           provider: provider as "google" | "microsoft",
-          userType: "employee",
+          userType: "enterprise",
         },
         token: `oauth_token_${Date.now()}`,
       };

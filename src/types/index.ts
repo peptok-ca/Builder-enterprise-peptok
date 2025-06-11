@@ -48,8 +48,10 @@ export interface MetricDefinition {
 export interface SubscriptionTier {
   id: string;
   name: string;
+  slug?: string;
   description: string;
   price: number;
+  priceAnnual?: number;
   billingPeriod: "monthly" | "annual";
   features: string[];
   userCap: number;
@@ -57,6 +59,11 @@ export interface SubscriptionTier {
   supportLevel: "basic" | "premium" | "enterprise";
   customizations: boolean;
   analytics: "basic" | "advanced" | "enterprise";
+  minimumUsers?: number;
+  extraSeatPrice?: number;
+  customPricing?: boolean;
+  badge?: string;
+  currency?: string;
 }
 
 export interface TeamMember {

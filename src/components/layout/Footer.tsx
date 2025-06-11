@@ -12,7 +12,7 @@ const Footer = () => {
               <Logo size="md" />
             </Link>
             <p className="text-sm text-muted-foreground">
-              Connecting enterprises with retired experts for meaningful
+              Connecting enterprises with retired coaches for meaningful
               mentorship and growth.
             </p>
           </div>
@@ -22,8 +22,8 @@ const Footer = () => {
             <h4 className="text-sm font-semibold">Product</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link to="/experts" className="hover:text-primary">
-                  Expert Directory
+                <Link to="/coaches" className="hover:text-primary">
+                  Coach Directory
                 </Link>
               </li>
               <li>

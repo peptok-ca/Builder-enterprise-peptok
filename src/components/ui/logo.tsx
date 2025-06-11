@@ -34,6 +34,19 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
     }
   };
 
+  // Immediate fallback if image fails to load
+  const TextLogo = () => (
+    <div className={cn("flex items-center font-bold text-blue-600", className)}>
+      <span
+        className={cn(
+          size === "sm" ? "text-lg" : size === "md" ? "text-xl" : "text-2xl",
+        )}
+      >
+        Peptok
+      </span>
+    </div>
+  );
+
   if (variant === "icon-only") {
     // For icon-only, show just a cropped version focusing on the arc
     return (
@@ -49,6 +62,9 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
           onLoad={handleImageLoad}
           onError={handleImageError}
         />
+        <noscript>
+          <TextLogo />
+        </noscript>
       </div>
     );
   }
@@ -62,6 +78,9 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
         onLoad={handleImageLoad}
         onError={handleImageError}
       />
+      <noscript>
+        <TextLogo />
+      </noscript>
     </div>
   );
 };

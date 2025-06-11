@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils";
+// Try importing the logo directly
+import peptokLogoPng from "/peptok-logo.png";
 
 interface LogoProps {
   className?: string;

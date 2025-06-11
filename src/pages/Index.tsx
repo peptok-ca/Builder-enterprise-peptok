@@ -623,34 +623,24 @@ const Index = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                {loadingPlans
-                  ? // Loading state
-                    Array.from({ length: 3 }).map((_, index) => (
-                      <Card
-                        key={index}
-                        className="relative backdrop-blur-sm bg-white/90 border-white/20 shadow-xl"
-                      >
-                        <CardHeader className="text-center space-y-4">
-                          <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
-                          <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
-                          <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-2">
-                            {Array.from({ length: 4 }).map((_, i) => (
-                              <div
-                                key={i}
-                                className="h-4 bg-gray-200 rounded animate-pulse"
-                              ></div>
-                            ))}
-                          </div>
-                ) : pricingPlans.length === 0 ? (
-                  <div className="col-span-3 text-center py-8">
-                    <div className="text-gray-500">
-                      <p>Unable to load pricing plans at the moment.</p>
-                      <p className="text-sm mt-2">Please refresh the page or try again later.</p>
-                    </div>
-                  </div>
+                {loadingPlans ? (
+                  // Loading state
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <Card key={index} className="relative backdrop-blur-sm bg-white/90 border-white/20 shadow-xl">
+                      <CardHeader className="text-center space-y-4">
+                        <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
                 ) : pricingPlans.length === 0 ? (
                   <div className="col-span-3 text-center py-8">
                     <div className="text-gray-500">
@@ -659,7 +649,7 @@ const Index = () => {
                     </div>
                   </div>
                 ) : (
-                  pricingPlans.map((plan, index) => {
+                  pricingPlans.map((plan) => {
                     const isPopular = plan.badge === "Best Value";
                     const price = plan.customPricing
                       ? "Custom"

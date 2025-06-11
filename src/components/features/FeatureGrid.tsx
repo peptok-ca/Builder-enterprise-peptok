@@ -25,24 +25,6 @@ const features = [
       "Access to a curated network of retired industry experts and leaders with proven track records.",
   },
   {
-    icon: Search,
-    title: "Smart Matching",
-    description:
-      "AI-powered matching algorithm connects employees with experts based on goals, skills, and experience.",
-  },
-  {
-    icon: Target,
-    title: "Goal Setting",
-    description:
-      "Define clear objectives and track progress with measurable milestones and success metrics.",
-  },
-  {
-    icon: Calendar,
-    title: "Flexible Scheduling",
-    description:
-      "Easy-to-use scheduling system that works with both mentor and mentee availability.",
-  },
-  {
     icon: MessageSquare,
     title: "Secure Communication",
     description:

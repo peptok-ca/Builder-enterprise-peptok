@@ -157,6 +157,7 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
                             <Badge variant="outline" className="text-xs">
                               Enterprise
                             </Badge>
+                          )}
                       </div>
                       <p className="w-[200px] truncate text-sm text-muted-foreground">
                         {user?.email}

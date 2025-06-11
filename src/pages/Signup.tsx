@@ -253,23 +253,27 @@ const Signup = () => {
                     <Button
                       type="button"
                       variant={
-                        formData.userType === "enterprise" ? "default" : "outline"
+                        formData.userType === "enterprise"
+                          ? "default"
+                          : "outline"
                       }
-                      onClick={() => handleInputChange("userType", "enterprise")}
+                      onClick={() =>
+                        handleInputChange("userType", "enterprise")
+                      }
                     >
                       👥 Enterprise
                     </Button>
                     <Button
                       type="button"
                       variant={
-                        formData.userType === "expert" ? "default" : "outline"
+                        formData.userType === "coach" ? "default" : "outline"
                       }
-                      onClick={() => handleInputChange("userType", "expert")}
+                      onClick={() => handleInputChange("userType", "coach")}
                       className="h-12 transition-all duration-200 hover:scale-105"
                       disabled={isLoading}
                     >
                       <Building className="mr-2 h-4 w-4" />
-                      Expert/Mentor
+                      Coach/Mentor
                     </Button>
                   </div>
                 </div>
@@ -514,11 +518,10 @@ const Signup = () => {
                     <label htmlFor="terms" className="text-muted-foreground">
                       I agree to the{" "}
                       <Link
-                        formData.userType === "coach" ? "default" : "outline"
-                      }
-                      onClick={() => handleInputChange("userType", "coach")}
-                    >
-                      🎯 Coach
+                        to="/terms"
+                        className="text-primary hover:underline"
+                      >
+                        Terms of Service
                       </Link>
                     </label>
                     {validationErrors.terms && (

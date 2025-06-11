@@ -652,16 +652,16 @@ const CompanyDashboard = () => {
                     <div>
                       <CardTitle className="flex items-center gap-2">
                         <Target className="w-5 h-5" />
-                        Mentorship Requests Management
+                        Mentorship Programs Management
                       </CardTitle>
                       <CardDescription>
-                        Create and manage mentorship programs for your
-                        organization
+                        Create and manage comprehensive mentorship programs for
+                        your organization
                       </CardDescription>
                     </div>
                     <Button onClick={() => navigate("/mentorship/new")}>
                       <Plus className="w-4 h-4 mr-2" />
-                      Create New Request
+                      Create New Program
                     </Button>
                   </CardHeader>
                   <CardContent>

@@ -546,9 +546,109 @@ router.delete("/mentorship-requests/:id", (req, res) => {
 router.get("/subscription-tiers", async (req, res) => {
   try {
     await simulateDelay();
+
+    // Updated subscription tiers with Canadian pricing
+    const updatedSubscriptionTiers = [
+      {
+        id: "starter",
+        name: "Starter Plan",
+        slug: "starter",
+        description:
+          "Designed for small teams launching their mentorship journey",
+        price: 99.0,
+        priceAnnual: 1069.2,
+        billingPeriod: "monthly",
+        userCap: 20,
+        features: [
+          "200 minutes of mentor time per month",
+          "Minimum commitment: 2 users (add up to 20 extra seats at CA$119/user/month)",
+          "Monthly progress reports",
+          "Email support",
+          "Basic metrics dashboard",
+        ],
+        metricsIncluded: [
+          "Session completion rate",
+          "Basic engagement metrics",
+          "Monthly progress tracking",
+        ],
+        supportLevel: "basic",
+        customizations: false,
+        analytics: "basic",
+        minimumUsers: 2,
+        extraSeatPrice: 119.0,
+        currency: "CAD",
+      },
+      {
+        id: "growth",
+        name: "Growth Plan",
+        slug: "growth",
+        description: "Ideal for expanding programs and scaling impact",
+        price: 199.0,
+        priceAnnual: 2148.4,
+        billingPeriod: "monthly",
+        userCap: 100,
+        features: [
+          "1,200 minutes of mentor time per month",
+          "Includes all Starter features",
+          "Minimum commitment: 5 users (add up to 100 extra seats at CA$219/user/month)",
+          "Advanced metrics and analytics",
+          "Priority support",
+        ],
+        metricsIncluded: [
+          "All Starter metrics",
+          "Advanced progress analytics",
+          "Team performance insights",
+          "ROI tracking",
+          "Department comparisons",
+        ],
+        supportLevel: "premium",
+        customizations: true,
+        analytics: "advanced",
+        minimumUsers: 5,
+        extraSeatPrice: 219.0,
+        badge: "Best Value",
+        currency: "CAD",
+      },
+      {
+        id: "enterprise",
+        name: "Enterprise Plan",
+        slug: "enterprise",
+        description:
+          "Tailored for large organizations with complex requirements",
+        price: 0,
+        priceAnnual: 0,
+        billingPeriod: "monthly",
+        userCap: 999999,
+        features: [
+          "Unlimited user seats",
+          "Dedicated Customer Success Manager",
+          "White-labeling and integration options",
+          "SLA guarantees and priority SLAs",
+          "Custom mentor vetting",
+          "API access",
+          "SSO integration",
+        ],
+        metricsIncluded: [
+          "All Growth metrics",
+          "Custom KPI tracking",
+          "Predictive analytics",
+          "Executive dashboards",
+          "Benchmark comparisons",
+          "Multi-department insights",
+        ],
+        supportLevel: "enterprise",
+        customizations: true,
+        analytics: "enterprise",
+        minimumUsers: 1,
+        extraSeatPrice: 0,
+        customPricing: true,
+        currency: "CAD",
+      },
+    ];
+
     res.json({
       success: true,
-      data: mockSubscriptionTiers,
+      data: updatedSubscriptionTiers,
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

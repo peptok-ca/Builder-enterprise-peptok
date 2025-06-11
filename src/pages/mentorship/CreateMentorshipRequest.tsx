@@ -27,26 +27,34 @@ import { toast } from "sonner";
 import { api } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Mock subscription data - in real app, this would come from user context/API
-const mockSubscriptionTier: SubscriptionTier = {
-  id: "growth",
-  name: "Growth",
-  description: "Growing company plan",
-  price: 99,
-  billingPeriod: "monthly",
-  userCap: 50,
-  features: [],
-  metricsIncluded: [],
-  supportLevel: "premium",
-  customizations: true,
-  analytics: "advanced",
-};
-
 export default function CreateMentorshipRequest() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [subscriptionTier] = useState<SubscriptionTier>(mockSubscriptionTier);
+  const [subscriptionTier, setSubscriptionTier] =
+    useState<SubscriptionTier | null>(null);
+  const [loadingTier, setLoadingTier] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Load user's subscription tier
+  useEffect(() => {
+    const loadSubscriptionTier = async () => {
+      try {
+        setLoadingTier(true);
+        // In a real app, this would load the user's current subscription tier
+        const tiers = await api.getSubscriptionTiers();
+        // For demo purposes, use Growth plan as default
+        const defaultTier = tiers.find((t) => t.id === "growth") || tiers[1];
+        setSubscriptionTier(defaultTier);
+      } catch (error) {
+        console.error("Failed to load subscription tier:", error);
+        toast.error("Failed to load subscription information");
+      } finally {
+        setLoadingTier(false);
+      }
+    };
+
+    loadSubscriptionTier();
+  }, []);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [savedDraft, setSavedDraft] =
     useState<MentorshipRequestFormData | null>(null);
@@ -127,7 +135,7 @@ export default function CreateMentorshipRequest() {
       localStorage.setItem("mentorship-request-draft", JSON.stringify(data));
       toast.success("Draft saved successfully!");
     } catch (error) {
-      toast.error("Failed to save draft");
+      toast.error("Failed to create mentorship program. Please try again.");
     }
   };
 
@@ -170,10 +178,11 @@ export default function CreateMentorshipRequest() {
           <div className="space-y-6">
             {/* Page Header */}
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold">Create Mentorship Request</h1>
+              <h1 className="text-3xl font-bold">Create Mentorship Program</h1>
               <p className="text-muted-foreground">
-                Define your mentorship needs, set goals, and invite team members
-                to participate.
+                Create a comprehensive mentorship program for your team. We'll
+                help you find the right coaches and structure your program for
+                maximum impact.
               </p>
             </div>
 

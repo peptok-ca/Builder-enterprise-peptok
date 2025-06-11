@@ -12,11 +12,52 @@ import {
 import { MetricDefinition, DashboardStats } from "@/types";
 
 interface MetricsOverviewProps {
-  metrics: MetricDefinition[];
-  stats: DashboardStats;
+  metrics?: MetricDefinition[];
+  stats?: DashboardStats;
 }
 
-const MetricsOverview = ({ metrics, stats }: MetricsOverviewProps) => {
+const MetricsOverview = ({ metrics = [], stats }: MetricsOverviewProps) => {
+  // Default metrics data if none provided
+  const defaultMetrics: MetricDefinition[] = [
+    {
+      id: "engagement",
+      name: "Employee Engagement",
+      description: "Overall engagement score across the organization",
+      targetValue: 85,
+      currentValue: 78,
+      unit: "%",
+      category: "engagement",
+    },
+    {
+      id: "skill_dev",
+      name: "Skill Development",
+      description: "Average skill improvement across all programs",
+      targetValue: 90,
+      currentValue: 82,
+      unit: "%",
+      category: "skill_development",
+    },
+    {
+      id: "retention",
+      name: "Retention Rate",
+      description: "Employee retention rate with mentorship programs",
+      targetValue: 95,
+      currentValue: 89,
+      unit: "%",
+      category: "retention",
+    },
+    {
+      id: "performance",
+      name: "Performance Rating",
+      description: "Average performance rating improvement",
+      targetValue: 4.5,
+      currentValue: 4.2,
+      unit: "/5",
+      category: "performance",
+    },
+  ];
+
+  const metricsData = metrics.length > 0 ? metrics : defaultMetrics;
   const getMetricIcon = (category: MetricDefinition["category"]) => {
     switch (category) {
       case "engagement":

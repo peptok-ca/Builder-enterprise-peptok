@@ -67,8 +67,9 @@ export class AuthMiddleware {
 
   requireAdmin = this.requireRole([UserType.ADMIN]);
   requireExpert = this.requireRole([UserType.EXPERT]);
-  requireEmployee = this.requireRole([UserType.EMPLOYEE]);
-  requireAdminOrExpert = this.requireRole([UserType.ADMIN, UserType.EXPERT]);
+  requireEnterprise = this.requireRole([UserType.ENTERPRISE]);
+  requireCoach = this.requireRole([UserType.COACH]);
+  requireAdminOrCoach = this.requireRole([UserType.ADMIN, UserType.COACH]);
 
   optional = async (
     req: AuthenticatedRequest,

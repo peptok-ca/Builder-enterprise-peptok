@@ -166,7 +166,7 @@ export class AuthService implements IAuthService {
             email: email.toLowerCase(),
             firstName,
             lastName,
-            userType: UserType.EMPLOYEE, // Default, can be changed later
+            userType: UserType.ENTERPRISE, // Default, can be changed later
             status: UserStatus.ACTIVE, // OAuth users are auto-verified
             oauthProvider: provider as OAuthProvider,
             oauthId,

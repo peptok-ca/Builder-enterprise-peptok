@@ -9,9 +9,9 @@ import {
 import { Transform } from "class-transformer";
 
 export enum UserType {
-  EMPLOYEE = "employee",
-  EXPERT = "expert",
   ADMIN = "admin",
+  ENTERPRISE = "enterprise",
+  COACH = "coach",
 }
 
 export enum UserStatus {

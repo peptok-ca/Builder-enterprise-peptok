@@ -2,7 +2,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create enum types
-CREATE TYPE user_type AS ENUM ('employee', 'expert', 'admin');
+CREATE TYPE user_type AS ENUM ('enterprise', 'coach', 'admin');
 CREATE TYPE user_status AS ENUM ('active', 'inactive', 'suspended', 'pending_verification');
 CREATE TYPE oauth_provider AS ENUM ('google', 'microsoft', 'email');
 CREATE TYPE subscription_status AS ENUM ('trial', 'active', 'suspended', 'cancelled', 'expired');
@@ -13,7 +13,7 @@ CREATE TYPE connection_status AS ENUM ('pending', 'active', 'completed', 'cancel
 CREATE TYPE session_status AS ENUM ('scheduled', 'completed', 'cancelled', 'no_show');
 CREATE TYPE goal_priority AS ENUM ('low', 'medium', 'high');
 CREATE TYPE goal_category AS ENUM ('leadership', 'technical', 'business', 'personal');
-CREATE TYPE skill_level AS ENUM ('beginner', 'intermediate', 'advanced', 'expert');
+CREATE TYPE skill_level AS ENUM ('beginner', 'intermediate', 'advanced', 'coach');
 
 -- Users table (central user management)
 CREATE TABLE users (
@@ -33,7 +33,7 @@ CREATE TABLE users (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_login_at TIMESTAMP WITH TIME ZONE,
     email_verified_at TIMESTAMP WITH TIME ZONE,
-    
+
     CONSTRAINT unique_oauth_provider_id UNIQUE (oauth_provider, oauth_id)
 );
 
@@ -87,23 +87,23 @@ CREATE TABLE company_subscriptions (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Company users (employees/admins)
+-- Company users (enterprises/admins)
 CREATE TABLE company_users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    role VARCHAR(50) DEFAULT 'employee',
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    company_id UUID NOT NULL REFERENCES companies(id),
+    role VARCHAR(50) DEFAULT 'enterprise',
     title VARCHAR(255),
     department VARCHAR(100),
     manager_id UUID REFERENCES company_users(id),
     joined_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     is_active BOOLEAN DEFAULT true,
-    
+
     CONSTRAINT unique_company_user UNIQUE (company_id, user_id)
 );
 
--- Expert profiles
-CREATE TABLE expert_profiles (
+-- Coach profiles
+CREATE TABLE coach_profiles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     bio TEXT,
@@ -112,7 +112,7 @@ CREATE TABLE expert_profiles (
     rating DECIMAL(3,2) DEFAULT 0,
     total_sessions INTEGER DEFAULT 0,
     total_reviews INTEGER DEFAULT 0,
-    expertise_areas JSONB DEFAULT '[]',
+    coaching_areas JSONB DEFAULT '[]',
     certifications JSONB DEFAULT '[]',
     achievements JSONB DEFAULT '[]',
     availability JSONB DEFAULT '{}',
@@ -123,8 +123,8 @@ CREATE TABLE expert_profiles (
     is_available BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    
-    CONSTRAINT unique_expert_user UNIQUE (user_id)
+
+    CONSTRAINT unique_coach_user UNIQUE (user_id)
 );
 
 -- Skills table
@@ -136,14 +136,14 @@ CREATE TABLE skills (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- User skills (for both experts and employees)
+-- User skills (for both coaches and enterprises)
 CREATE TABLE user_skills (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     skill_id UUID NOT NULL REFERENCES skills(id) ON DELETE CASCADE,
     level skill_level DEFAULT 'beginner',
     acquired_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT unique_user_skill UNIQUE (user_id, skill_id)
 );
 
@@ -155,7 +155,7 @@ CREATE TABLE mentorship_requests (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     status mentorship_request_status DEFAULT 'draft',
-    preferred_expertise JSONB DEFAULT '[]',
+    preferred_coaching JSONB DEFAULT '[]',
     budget_min DECIMAL(10,2),
     budget_max DECIMAL(10,2),
     start_date DATE,
@@ -189,16 +189,16 @@ CREATE TABLE mentorship_team_members (
     invited_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     accepted_at TIMESTAMP WITH TIME ZONE,
     declined_at TIMESTAMP WITH TIME ZONE,
-    
+
     CONSTRAINT unique_request_member UNIQUE (request_id, email)
 );
 
--- Mentorship connections (expert-employee relationships)
+-- Mentorship connections (coach-enterprise relationships)
 CREATE TABLE mentorship_connections (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     request_id UUID REFERENCES mentorship_requests(id),
-    expert_id UUID NOT NULL REFERENCES users(id),
-    employee_id UUID NOT NULL REFERENCES users(id),
+    coach_id UUID NOT NULL REFERENCES users(id),
+    enterprise_id UUID NOT NULL REFERENCES users(id),
     status connection_status DEFAULT 'pending',
     goals JSONB DEFAULT '[]',
     progress INTEGER DEFAULT 0,
@@ -209,8 +209,8 @@ CREATE TABLE mentorship_connections (
     completed_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    
-    CONSTRAINT unique_expert_employee UNIQUE (expert_id, employee_id)
+
+    CONSTRAINT unique_coach_enterprise UNIQUE (coach_id, enterprise_id)
 );
 
 -- Mentorship sessions
@@ -265,7 +265,7 @@ CREATE TABLE company_metrics (
     target_value DECIMAL(15,4),
     measurement_date DATE DEFAULT CURRENT_DATE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT unique_company_metric_date UNIQUE (company_id, metric_id, measurement_date)
 );
 
@@ -276,11 +276,11 @@ CREATE INDEX idx_users_status ON users(status);
 CREATE INDEX idx_users_type ON users(user_type);
 CREATE INDEX idx_company_users_company ON company_users(company_id);
 CREATE INDEX idx_company_users_user ON company_users(user_id);
-CREATE INDEX idx_expert_profiles_rating ON expert_profiles(rating DESC);
-CREATE INDEX idx_expert_profiles_available ON expert_profiles(is_available);
-CREATE INDEX idx_mentorship_requests_company ON mentorship_requests(company_id);
-CREATE INDEX idx_mentorship_requests_status ON mentorship_requests(status);
-CREATE INDEX idx_mentorship_connections_expert ON mentorship_connections(expert_id);
+CREATE INDEX idx_coach_profiles_rating ON coach_profiles(rating DESC);
+CREATE INDEX idx_coach_profiles_available ON coach_profiles(is_available);
+-- Connections and sessions indexes
+CREATE INDEX idx_mentorship_connections_coach ON mentorship_connections(coach_id);
+CREATE INDEX idx_mentorship_connections_enterprise ON mentorship_connections(enterprise_id);
 CREATE INDEX idx_mentorship_connections_employee ON mentorship_connections(employee_id);
 CREATE INDEX idx_mentorship_sessions_connection ON mentorship_sessions(connection_id);
 CREATE INDEX idx_mentorship_sessions_scheduled ON mentorship_sessions(scheduled_at);
@@ -302,7 +302,7 @@ CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECU
 CREATE TRIGGER update_companies_updated_at BEFORE UPDATE ON companies FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_subscription_tiers_updated_at BEFORE UPDATE ON subscription_tiers FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_company_subscriptions_updated_at BEFORE UPDATE ON company_subscriptions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_expert_profiles_updated_at BEFORE UPDATE ON expert_profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_coach_profiles_updated_at BEFORE UPDATE ON coach_profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_mentorship_requests_updated_at BEFORE UPDATE ON mentorship_requests FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_mentorship_connections_updated_at BEFORE UPDATE ON mentorship_connections FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_mentorship_sessions_updated_at BEFORE UPDATE ON mentorship_sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

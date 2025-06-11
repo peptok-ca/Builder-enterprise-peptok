@@ -39,7 +39,7 @@ export const authValidation = {
       .withMessage("Last name must be between 2 and 50 characters"),
     body("userType")
       .isIn(Object.values(UserType))
-      .withMessage("User type must be employee, expert, or admin"),
+      .withMessage("User type must be enterprise, coach, or admin"),
     body("phone")
       .optional()
       .isMobilePhone("any")
@@ -146,7 +146,7 @@ export const userValidation = {
     query("userType")
       .optional()
       .isIn(Object.values(UserType))
-      .withMessage("User type must be employee, expert, or admin"),
+      .withMessage("User type must be enterprise, coach, or admin"),
     query("status")
       .optional()
       .isIn(["active", "inactive", "suspended", "pending_verification"])

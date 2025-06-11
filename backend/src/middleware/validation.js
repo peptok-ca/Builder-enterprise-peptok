@@ -47,8 +47,8 @@ export const validateRegister = [
     .isLength({ min: 2 })
     .withMessage("Last name must be at least 2 characters"),
   body("userType")
-    .isIn(["employee", "expert", "admin"])
-    .withMessage("User type must be employee, expert, or admin"),
+    .isIn(["enterprise", "coach", "admin"])
+    .withMessage("User type must be enterprise, coach, or admin"),
   handleValidationErrors,
 ];
 

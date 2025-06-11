@@ -626,7 +626,10 @@ const Index = () => {
                 {loadingPlans ? (
                   // Loading state
                   Array.from({ length: 3 }).map((_, index) => (
-                    <Card key={index} className="relative backdrop-blur-sm bg-white/90 border-white/20 shadow-xl">
+                    <Card
+                      key={index}
+                      className="relative backdrop-blur-sm bg-white/90 border-white/20 shadow-xl"
+                    >
                       <CardHeader className="text-center space-y-4">
                         <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
                         <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
@@ -635,7 +638,10 @@ const Index = () => {
                       <CardContent>
                         <div className="space-y-2">
                           {Array.from({ length: 4 }).map((_, i) => (
-                            <div key={i} className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                            <div
+                              key={i}
+                              className="h-4 bg-gray-200 rounded animate-pulse"
+                            ></div>
                           ))}
                         </div>
                       </CardContent>
@@ -645,7 +651,9 @@ const Index = () => {
                   <div className="col-span-3 text-center py-8">
                     <div className="text-gray-500">
                       <p>Unable to load pricing plans at the moment.</p>
-                      <p className="text-sm mt-2">Please refresh the page or try again later.</p>
+                      <p className="text-sm mt-2">
+                        Please refresh the page or try again later.
+                      </p>
                     </div>
                   </div>
                 ) : (
@@ -659,76 +667,75 @@ const Index = () => {
                       : "per user/month";
 
                     return (
-                        <Card
-                          key={plan.id}
-                          className={`relative backdrop-blur-sm bg-white/90 border-white/20 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isPopular ? "ring-2 ring-blue-500 scale-105" : ""}`}
-                        >
-                          {plan.badge && (
-                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                              <Badge
-                                className={`${isPopular ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white" : "bg-gray-100 text-gray-700"} shadow-lg`}
-                              >
-                                {plan.badge}
-                              </Badge>
+                      <Card
+                        key={plan.id}
+                        className={`relative backdrop-blur-sm bg-white/90 border-white/20 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isPopular ? "ring-2 ring-blue-500 scale-105" : ""}`}
+                      >
+                        {plan.badge && (
+                          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                            <Badge
+                              className={`${isPopular ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white" : "bg-gray-100 text-gray-700"} shadow-lg`}
+                            >
+                              {plan.badge}
+                            </Badge>
+                          </div>
+                        )}
+                        <CardHeader className="text-center space-y-4">
+                          <CardTitle className="text-2xl">
+                            {plan.name}
+                          </CardTitle>
+                          <div>
+                            <span className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                              {price}
+                            </span>
+                            <span className="text-muted-foreground">
+                              /{period}
+                            </span>
+                          </div>
+                          {plan.minimumUsers && plan.minimumUsers > 1 && (
+                            <p className="text-sm text-muted-foreground">
+                              Minimum {plan.minimumUsers} users
+                            </p>
+                          )}
+                          <CardDescription className="text-base">
+                            {plan.description}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          <ul className="space-y-4">
+                            {plan.features
+                              .slice(0, 5)
+                              .map((feature, featureIndex) => (
+                                <li
+                                  key={featureIndex}
+                                  className="flex items-center space-x-3"
+                                >
+                                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                                  <span className="text-sm">{feature}</span>
+                                </li>
+                              ))}
+                          </ul>
+                          {plan.extraSeatPrice && plan.extraSeatPrice > 0 && (
+                            <div className="pt-2 border-t">
+                              <p className="text-xs text-muted-foreground">
+                                Additional seats: {plan.currency || "CA"}$
+                                {plan.extraSeatPrice}/user/month
+                              </p>
                             </div>
                           )}
-                          <CardHeader className="text-center space-y-4">
-                            <CardTitle className="text-2xl">
-                              {plan.name}
-                            </CardTitle>
-                            <div>
-                              <span className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
-                                {price}
-                              </span>
-                              <span className="text-muted-foreground">
-                                /{period}
-                              </span>
-                            </div>
-                            {plan.minimumUsers && plan.minimumUsers > 1 && (
-                              <p className="text-sm text-muted-foreground">
-                                Minimum {plan.minimumUsers} users
-                              </p>
-                            )}
-                            <CardDescription className="text-base">
-                              {plan.description}
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-6">
-                            <ul className="space-y-4">
-                              {plan.features
-                                .slice(0, 5)
-                                .map((feature, featureIndex) => (
-                                  <li
-                                    key={featureIndex}
-                                    className="flex items-center space-x-3"
-                                  >
-                                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                                    <span className="text-sm">{feature}</span>
-                                  </li>
-                                ))}
-                            </ul>
-                            {plan.extraSeatPrice && plan.extraSeatPrice > 0 && (
-                              <div className="pt-2 border-t">
-                                <p className="text-xs text-muted-foreground">
-                                  Additional seats: {plan.currency || "CA"}$
-                                  {plan.extraSeatPrice}/user/month
-                                </p>
-                              </div>
-                            )}
-                            <Button
-                              className={`w-full transition-all duration-300 hover:scale-105 ${isPopular ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg" : ""}`}
-                              variant={isPopular ? "default" : "outline"}
-                              size="lg"
-                              onClick={() => navigate("/signup")}
-                            >
-                              {plan.customPricing
-                                ? "Contact Sales"
-                                : "Start Now"}
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
+                          <Button
+                            className={`w-full transition-all duration-300 hover:scale-105 ${isPopular ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg" : ""}`}
+                            variant={isPopular ? "default" : "outline"}
+                            size="lg"
+                            onClick={() => navigate("/signup")}
+                          >
+                            {plan.customPricing ? "Contact Sales" : "Start Now"}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    );
+                  })
+                )}
               </div>
             </div>
           </section>

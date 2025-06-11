@@ -34,16 +34,16 @@ import { Link } from "react-router-dom";
 const features = [
   {
     icon: Users,
-    title: "Expert Network",
+    title: "Coach Network",
     description:
-      "Access to a curated network of retired industry experts and leaders with proven track records.",
+      "Access to a curated network of retired industry coaches and leaders with proven track records.",
     color: "from-blue-500 to-blue-600",
   },
   {
     icon: Search,
     title: "Smart Matching",
     description:
-      "AI-powered matching algorithm connects employees with experts based on goals, skills, and experience.",
+      "AI-powered matching algorithm connects enterprises with coaches based on goals, skills, and experience.",
     color: "from-purple-500 to-purple-600",
   },
   {
@@ -105,7 +105,7 @@ const testimonials = [
     avatar:
       "https://images.unsplash.com/photo-1494790108755-2616b9d3cc57?w=400&h=400&fit=crop&crop=face",
     quote:
-      "Peptok transformed our mentorship program. We saw a 40% increase in employee engagement and retention within 6 months.",
+      "Peptok transformed our mentorship program. We saw a 40% increase in enterprise engagement and retention within 6 months.",
     rating: 5,
     impact: "+40% Engagement",
   },
@@ -116,7 +116,7 @@ const testimonials = [
     avatar:
       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
     quote:
-      "The quality of experts and the matching system exceeded our expectations. Our employees are developing skills faster than ever.",
+      "The quality of coaches and the matching system exceeded our expectations. Our enterprises are developing skills faster than ever.",
     rating: 5,
     impact: "+60% Skill Growth",
   },
@@ -137,10 +137,10 @@ const pricingPlans = [
   {
     name: "Starter",
     price: "$49",
-    period: "per employee/month",
+    period: "per enterprise/month",
     description: "Perfect for small teams getting started with mentorship",
     features: [
-      "Up to 50 employees",
+      "Up to 50 enterprises",
       "Basic expert matching",
       "Monthly progress reports",
       "Email support",
@@ -154,7 +154,7 @@ const pricingPlans = [
     period: "per employee/month",
     description: "Ideal for growing companies scaling their programs",
     features: [
-      "Up to 250 employees",
+      "Up to 250 enterprises",
       "Advanced AI matching",
       "Real-time analytics",
       "Priority support",
@@ -170,7 +170,7 @@ const pricingPlans = [
     period: "pricing",
     description: "For large organizations with complex needs",
     features: [
-      "Unlimited employees",
+      "Unlimited enterprises",
       "Dedicated success manager",
       "Custom integrations",
       "Advanced security",
@@ -182,7 +182,7 @@ const pricingPlans = [
 ];
 
 const stats = [
-  { value: "500+", label: "Expert Mentors", icon: Users },
+  { value: "500+", label: "Coach Mentors", icon: Users },
   { value: "10k+", label: "Connections Made", icon: Target },
   { value: "95%", label: "Success Rate", icon: TrendingUp },
   { value: "50+", label: "Countries", icon: Globe },
@@ -259,7 +259,7 @@ const Index = () => {
                       Connect with
                       <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
                         {" "}
-                        Retired Experts
+                        Retired Coaches
                       </span>{" "}
                       for
                       <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
@@ -268,9 +268,9 @@ const Index = () => {
                       </span>
                     </h1>
                     <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
-                      Peptok bridges the gap between your employees and seasoned
-                      professionals, creating meaningful mentorship connections
-                      that drive measurable business outcomes.
+                      Peptok bridges the gap between your enterprises and
+                      seasoned professionals, creating meaningful mentorship
+                      connections that drive measurable business outcomes.
                     </p>
                   </div>
 
@@ -378,7 +378,7 @@ const Index = () => {
                       {/* Feature Icons */}
                       <div className="flex justify-center space-x-8 pt-4">
                         {[
-                          { icon: Users, label: "Expert Network", delay: "0s" },
+                          { icon: Users, label: "Coach Network", delay: "0s" },
                           {
                             icon: Target,
                             label: "Goal Tracking",
@@ -677,9 +677,9 @@ const Index = () => {
                   Ready to transform your workforce development?
                 </h2>
                 <p className="text-xl text-muted-foreground leading-relaxed">
-                  Join leading companies using Peptok to connect their employees
-                  with expert mentors and drive measurable business outcomes.
-                  Start your free trial today.
+                  Join leading companies using Peptok to connect their
+                  enterprises with coach mentors and drive measurable business
+                  outcomes. Start your free trial today.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-6 justify-center">
                   <Button

@@ -260,7 +260,7 @@ const Signup = () => {
                       disabled={isLoading}
                     >
                       <User className="mr-2 h-4 w-4" />
-                      Employee
+                      Enterprise
                     </Button>
                     <Button
                       type="button"
@@ -272,7 +272,7 @@ const Signup = () => {
                       disabled={isLoading}
                     >
                       <Building className="mr-2 h-4 w-4" />
-                      Expert/Mentor
+                      Coach
                     </Button>
                   </div>
                 </div>

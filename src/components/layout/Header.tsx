@@ -50,17 +50,16 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
 
   const navigationItems = [
     {
-      label: "Dashboard",
+      label: userType === "admin" ? "Company Dashboard" : "Dashboard",
       path: getDashboardPath(userType),
       roles: ["enterprise", "coach", "admin"],
     },
-    { label: "Coaches", path: "/coaches", roles: ["enterprise", "admin"] },
+    { label: "Mentors", path: "/coaches", roles: ["enterprise", "admin"] },
     {
       label: "Connections",
       path: "/connections",
       roles: ["enterprise", "coach"],
     },
-    { label: "Company", path: "/admin", roles: ["admin"] },
   ];
 
   const filteredItems = navigationItems.filter((item) =>

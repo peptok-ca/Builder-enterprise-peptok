@@ -26,42 +26,8 @@ const Logo = ({ className, size = "md", variant = "full" }: LogoProps) => {
     </div>
   );
 
-  if (variant === "icon-only") {
-    // For icon-only, show just a cropped version focusing on the arc
-    return (
-      <div className={cn("flex items-center", className)}>
-        <img
-          src="/peptok-logo.png"
-          alt="Peptok"
-          className={cn("w-auto object-contain", sizeClasses[size])}
-          style={{
-            objectPosition: "left center",
-            aspectRatio: "2/1",
-          }}
-          onLoad={handleImageLoad}
-          onError={handleImageError}
-        />
-        <noscript>
-          <TextLogo />
-        </noscript>
-      </div>
-    );
-  }
-
-  return (
-    <div className={cn("flex items-center", className)}>
-      <img
-        src="/peptok-logo.png"
-        alt="Peptok"
-        className={cn("w-auto object-contain", sizeClasses[size])}
-        onLoad={handleImageLoad}
-        onError={handleImageError}
-      />
-      <noscript>
-        <TextLogo />
-      </noscript>
-    </div>
-  );
+  // Use text logo as the primary solution to avoid deployment issues
+  return <TextLogo />;
 };
 
 export default Logo;

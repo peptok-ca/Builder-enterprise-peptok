@@ -86,7 +86,9 @@ const App: React.FC = () => {
               <Route
                 path="/mentorship/new"
                 element={
-                  <ProtectedRoute allowedRoles={["admin", "enterprise"]}>
+                  <ProtectedRoute
+                    allowedRoles={["platform_admin", "company_admin"]}
+                  >
                     <CreateMentorshipRequest />
                   </ProtectedRoute>
                 }
@@ -94,7 +96,9 @@ const App: React.FC = () => {
               <Route
                 path="/mentorship/matching"
                 element={
-                  <ProtectedRoute allowedRoles={["admin", "enterprise"]}>
+                  <ProtectedRoute
+                    allowedRoles={["platform_admin", "company_admin"]}
+                  >
                     <CoachMatching />
                   </ProtectedRoute>
                 }

@@ -181,6 +181,13 @@ class AuthService {
     company?: string;
     role?: string;
     userType: "enterprise" | "coach";
+    businessDetails?: {
+      companyName: string;
+      industry: string;
+      employeeCount: number;
+      website?: string;
+      phone?: string;
+    };
   }): Promise<AuthResponse> {
     try {
       // Simulate API call delay
@@ -217,7 +224,16 @@ class AuthService {
         provider: "email",
         userType: userData.userType,
         isNewUser: true,
+        businessDetails: userData.businessDetails,
       };
+
+      // Save business details to localStorage for onboarding reuse
+      if (userData.businessDetails) {
+        localStorage.setItem(
+          "peptok_business_details",
+          JSON.stringify(userData.businessDetails),
+        );
+      }
 
       // Save to mock database
       mockUsers.push(newUser);

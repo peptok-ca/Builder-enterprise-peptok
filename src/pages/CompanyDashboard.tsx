@@ -300,7 +300,7 @@ const CompanyDashboard = () => {
       </div>
 
       <div className="relative z-10">
-        <Header userType="admin" />
+        <Header userType="platform_admin" />
 
         <main className="container py-8">
           <div className="space-y-8">

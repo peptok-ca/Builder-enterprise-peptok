@@ -208,10 +208,15 @@ const Login = () => {
                 <AlertDescription className="text-blue-800">
                   <strong>Demo Accounts (any password works):</strong>
                   <br />
-                  <strong>Admin (can create sessions):</strong> demo@admin.com
+                  <strong>
+                    Platform Admin (manages entire platform):
+                  </strong>{" "}
+                  demo@platform.com
                   <br />
-                  <strong>Enterprise (can create sessions):</strong>{" "}
-                  demo@enterprise.com
+                  <strong>
+                    Company Admin (manages company, creates sessions):
+                  </strong>{" "}
+                  demo@company.com
                   <br />
                   <strong>Coach (cannot create sessions):</strong>{" "}
                   demo@coach.com

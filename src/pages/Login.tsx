@@ -206,14 +206,15 @@ const Login = () => {
               <Alert className="mb-6 bg-blue-50 border-blue-200">
                 <AlertCircle className="h-4 w-4 text-blue-600" />
                 <AlertDescription className="text-blue-800">
-                  <strong>Demo Accounts:</strong>
+                  <strong>Demo Accounts (any password works):</strong>
                   <br />
-                  <strong>Enterprise:</strong> enterprise@company.com /
-                  password123
+                  <strong>Admin (can create sessions):</strong> demo@admin.com
                   <br />
-                  <strong>Admin:</strong> admin@company.com / password123
+                  <strong>Enterprise (can create sessions):</strong>{" "}
+                  demo@enterprise.com
                   <br />
-                  <strong>Coach:</strong> coach@mentor.com / password123
+                  <strong>Coach (cannot create sessions):</strong>{" "}
+                  demo@coach.com
                 </AlertDescription>
               </Alert>
 

@@ -484,6 +484,22 @@ class AuthService {
     }
   }
 
+  // Get saved business details for onboarding
+  getSavedBusinessDetails() {
+    try {
+      const businessDetails = localStorage.getItem("peptok_business_details");
+      return businessDetails ? JSON.parse(businessDetails) : null;
+    } catch (error) {
+      console.error("Failed to load business details:", error);
+      return null;
+    }
+  }
+
+  // Clear saved business details after onboarding
+  clearSavedBusinessDetails() {
+    localStorage.removeItem("peptok_business_details");
+  }
+
   // Password reset (email)
   async resetPassword(
     email: string,

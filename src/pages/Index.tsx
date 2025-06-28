@@ -611,9 +611,10 @@ const Index = () => {
             <div className="absolute inset-0 bg-gradient-to-l from-blue-400/5 via-transparent to-blue-600/5"></div>
             <div className="container relative">
               <div className="text-center space-y-4 mb-16">
-                <Badge variant="outline" className="mb-4">
-                  Pricing
-                </Badge>
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <Badge variant="outline">Pricing</Badge>
+                  <BackendStatus />
+                </div>
                 <h2 className="text-4xl md:text-5xl font-bold">
                   Simple, transparent pricing
                 </h2>

@@ -265,15 +265,15 @@ const Signup = () => {
                     <Button
                       type="button"
                       variant={
-                        formData.userType === "enterprise"
+                        formData.userType === "company_admin"
                           ? "default"
                           : "outline"
                       }
                       onClick={() =>
-                        handleInputChange("userType", "enterprise")
+                        handleInputChange("userType", "company_admin")
                       }
                     >
-                      👥 Enterprise
+                      👥 Company Admin
                     </Button>
                     <Button
                       type="button"

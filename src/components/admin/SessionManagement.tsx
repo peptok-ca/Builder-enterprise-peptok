@@ -263,14 +263,18 @@ export function SessionManagement({ matches = [] }: SessionManagementProps) {
     selectedCoach &&
     calculateSessionCosts(selectedCoach, durationMinutes, participantCount);
 
-  // Only allow admin and enterprise users to access this
-  if (!user || (user.userType !== "admin" && user.userType !== "enterprise")) {
+  // Only allow platform admin and company admin users to access this
+  if (
+    !user ||
+    (user.userType !== "platform_admin" && user.userType !== "company_admin")
+  ) {
     return (
       <Card>
         <CardContent className="pt-6">
           <div className="text-center">
             <p className="text-muted-foreground">
-              Access denied. Admin or Enterprise privileges required.
+              Access denied. Platform Admin or Company Admin privileges
+              required.
             </p>
           </div>
         </CardContent>

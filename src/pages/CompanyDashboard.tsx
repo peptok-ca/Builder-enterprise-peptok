@@ -3,6 +3,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import MetricsOverview from "@/components/metrics/MetricsOverview";
 import { MentorshipRequestProgress } from "@/components/mentorship/MentorshipRequestProgress";
+import { SessionManagement } from "@/components/admin/SessionManagement";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Card,

@@ -54,23 +54,23 @@ const App: React.FC = () => {
               <Route
                 path="/dashboard"
                 element={
-                  <ProtectedRoute requiredUserType="enterprise">
+                  <ProtectedRoute requiredUserType="company_admin">
                     <EnterpriseDashboard />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/enterprise/dashboard"
+                path="/company/dashboard"
                 element={
-                  <ProtectedRoute requiredUserType="enterprise">
+                  <ProtectedRoute requiredUserType="company_admin">
                     <EnterpriseDashboard />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/admin"
+                path="/platform-admin"
                 element={
-                  <ProtectedRoute requiredUserType="admin">
+                  <ProtectedRoute requiredUserType="platform_admin">
                     <CompanyDashboard />
                   </ProtectedRoute>
                 }

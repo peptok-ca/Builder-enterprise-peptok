@@ -32,17 +32,17 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
   const { user, isAuthenticated, logout } = useAuth();
 
   // Use auth context user type if available, otherwise fall back to prop
-  const userType = user?.userType || propUserType || "enterprise";
+  const userType = user?.userType || propUserType || "company_admin";
 
   const isActive = (path: string) => location.pathname === path;
 
   const getDashboardPath = (userType: string) => {
     switch (userType) {
-      case "admin":
-        return "/admin";
+      case "platform_admin":
+        return "/platform-admin";
       case "coach":
         return "/coach/dashboard";
-      case "enterprise":
+      case "company_admin":
       default:
         return "/dashboard";
     }

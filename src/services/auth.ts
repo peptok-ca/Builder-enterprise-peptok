@@ -429,13 +429,13 @@ class AuthService {
         } else {
           // Route to appropriate dashboard based on user type
           switch (user?.userType) {
-            case "admin":
-              window.location.href = "/admin";
+            case "platform_admin":
+              window.location.href = "/platform-admin";
               break;
             case "coach":
               window.location.href = "/coach/dashboard";
               break;
-            case "enterprise":
+            case "company_admin":
             default:
               window.location.href = "/dashboard";
               break;

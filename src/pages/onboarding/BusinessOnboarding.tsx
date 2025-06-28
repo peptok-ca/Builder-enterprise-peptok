@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ProgressStepper } from "@/components/ui/ProgressStepper";
 import {
@@ -21,6 +21,7 @@ import { CheckCircle, Mail, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SubscriptionTier, CompanyProfile } from "@/types";
 import { toast } from "sonner";
+import { authService } from "@/services/auth";
 
 type OnboardingStep =
   | "company-details"

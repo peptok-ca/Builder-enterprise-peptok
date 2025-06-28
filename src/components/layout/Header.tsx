@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
-  userType?: "enterprise" | "coach" | "admin";
+  userType?: "platform_admin" | "company_admin" | "coach";
 }
 
 const Header = ({ userType: propUserType }: HeaderProps) => {

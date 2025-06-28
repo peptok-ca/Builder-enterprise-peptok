@@ -415,7 +415,7 @@ const Signup = () => {
                       <SelectValue placeholder="Select your role" />
                     </SelectTrigger>
                     <SelectContent className="bg-white/95 backdrop-blur-md">
-                      {formData.userType === "enterprise" ? (
+                      {formData.userType === "company_admin" ? (
                         <>
                           <SelectItem value="software-engineer">
                             Software Engineer

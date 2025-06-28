@@ -48,28 +48,53 @@ export interface AuthResponse {
 
 // Simulated user database for demo purposes
 const mockUsers: User[] = [
+  // Platform Admin - Manages entire platform
   {
-    id: "user-enterprise",
-    email: "enterprise@company.com",
-    name: "John Doe",
-    firstName: "John",
-    lastName: "Doe",
-    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
+    id: "platform-admin-1",
+    email: "platform@peptok.com",
+    name: "Platform Admin",
+    firstName: "Platform",
+    lastName: "Admin",
+    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=platform",
     provider: "email",
-    userType: "enterprise",
+    userType: "platform_admin",
   },
   {
-    id: "user-admin",
+    id: "demo-platform-admin",
+    email: "demo@platform.com",
+    name: "Demo Platform Admin",
+    firstName: "Demo",
+    lastName: "Platform Admin",
+    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=demoplatform",
+    provider: "email",
+    userType: "platform_admin",
+  },
+
+  // Company/SME Admin - Manages their company
+  {
+    id: "company-admin-1",
     email: "admin@company.com",
-    name: "Admin User",
-    firstName: "Admin",
-    lastName: "User",
-    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=admin",
+    name: "Company Admin",
+    firstName: "Company",
+    lastName: "Admin",
+    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=company",
     provider: "email",
-    userType: "admin",
+    userType: "company_admin",
   },
   {
-    id: "user-coach",
+    id: "demo-company-admin",
+    email: "demo@company.com",
+    name: "Demo Company Admin",
+    firstName: "Demo",
+    lastName: "Company Admin",
+    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=democompany",
+    provider: "email",
+    userType: "company_admin",
+  },
+
+  // Coaches - Individual mentors/coaches
+  {
+    id: "coach-1",
     email: "coach@mentor.com",
     name: "Sarah Coach",
     firstName: "Sarah",
@@ -77,27 +102,6 @@ const mockUsers: User[] = [
     picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
     provider: "email",
     userType: "coach",
-  },
-  // Additional demo users for testing
-  {
-    id: "demo-admin",
-    email: "demo@admin.com",
-    name: "Demo Admin",
-    firstName: "Demo",
-    lastName: "Admin",
-    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=demoadmin",
-    provider: "email",
-    userType: "admin",
-  },
-  {
-    id: "demo-enterprise",
-    email: "demo@enterprise.com",
-    name: "Demo Enterprise",
-    firstName: "Demo",
-    lastName: "Enterprise",
-    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=demoenterprise",
-    provider: "email",
-    userType: "enterprise",
   },
   {
     id: "demo-coach",

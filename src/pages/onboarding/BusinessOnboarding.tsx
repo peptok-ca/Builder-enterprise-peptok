@@ -66,6 +66,30 @@ export default function BusinessOnboarding() {
   // Track completed steps
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
 
+  // Load saved business details on component mount
+  useEffect(() => {
+    const savedBusinessDetails = authService.getSavedBusinessDetails();
+    if (savedBusinessDetails) {
+      // Pre-populate company data from signup
+      const preFilledData: CompanyFormData = {
+        companyName: savedBusinessDetails.companyName,
+        email: authService.getCurrentUser()?.email || "",
+        industry: savedBusinessDetails.industry,
+        employeeCount: savedBusinessDetails.employeeCount,
+        website: savedBusinessDetails.website || "",
+        phone: savedBusinessDetails.phone || "",
+        address: {
+          street: "",
+          city: "",
+          state: "",
+          country: "",
+          zipCode: "",
+        },
+      };
+      setCompanyData(preFilledData);
+    }
+  }, []);
+
   const handleCompanyDetailsSubmit = async (data: CompanyFormData) => {
     setIsLoading(true);
 

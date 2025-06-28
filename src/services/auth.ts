@@ -78,6 +78,37 @@ const mockUsers: User[] = [
     provider: "email",
     userType: "coach",
   },
+  // Additional demo users for testing
+  {
+    id: "demo-admin",
+    email: "demo@admin.com",
+    name: "Demo Admin",
+    firstName: "Demo",
+    lastName: "Admin",
+    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=demoadmin",
+    provider: "email",
+    userType: "admin",
+  },
+  {
+    id: "demo-enterprise",
+    email: "demo@enterprise.com",
+    name: "Demo Enterprise",
+    firstName: "Demo",
+    lastName: "Enterprise",
+    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=demoenterprise",
+    provider: "email",
+    userType: "enterprise",
+  },
+  {
+    id: "demo-coach",
+    email: "demo@coach.com",
+    name: "Demo Coach",
+    firstName: "Demo",
+    lastName: "Coach",
+    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=democoach",
+    provider: "email",
+    userType: "coach",
+  },
 ];
 
 class AuthService {

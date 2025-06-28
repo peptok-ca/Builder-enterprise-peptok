@@ -222,7 +222,7 @@ class AuthService {
     password: string;
     company?: string;
     role?: string;
-    userType: "enterprise" | "coach";
+    userType: "company_admin" | "coach";
     businessDetails?: {
       companyName: string;
       industry: string;

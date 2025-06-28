@@ -33,6 +33,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "@/services/api";
 import { SubscriptionTier } from "@/types";
+import { BackendStatus } from "@/components/ui/BackendStatus";
 
 const features = [
   {

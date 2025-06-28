@@ -41,15 +41,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string) => {
     try {
+      setIsLoading(true);
       const response = await authService.loginWithEmail(email, password);
       if (response.success && response.user) {
         setUser(response.user);
         return { success: true };
       } else {
-        return { success: false, error: response.error };
+        return { success: false, error: response.error || "Login failed" };
       }
     } catch (error) {
-      return { success: false, error: "Login failed" };
+      console.error("Login error:", error);
+      return { success: false, error: "Login failed. Please try again." };
+    } finally {
+      setIsLoading(false);
     }
   };
 

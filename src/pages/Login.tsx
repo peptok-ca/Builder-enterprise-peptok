@@ -62,15 +62,15 @@ const Login = () => {
         const currentUser = authService.getCurrentUser();
         if (currentUser) {
           // Redirect based on user type
-          let redirectPath = "/dashboard"; // default for enterprise
+          let redirectPath = "/dashboard"; // default for company admin
           switch (currentUser.userType) {
-            case "admin":
-              redirectPath = "/admin";
+            case "platform_admin":
+              redirectPath = "/platform-admin";
               break;
             case "coach":
               redirectPath = "/coach/dashboard";
               break;
-            case "enterprise":
+            case "company_admin":
             default:
               redirectPath = "/dashboard";
               break;

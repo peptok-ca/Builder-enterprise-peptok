@@ -401,7 +401,7 @@ class AuthService {
         // Create new user from OAuth data
         user = {
           ...userData,
-          userType: "enterprise", // Default to enterprise, can be changed later
+          userType: "company_admin", // Default to company admin, can be changed later
           isNewUser: true,
         };
         mockUsers.push(user);

@@ -182,7 +182,10 @@ export default function CreateMentorshipRequest() {
           <div className="space-y-6">
             {/* Page Header */}
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold">Create New Program</h1>
+              <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold">Create New Program</h1>
+                <BackendStatus />
+              </div>
               <p className="text-muted-foreground">
                 Create a comprehensive mentorship program for your team. We'll
                 help you find the right mentors and structure your program for

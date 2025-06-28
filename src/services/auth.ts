@@ -29,6 +29,13 @@ export interface User {
   provider: "email" | "google" | "microsoft";
   userType: "enterprise" | "coach" | "admin";
   isNewUser?: boolean;
+  businessDetails?: {
+    companyName: string;
+    industry: string;
+    employeeCount: number;
+    website?: string;
+    phone?: string;
+  };
 }
 
 export interface AuthResponse {

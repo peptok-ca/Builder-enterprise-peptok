@@ -52,30 +52,31 @@ const Login = () => {
         return;
       }
 
-      // Attempt login
-      const response = await authService.loginWithEmail(
-        formData.email,
-        formData.password,
-      );
+      // Attempt login using AuthContext
+      const response = await login(formData.email, formData.password);
 
-      if (response.success && response.user) {
+      if (response.success) {
         toast.success("Successfully signed in!");
 
-        // Redirect based on user type
-        let redirectPath = "/dashboard"; // default for enterprise
-        switch (response.user.userType) {
-          case "admin":
-            redirectPath = "/admin";
-            break;
-          case "coach":
-            redirectPath = "/coach/dashboard";
-            break;
-          case "enterprise":
-          default:
-            redirectPath = "/dashboard";
-            break;
+        // Get the current user to determine redirect path
+        const currentUser = authService.getCurrentUser();
+        if (currentUser) {
+          // Redirect based on user type
+          let redirectPath = "/dashboard"; // default for enterprise
+          switch (currentUser.userType) {
+            case "admin":
+              redirectPath = "/admin";
+              break;
+            case "coach":
+              redirectPath = "/coach/dashboard";
+              break;
+            case "enterprise":
+            default:
+              redirectPath = "/dashboard";
+              break;
+          }
+          navigate(redirectPath);
         }
-        navigate(redirectPath);
       } else {
         setError(response.error || "Login failed. Please try again.");
       }

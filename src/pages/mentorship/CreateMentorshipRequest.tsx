@@ -110,7 +110,7 @@ export default function CreateMentorshipRequest() {
 
       // Navigate to appropriate dashboard based on user type
       const dashboardPath =
-        user?.userType === "admin" ? "/admin" : "/dashboard";
+        user?.userType === "platform_admin" ? "/platform-admin" : "/dashboard";
       navigate(dashboardPath, {
         state: {
           newRequest: request,

@@ -27,7 +27,7 @@ export interface User {
   lastName?: string;
   picture?: string;
   provider: "email" | "google" | "microsoft";
-  userType: "enterprise" | "coach" | "admin";
+  userType: "platform_admin" | "company_admin" | "coach";
   isNewUser?: boolean;
   businessDetails?: {
     companyName: string;

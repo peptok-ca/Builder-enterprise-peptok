@@ -37,7 +37,9 @@ export function ProtectedRoute({
       if (!hasRequiredType || !hasAllowedRole) {
         // Redirect to appropriate dashboard based on user type
         const userDashboard =
-          user?.userType === "admin" ? "/admin" : "/dashboard";
+          user?.userType === "platform_admin"
+            ? "/platform-admin"
+            : "/dashboard";
         navigate(userDashboard);
         return;
       }

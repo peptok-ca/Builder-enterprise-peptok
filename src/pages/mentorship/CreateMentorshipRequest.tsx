@@ -26,6 +26,7 @@ import { SubscriptionTier, MentorshipRequest } from "@/types";
 import { toast } from "sonner";
 import { api } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { BackendStatus } from "@/components/ui/BackendStatus";
 
 export default function CreateMentorshipRequest() {
   const navigate = useNavigate();

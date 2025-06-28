@@ -5,8 +5,8 @@ import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredUserType?: "enterprise" | "coach" | "admin";
-  allowedRoles?: ("enterprise" | "coach" | "admin")[];
+  requiredUserType?: "platform_admin" | "company_admin" | "coach";
+  allowedRoles?: ("platform_admin" | "company_admin" | "coach")[];
   redirectTo?: string;
 }
 

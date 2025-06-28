@@ -764,6 +764,11 @@ const CompanyDashboard = () => {
                 </div>
               </TabsContent>
 
+              {/* Sessions Tab */}
+              <TabsContent value="sessions" className="space-y-6">
+                <SessionManagement />
+              </TabsContent>
+
               {/* Analytics Tab */}
               <TabsContent value="analytics" className="space-y-6">
                 <MetricsOverview />

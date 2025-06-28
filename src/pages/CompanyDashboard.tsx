@@ -453,6 +453,13 @@ const CompanyDashboard = () => {
                   Mentorship Requests
                 </TabsTrigger>
                 <TabsTrigger
+                  value="sessions"
+                  className="flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Sessions
+                </TabsTrigger>
+                <TabsTrigger
                   value="departments"
                   className="flex items-center gap-2"
                 >

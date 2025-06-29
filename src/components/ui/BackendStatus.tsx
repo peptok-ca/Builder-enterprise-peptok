@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, CheckCircle, Wifi, WifiOff } from "lucide-react";
+import { Environment } from "@/utils/environment";
 
 interface BackendStatusProps {
   className?: string;

@@ -35,8 +35,8 @@ import { BackendStatus } from "@/components/ui/BackendStatus";
 export default function CreateMentorshipRequest() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [subscriptionTier, setSubscriptionTier] =
-    useState<SubscriptionTier | null>(null);
+  const [sessionPricingTier, setSessionPricingTier] =
+    useState<SessionPricingTier | null>(null);
   const [loadingTier, setLoadingTier] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

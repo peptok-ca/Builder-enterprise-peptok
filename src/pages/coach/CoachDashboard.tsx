@@ -457,6 +457,14 @@ export const CoachDashboard: React.FC = () => {
               </div>
             </div>
 
+            {/* Session Settings */}
+            <CoachSessionSettings
+              onSettingsUpdated={(settings) => {
+                toast.success("Session settings updated successfully!");
+                console.log("Updated settings:", settings);
+              }}
+            />
+
             {/* Recent Activity */}
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">

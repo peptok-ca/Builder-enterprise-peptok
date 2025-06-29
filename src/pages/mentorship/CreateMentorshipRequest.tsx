@@ -22,7 +22,11 @@ import {
   AlertTriangle,
   CreditCard,
 } from "lucide-react";
-import { SubscriptionTier, MentorshipRequest } from "@/types";
+import {
+  SubscriptionTier,
+  MentorshipRequest,
+  SessionPricingTier,
+} from "@/types";
 import { toast } from "sonner";
 import { api } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";

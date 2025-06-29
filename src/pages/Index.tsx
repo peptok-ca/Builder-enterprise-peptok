@@ -697,9 +697,9 @@ const Index = () => {
                               /{period}
                             </span>
                           </div>
-                          {plan.minimumUsers && plan.minimumUsers > 1 && (
+                          {!plan.customPricing && plan.participantFee > 0 && (
                             <p className="text-sm text-muted-foreground">
-                              Minimum {plan.minimumUsers} users
+                              +${plan.participantFee} per additional participant
                             </p>
                           )}
                           <CardDescription className="text-base">

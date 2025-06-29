@@ -18,6 +18,7 @@ import Header from "../../components/layout/Header";
 import { useAuth } from "../../contexts/AuthContext";
 import { MentorshipRequest } from "../../types";
 import { Session } from "../../types/session";
+import { CoachSessionSettings } from "../../components/coach/CoachSessionSettings";
 import { toast } from "sonner";
 
 interface PendingRequest {

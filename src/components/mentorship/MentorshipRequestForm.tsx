@@ -40,6 +40,7 @@ import {
 import { TeamManagement } from "./TeamManagement";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import {
   MentorshipRequest,
   MentorshipGoal,
@@ -147,6 +148,7 @@ const expertiseAreas = [
 export function MentorshipRequestForm({
   onSubmit,
   onSaveDraft,
+  sessionPricingTier,
   subscriptionTier,
   onUpgradePrompt,
   initialData,
@@ -177,17 +179,39 @@ export function MentorshipRequestForm({
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
 
-  // Get available metrics based on subscription tier
+  // Determine which pricing model we're using
+  const useSessionPricing =
+    sessionPricingTier !== null && sessionPricingTier !== undefined;
+  const currentTier = useSessionPricing ? sessionPricingTier : subscriptionTier;
+
+  // Get available metrics based on pricing tier
   const getAvailableMetrics = () => {
-    switch (subscriptionTier.id) {
-      case "starter":
-        return availableMetrics.slice(0, 3); // Basic metrics only
-      case "growth":
-        return availableMetrics.slice(0, 6); // More metrics
-      case "enterprise":
-        return availableMetrics; // All metrics
-      default:
-        return availableMetrics.slice(0, 3);
+    if (!currentTier) return availableMetrics.slice(0, 3);
+
+    if (useSessionPricing) {
+      // Session pricing tier logic
+      switch (sessionPricingTier?.id) {
+        case "standard":
+          return availableMetrics.slice(0, 3);
+        case "premium":
+          return availableMetrics.slice(0, 7);
+        case "enterprise":
+          return availableMetrics;
+        default:
+          return availableMetrics.slice(0, 3);
+      }
+    } else {
+      // Subscription tier logic (backward compatibility)
+      switch (subscriptionTier?.id) {
+        case "starter":
+          return availableMetrics.slice(0, 3);
+        case "growth":
+          return availableMetrics.slice(0, 6);
+        case "enterprise":
+          return availableMetrics;
+        default:
+          return availableMetrics.slice(0, 3);
+      }
     }
   };
 
@@ -222,9 +246,40 @@ export function MentorshipRequestForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      onSubmit(formData);
+
+    // Validate required fields
+    if (!formData.title.trim()) {
+      toast.error("Please enter a program title");
+      return;
     }
+
+    if (!formData.description.trim()) {
+      toast.error("Please enter a program description");
+      return;
+    }
+
+    if (formData.goals.length === 0) {
+      toast.error("Please add at least one goal");
+      return;
+    }
+
+    if (formData.teamMembers.length === 0) {
+      toast.error("Please add at least one team member");
+      return;
+    }
+
+    // Check subscription limits only if using subscription pricing
+    if (
+      !useSessionPricing &&
+      subscriptionTier &&
+      formData.teamMembers.length > subscriptionTier.userCap
+    ) {
+      onUpgradePrompt();
+      return;
+    }
+
+    // With session-based pricing, no team size limits - just proceed
+    onSubmit(formData);
   };
 
   const handleSaveDraft = () => {
@@ -264,10 +319,12 @@ export function MentorshipRequestForm({
     const maxMetrics = availableMetrics.length;
 
     if (checked) {
-      if (
-        formData.metricsToTrack.length >= maxMetrics &&
-        subscriptionTier.id !== "enterprise"
-      ) {
+      // Only enforce limits for non-enterprise tiers
+      const isEnterprise = useSessionPricing
+        ? sessionPricingTier?.id === "enterprise"
+        : subscriptionTier?.id === "enterprise";
+
+      if (formData.metricsToTrack.length >= maxMetrics && !isEnterprise) {
         onUpgradePrompt();
         return;
       }
@@ -510,13 +567,17 @@ export function MentorshipRequestForm({
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
             Success Metrics
-            <Badge variant="outline" className="ml-auto">
-              {subscriptionTier.name} Plan
-            </Badge>
+            {currentTier && (
+              <Badge variant="outline" className="ml-auto">
+                {currentTier.name} {useSessionPricing ? "Sessions" : "Plan"}
+              </Badge>
+            )}
           </CardTitle>
           <CardDescription>
             Choose metrics to track the success of your mentorship program.
-            Available metrics depend on your subscription tier.
+            {useSessionPricing
+              ? "Available metrics depend on your session pricing tier."
+              : "Available metrics depend on your subscription tier."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -548,7 +609,7 @@ export function MentorshipRequestForm({
             ))}
           </div>
 
-          {subscriptionTier.id !== "enterprise" && (
+          {currentTier && currentTier.id !== "enterprise" && (
             <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
               Want more metrics? Upgrade to a higher tier for advanced tracking
               capabilities.

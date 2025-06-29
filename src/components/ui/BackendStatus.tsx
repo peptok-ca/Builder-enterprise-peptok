@@ -15,11 +15,28 @@ export function BackendStatus({ className }: BackendStatusProps) {
   useEffect(() => {
     const checkBackendConnection = async () => {
       try {
-        const response = await fetch("http://localhost:3001/health", {
+        // Don't try to connect to localhost in deployed environments
+        const isLocalhost =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1";
+
+        if (!isLocalhost) {
+          // In deployed environment, assume using local data
+          setIsBackendConnected(false);
+          setLastChecked(new Date());
+          return;
+        }
+
+        // Only try backend connection in local development
+        const backendUrl =
+          import.meta.env.VITE_API_URL || "http://localhost:3001";
+        const response = await fetch(`${backendUrl}/health`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
+          // Add timeout to prevent hanging
+          signal: AbortSignal.timeout(5000), // 5 second timeout
         });
 
         if (response.ok) {
@@ -29,6 +46,10 @@ export function BackendStatus({ className }: BackendStatusProps) {
           setIsBackendConnected(false);
         }
       } catch (error) {
+        // Silently handle fetch errors in deployed environment
+        console.log(
+          "Backend connection check failed (expected in deployed environment)",
+        );
         setIsBackendConnected(false);
       }
       setLastChecked(new Date());
@@ -37,10 +58,19 @@ export function BackendStatus({ className }: BackendStatusProps) {
     // Check on mount
     checkBackendConnection();
 
-    // Check every 30 seconds
-    const interval = setInterval(checkBackendConnection, 30000);
+    // Only set interval for local development
+    const isLocalhost =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
 
-    return () => clearInterval(interval);
+    let interval: NodeJS.Timeout | null = null;
+    if (isLocalhost) {
+      interval = setInterval(checkBackendConnection, 30000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
   if (isBackendConnected === null) {

@@ -487,6 +487,176 @@ class ApiService {
     }
   }
 
+  // Session Pricing Methods
+  async getSessionPricingTiers(): Promise<SessionPricingTier[]> {
+    try {
+      // Only try backend if environment supports it
+      if (!Environment.shouldTryBackend()) {
+        throw new Error("Backend not configured for deployed environment");
+      }
+
+      // Try to fetch from backend first
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(`${API_BASE_URL}/sessions/pricing-tiers`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const tiers = await response.json();
+        console.log("✅ Loaded session pricing tiers from backend");
+        return tiers.map((tier: any) => ({
+          ...tier,
+          currency: tier.currency || "CAD",
+        }));
+      } else {
+        console.warn("⚠️ Backend returned error, using local data");
+        throw new Error("Backend not available");
+      }
+    } catch (error) {
+      // Handle network errors appropriately based on environment
+      if (Environment.isProduction()) {
+        console.log(
+          `Using local session pricing data (${Environment.getEnvironmentName()} environment)`,
+        );
+      } else {
+        console.warn(
+          "⚠️ Failed to fetch from backend, using local data:",
+          error,
+        );
+      }
+
+      // Fallback to local session pricing data
+      const sessionPricingTiers: SessionPricingTier[] = [
+        {
+          id: "standard",
+          name: "Standard Sessions",
+          slug: "standard",
+          description: "Perfect for individual coaching sessions",
+          baseSessionPrice: 150, // CAD per session
+          participantFee: 25, // CAD per additional participant
+          maxParticipantsIncluded: 1, // First participant included
+          platformServiceCharge: 15, // 15% platform fee
+          features: [
+            "1-hour coaching sessions",
+            "Professional mentor matching",
+            "Session recordings available",
+            "Basic progress tracking",
+            "Email support",
+          ],
+          supportLevel: "basic",
+          customizations: false,
+          analytics: "basic",
+          currency: "CAD",
+        },
+        {
+          id: "premium",
+          name: "Premium Sessions",
+          slug: "premium",
+          description: "Enhanced sessions with advanced features",
+          baseSessionPrice: 200, // CAD per session
+          participantFee: 30, // CAD per additional participant
+          maxParticipantsIncluded: 2, // Two participants included
+          platformServiceCharge: 12, // 12% platform fee (discount)
+          features: [
+            "All Standard features",
+            "Extended 90-minute sessions available",
+            "Priority mentor selection",
+            "Advanced analytics & insights",
+            "Custom session objectives",
+            "Priority support",
+          ],
+          supportLevel: "premium",
+          customizations: true,
+          analytics: "advanced",
+          badge: "Most Popular",
+          currency: "CAD",
+        },
+        {
+          id: "enterprise",
+          name: "Enterprise Sessions",
+          slug: "enterprise",
+          description: "Custom sessions for large organizations",
+          baseSessionPrice: 0, // Custom pricing
+          participantFee: 0,
+          maxParticipantsIncluded: 999,
+          platformServiceCharge: 10, // 10% platform fee (best rate)
+          features: [
+            "All Premium features",
+            "Unlimited participants per session",
+            "Custom session durations",
+            "Dedicated account manager",
+            "White-label options",
+            "API integration",
+            "SLA guarantees",
+          ],
+          supportLevel: "enterprise",
+          customizations: true,
+          analytics: "enterprise",
+          customPricing: true,
+          currency: "CAD",
+        },
+      ];
+
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      return sessionPricingTiers;
+    }
+  }
+
+  async getCoachSessionLimits(
+    coachId: string,
+    programId?: string,
+  ): Promise<CoachSessionLimits | null> {
+    try {
+      const queryParams = programId ? `?programId=${programId}` : "";
+      const response = await this.request<CoachSessionLimits>(
+        `/coaches/${coachId}/session-limits${queryParams}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.warn("Failed to fetch coach session limits, using defaults");
+
+      // Return default limits
+      return {
+        id: `default-${coachId}`,
+        coachId,
+        programId,
+        minSessionsPerProgram: 1,
+        maxSessionsPerProgram: 10,
+        sessionDurationMinutes: 60,
+        coachHourlyRate: 150,
+        isAvailable: true,
+      };
+    }
+  }
+
+  async updateCoachSessionLimits(
+    limits: CoachSessionLimits,
+  ): Promise<CoachSessionLimits> {
+    try {
+      const response = await this.request<CoachSessionLimits>(
+        `/coaches/${limits.coachId}/session-limits`,
+        {
+          method: "PUT",
+          body: JSON.stringify(limits),
+        },
+      );
+      return response.data;
+    } catch (error) {
+      console.warn("Failed to update coach session limits");
+      throw error;
+    }
+  }
+
   async createPaymentIntent(
     amount: number,
     currency: string = "USD",

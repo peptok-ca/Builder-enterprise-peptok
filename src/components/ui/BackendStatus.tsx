@@ -16,21 +16,15 @@ export function BackendStatus({ className }: BackendStatusProps) {
   useEffect(() => {
     const checkBackendConnection = async () => {
       try {
-        // Don't try to connect to localhost in deployed environments
-        const isLocalhost =
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1";
-
-        if (!isLocalhost) {
-          // In deployed environment, assume using local data
+        // Don't try to connect to backend in deployed environments unless configured
+        if (!Environment.shouldTryBackend()) {
           setIsBackendConnected(false);
           setLastChecked(new Date());
           return;
         }
 
-        // Only try backend connection in local development
-        const backendUrl =
-          import.meta.env.VITE_API_URL || "http://localhost:3001";
+        // Try backend connection
+        const backendUrl = Environment.getApiBaseUrl().replace("/api", ""); // Remove /api for health endpoint
         const response = await fetch(`${backendUrl}/health`, {
           method: "GET",
           headers: {
@@ -48,9 +42,13 @@ export function BackendStatus({ className }: BackendStatusProps) {
         }
       } catch (error) {
         // Silently handle fetch errors in deployed environment
-        console.log(
-          "Backend connection check failed (expected in deployed environment)",
-        );
+        if (Environment.isProduction()) {
+          console.log(
+            "Backend connection check failed (expected in deployed environment)",
+          );
+        } else {
+          console.warn("Backend connection failed:", error);
+        }
         setIsBackendConnected(false);
       }
       setLastChecked(new Date());
@@ -59,13 +57,9 @@ export function BackendStatus({ className }: BackendStatusProps) {
     // Check on mount
     checkBackendConnection();
 
-    // Only set interval for local development
-    const isLocalhost =
-      window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1";
-
+    // Only set interval for environments where backend is expected
     let interval: NodeJS.Timeout | null = null;
-    if (isLocalhost) {
+    if (Environment.shouldTryBackend()) {
       interval = setInterval(checkBackendConnection, 30000);
     }
 

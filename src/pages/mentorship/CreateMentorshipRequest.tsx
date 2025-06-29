@@ -40,25 +40,25 @@ export default function CreateMentorshipRequest() {
   const [loadingTier, setLoadingTier] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Load user's subscription tier
+  // Load session pricing tier
   useEffect(() => {
-    const loadSubscriptionTier = async () => {
+    const loadSessionPricingTier = async () => {
       try {
         setLoadingTier(true);
-        // In a real app, this would load the user's current subscription tier
-        const tiers = await api.getSubscriptionTiers();
-        // For demo purposes, use Growth plan as default
-        const defaultTier = tiers.find((t) => t.id === "growth") || tiers[1];
-        setSubscriptionTier(defaultTier);
+        // Load session pricing tiers
+        const tiers = await api.getSessionPricingTiers();
+        // For demo purposes, use Premium plan as default
+        const defaultTier = tiers.find((t) => t.id === "premium") || tiers[1];
+        setSessionPricingTier(defaultTier);
       } catch (error) {
-        console.error("Failed to load subscription tier:", error);
-        toast.error("Failed to load subscription information");
+        console.error("Failed to load session pricing:", error);
+        toast.error("Failed to load session pricing information");
       } finally {
         setLoadingTier(false);
       }
     };
 
-    loadSubscriptionTier();
+    loadSessionPricingTier();
   }, []);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [savedDraft, setSavedDraft] =

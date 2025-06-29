@@ -331,12 +331,24 @@ class ApiService {
   // Payment-related methods
   async getSubscriptionTiers(): Promise<SubscriptionTier[]> {
     try {
+      // Only try backend in local development or if explicitly configured
+      const isLocalhost =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+      const hasBackendUrl = import.meta.env.VITE_API_URL;
+
+      if (!isLocalhost && !hasBackendUrl) {
+        throw new Error("Backend not configured for deployed environment");
+      }
+
       // Try to fetch from backend first
       const response = await fetch(`${API_BASE_URL}/subscriptions/tiers`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        // Add timeout to prevent hanging
+        signal: AbortSignal.timeout(5000),
       });
 
       if (response.ok) {
@@ -352,7 +364,15 @@ class ApiService {
         throw new Error("Backend not available");
       }
     } catch (error) {
-      console.warn("⚠️ Failed to fetch from backend, using local data:", error);
+      // Silently handle network errors in deployed environment
+      if (window.location.hostname !== "localhost") {
+        console.log("Using local subscription data (deployed environment)");
+      } else {
+        console.warn(
+          "⚠️ Failed to fetch from backend, using local data:",
+          error,
+        );
+      }
 
       // Fallback to local subscription tiers data if backend is not available
       const subscriptionTiers: SubscriptionTier[] = [

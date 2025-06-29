@@ -45,6 +45,37 @@ export interface MetricDefinition {
   category: "engagement" | "skill_development" | "performance" | "retention";
 }
 
+export interface SessionPricingTier {
+  id: string;
+  name: string;
+  slug?: string;
+  description: string;
+  baseSessionPrice: number; // Base price per session
+  participantFee: number; // Additional fee per participant beyond first
+  maxParticipantsIncluded: number; // Number of participants included in base price
+  features: string[];
+  supportLevel: "basic" | "premium" | "enterprise";
+  customizations: boolean;
+  analytics: "basic" | "advanced" | "enterprise";
+  platformServiceCharge: number; // Platform service charge percentage
+  customPricing?: boolean;
+  badge?: string;
+  currency?: string;
+}
+
+export interface CoachSessionLimits {
+  id: string;
+  coachId: string;
+  programId?: string; // If specific to a program
+  minSessionsPerProgram: number;
+  maxSessionsPerProgram: number;
+  sessionDurationMinutes: number;
+  coachHourlyRate: number;
+  isAvailable: boolean;
+}
+
+// Keep SubscriptionTier for backward compatibility but mark as deprecated
+/** @deprecated Use SessionPricingTier instead */
 export interface SubscriptionTier {
   id: string;
   name: string;

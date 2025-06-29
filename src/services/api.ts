@@ -332,13 +332,8 @@ class ApiService {
   // Payment-related methods
   async getSubscriptionTiers(): Promise<SubscriptionTier[]> {
     try {
-      // Only try backend in local development or if explicitly configured
-      const isLocalhost =
-        window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1";
-      const hasBackendUrl = import.meta.env.VITE_API_URL;
-
-      if (!isLocalhost && !hasBackendUrl) {
+      // Only try backend if environment supports it
+      if (!Environment.shouldTryBackend()) {
         throw new Error("Backend not configured for deployed environment");
       }
 

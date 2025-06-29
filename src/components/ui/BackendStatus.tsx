@@ -77,6 +77,9 @@ export function BackendStatus({ className }: BackendStatusProps) {
     );
   }
 
+  // Show appropriate messaging based on environment
+  const isProduction = Environment.isProduction();
+
   return (
     <Badge
       variant={isBackendConnected ? "default" : "secondary"}
@@ -90,7 +93,7 @@ export function BackendStatus({ className }: BackendStatusProps) {
       ) : (
         <>
           <WifiOff className="w-3 h-3 mr-1" />
-          Using Local Data
+          {isProduction ? "Production Data" : "Using Local Data"}
         </>
       )}
     </Badge>

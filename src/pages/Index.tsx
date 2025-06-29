@@ -32,8 +32,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "@/services/api";
-import { SubscriptionTier, SessionPricingTier } from "@/types";
-import { BackendStatus } from "@/components/ui/BackendStatus";
+import { SubscriptionTier } from "@/types";
 
 const features = [
   {

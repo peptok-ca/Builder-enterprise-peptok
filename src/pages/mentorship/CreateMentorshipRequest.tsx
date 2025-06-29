@@ -80,15 +80,12 @@ export default function CreateMentorshipRequest() {
     setIsSubmitting(true);
 
     try {
-      // Validate team size against subscription tier
-      if (
-        subscriptionTier &&
-        data.teamMembers.length > subscriptionTier.userCap
-      ) {
-        setShowUpgradeModal(true);
-        setIsSubmitting(false);
-        return;
-      }
+      // Note: With session-based pricing, team size validation is less restrictive
+      // Pricing is calculated per session with additional participant fees
+      const teamSize = data.teamMembers.length;
+      console.log(
+        `Creating program for ${teamSize} team members with session-based pricing`,
+      );
 
       // Create the request object
       const requestData = {

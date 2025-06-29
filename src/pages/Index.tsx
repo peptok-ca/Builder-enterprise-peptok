@@ -29,6 +29,7 @@ import {
   Zap,
   Award,
   Globe,
+  DollarSign,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "@/services/api";

@@ -619,8 +619,9 @@ const Index = () => {
                   Simple, transparent pricing
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                  Choose the plan that's right for your organization. Start
-                  immediately with any plan - no trial period needed.
+                  Pay per session for maximum flexibility. Choose the session
+                  type that fits your coaching needs - no long-term commitments
+                  required.
                 </p>
               </div>
 

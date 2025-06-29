@@ -606,23 +606,6 @@ const Index = () => {
             </div>
           </section>
 
-
-                            className={`w-full transition-all duration-300 hover:scale-105 ${isPopular ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg" : ""}`}
-                            variant={isPopular ? "default" : "outline"}
-                            size="lg"
-                            onClick={() => navigate("/signup")}
-                          >
-                            {plan.customPricing ? "Contact Sales" : "Start Now"}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    );
-                  })
-                )}
-              </div>
-            </div>
-          </section>
-
           {/* Enhanced CTA Section */}
           <section className="py-20 md:py-28">
             <div className="container">

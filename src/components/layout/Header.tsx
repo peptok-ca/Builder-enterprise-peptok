@@ -217,14 +217,40 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
               </DropdownMenu>
             </>
           ) : (
-            /* Not authenticated - show login/signup buttons */
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" asChild>
-                <Link to="/login">Sign in</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/signup">Sign up</Link>
-              </Button>
+            /* Not authenticated - show public navigation and auth buttons */
+            <div className="flex items-center space-x-4">
+              <nav className="hidden md:flex items-center space-x-6">
+                <Link
+                  to="/pricing"
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-primary",
+                    isActive("/pricing")
+                      ? "text-primary"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  Pricing
+                </Link>
+                <Link
+                  to="/coaches"
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-primary",
+                    isActive("/coaches")
+                      ? "text-primary"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  Find Coaches
+                </Link>
+              </nav>
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" asChild>
+                  <Link to="/login">Sign in</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/signup">Sign up</Link>
+                </Button>
+              </div>
             </div>
           )}
 

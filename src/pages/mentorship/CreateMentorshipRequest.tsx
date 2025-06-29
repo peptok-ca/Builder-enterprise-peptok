@@ -194,21 +194,21 @@ export default function CreateMentorshipRequest() {
               </p>
             </div>
 
-            {/* Subscription Info */}
-            {!loadingTier && subscriptionTier && (
+            {/* Session Pricing Info */}
+            {!loadingTier && sessionPricingTier && (
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Badge variant="default">
-                        {subscriptionTier.name} Plan
-                      </Badge>
+                      <Badge variant="default">{sessionPricingTier.name}</Badge>
                       <span className="text-sm text-muted-foreground">
-                        Up to{" "}
-                        {subscriptionTier.userCap === 999999
-                          ? "unlimited"
-                          : subscriptionTier.userCap}{" "}
-                        team members
+                        ${sessionPricingTier.baseSessionPrice} per session
+                        {sessionPricingTier.participantFee > 0 && (
+                          <>
+                            , +${sessionPricingTier.participantFee} per
+                            additional participant
+                          </>
+                        )}
                       </span>
                     </div>
                     <Button
@@ -216,7 +216,7 @@ export default function CreateMentorshipRequest() {
                       onClick={() => setShowUpgradeModal(true)}
                     >
                       <CreditCard className="w-4 h-4 mr-2" />
-                      Upgrade Plan
+                      View Pricing Options
                     </Button>
                   </div>
                 </CardContent>

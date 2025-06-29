@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { User } from "../types";
 
 // OAuth Configuration
 const OAUTH_CONFIG = {
@@ -18,25 +19,6 @@ const OAUTH_CONFIG = {
     authUrl: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
   },
 };
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  firstName?: string;
-  lastName?: string;
-  picture?: string;
-  provider: "email" | "google" | "microsoft";
-  userType: "platform_admin" | "company_admin" | "coach";
-  isNewUser?: boolean;
-  businessDetails?: {
-    companyName: string;
-    industry: string;
-    employeeCount: number;
-    website?: string;
-    phone?: string;
-  };
-}
 
 export interface AuthResponse {
   success: boolean;

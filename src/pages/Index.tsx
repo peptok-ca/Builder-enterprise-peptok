@@ -179,15 +179,15 @@ const stats = [
 const Index = () => {
   const navigate = useNavigate();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [pricingPlans, setPricingPlans] = useState<SubscriptionTier[]>([]);
+  const [pricingPlans, setPricingPlans] = useState<SessionPricingTier[]>([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
 
-  // Load pricing plans from API
+  // Load session pricing plans from API
   useEffect(() => {
     const loadPricingPlans = async () => {
       try {
         setLoadingPlans(true);
-        const plans = await api.getSubscriptionTiers();
+        const plans = await api.getSessionPricingTiers();
         setPricingPlans(plans);
       } catch (error) {
         console.error("Failed to load pricing plans:", error);

@@ -97,6 +97,32 @@ export interface SubscriptionTier {
   currency?: string;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  picture?: string;
+  provider: "email" | "google" | "microsoft";
+  userType: "platform_admin" | "company_admin" | "coach";
+  status?: "active" | "suspended" | "inactive";
+  company?: string;
+  companyId?: string;
+  joinedAt?: string;
+  lastActive?: string;
+  sessionsCount?: number;
+  revenue?: number;
+  isNewUser?: boolean;
+  businessDetails?: {
+    companyName: string;
+    industry: string;
+    employeeCount: number;
+    website?: string;
+    phone?: string;
+  };
+}
+
 export interface TeamMember {
   id: string;
   email: string;
@@ -145,7 +171,7 @@ export interface MentorshipRequest {
   goals: MentorshipGoal[];
   metricsToTrack: string[];
   teamMembers: TeamMember[];
-  preferredCoaching: string[];
+  preferredExpertise: string[];
   budget?: {
     min: number;
     max: number;

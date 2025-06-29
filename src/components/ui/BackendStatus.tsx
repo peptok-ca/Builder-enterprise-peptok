@@ -25,14 +25,20 @@ export function BackendStatus({ className }: BackendStatusProps) {
 
         // Try backend connection
         const backendUrl = Environment.getApiBaseUrl().replace("/api", ""); // Remove /api for health endpoint
+
+        // Create abort controller for timeout (fallback for older browsers)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
         const response = await fetch(`${backendUrl}/health`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-          // Add timeout to prevent hanging
-          signal: AbortSignal.timeout(5000), // 5 second timeout
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           const data = await response.json();

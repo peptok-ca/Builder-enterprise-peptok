@@ -249,7 +249,7 @@ export default function CreateMentorshipRequest() {
                     <div className="text-center space-y-4">
                       <Clock className="h-8 w-8 animate-spin mx-auto text-primary" />
                       <p className="text-muted-foreground">
-                        Loading subscription information...
+                        Loading session pricing information...
                       </p>
                     </div>
                   </div>
@@ -259,7 +259,7 @@ export default function CreateMentorshipRequest() {
               <MentorshipRequestForm
                 onSubmit={handleSubmitRequest}
                 onSaveDraft={handleSaveDraft}
-                subscriptionTier={subscriptionTier}
+                sessionPricingTier={sessionPricingTier}
                 onUpgradePrompt={handleUpgradePrompt}
                 initialData={savedDraft || undefined}
                 isLoading={isSubmitting}

@@ -13,8 +13,9 @@ import {
   SessionJoinInfo,
 } from "../types/session";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+import { Environment } from "../utils/environment";
+
+const API_BASE_URL = Environment.getApiBaseUrl();
 
 class ApiService {
   constructor() {

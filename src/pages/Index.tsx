@@ -279,9 +279,12 @@ const Index = () => {
                       variant="outline"
                       size="lg"
                       className="text-lg px-8 transition-all duration-300 hover:scale-105 hover:shadow-lg border-blue-200 hover:border-blue-300 group"
+                      asChild
                     >
-                      <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-                      Watch Demo
+                      <Link to="/pricing">
+                        <DollarSign className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
+                        View Pricing
+                      </Link>
                     </Button>
                   </div>
 

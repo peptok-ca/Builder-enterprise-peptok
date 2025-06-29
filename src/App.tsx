@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import DashboardRouter from "@/components/auth/DashboardRouter";
 import Index from "./pages/Index";
+import Pricing from "./pages/Pricing";
 import CoachDirectory from "./pages/CoachDirectory";
 import EnterpriseDashboard from "./pages/EnterpriseDashboard";
 import CompanyDashboard from "./pages/CompanyDashboard";

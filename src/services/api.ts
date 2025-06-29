@@ -360,9 +360,11 @@ class ApiService {
         throw new Error("Backend not available");
       }
     } catch (error) {
-      // Silently handle network errors in deployed environment
-      if (window.location.hostname !== "localhost") {
-        console.log("Using local subscription data (deployed environment)");
+      // Handle network errors appropriately based on environment
+      if (Environment.isProduction()) {
+        console.log(
+          `Using local subscription data (${Environment.getEnvironmentName()} environment)`,
+        );
       } else {
         console.warn(
           "⚠️ Failed to fetch from backend, using local data:",

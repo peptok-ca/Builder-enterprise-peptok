@@ -45,6 +45,7 @@ import {
   MentorshipGoal,
   TeamMember,
   SubscriptionTier,
+  SessionPricingTier,
 } from "@/types";
 
 interface MentorshipRequestFormProps {

@@ -661,13 +661,15 @@ const Index = () => {
                   </div>
                 ) : (
                   pricingPlans.map((plan) => {
-                    const isPopular = plan.badge === "Best Value";
+                    const isPopular =
+                      plan.badge === "Most Popular" ||
+                      plan.badge === "Best Value";
                     const price = plan.customPricing
                       ? "Custom"
-                      : `${plan.currency || "CA"}$${plan.price}`;
+                      : `${plan.currency || "CA"}$${plan.baseSessionPrice}`;
                     const period = plan.customPricing
                       ? "pricing"
-                      : "per user/month";
+                      : "per session";
 
                     return (
                       <Card

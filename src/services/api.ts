@@ -1,4 +1,9 @@
-import { MentorshipRequest, SubscriptionTier } from "../types";
+import {
+  MentorshipRequest,
+  SubscriptionTier,
+  SessionPricingTier,
+  CoachSessionLimits,
+} from "../types";
 import { Mentor, MatchingFilters, MatchingResult } from "../types/mentor";
 import {
   Coach,

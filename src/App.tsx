@@ -23,6 +23,7 @@ import { CoachDashboard } from "./pages/coach/CoachDashboard";
 import InvitationAccept from "./pages/InvitationAccept";
 import Connections from "./pages/Connections";
 import NotFound from "./pages/NotFound";
+import PlatformAdminDashboard from "./pages/PlatformAdminDashboard";
 
 // Debug utilities in development
 if (import.meta.env.DEV) {
@@ -73,7 +74,7 @@ const App: React.FC = () => {
                 path="/platform-admin"
                 element={
                   <ProtectedRoute requiredUserType="platform_admin">
-                    <CompanyDashboard />
+                    <PlatformAdminDashboard />
                   </ProtectedRoute>
                 }
               />

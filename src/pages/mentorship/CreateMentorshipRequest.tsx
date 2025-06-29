@@ -172,7 +172,13 @@ export default function CreateMentorshipRequest() {
           <div className="flex items-center gap-4 mb-6">
             <Button
               variant="ghost"
-              onClick={() => navigate("/admin")}
+              onClick={() => {
+                const dashboardPath =
+                  user?.userType === "platform_admin"
+                    ? "/platform-admin"
+                    : "/dashboard";
+                navigate(dashboardPath);
+              }}
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />

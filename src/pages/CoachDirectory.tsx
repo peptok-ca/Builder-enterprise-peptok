@@ -42,8 +42,10 @@ interface SearchFilters {
 }
 
 const CoachDirectory = () => {
-  const [filteredCoaches, setFilteredCoaches] = useState<Coach[]>(mockCoaches);
+  const [allCoaches, setAllCoaches] = useState<Coach[]>([]);
+  const [filteredCoaches, setFilteredCoaches] = useState<Coach[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("rating");
   const [showFilters, setShowFilters] = useState(true);
   const [filters, setFilters] = useState<SearchFilters>({

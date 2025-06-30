@@ -766,31 +766,52 @@ class ApiService {
     coachId: string,
     programId?: string,
   ): Promise<CoachSessionLimits | null> {
+    console.log(
+      `API: Fetching session limits for coach ${coachId}${programId ? `, program ${programId}` : ""}`,
+    );
+
     try {
       const queryParams = programId ? `?programId=${programId}` : "";
       const response = await this.request<CoachSessionLimits>(
         `/coaches/${coachId}/session-limits${queryParams}`,
       );
+      console.log(
+        "API: Successfully fetched session limits from server:",
+        response.data,
+      );
       return response.data;
     } catch (error) {
       console.warn(
-        "Failed to fetch coach session limits, checking localStorage fallback",
+        "API: Failed to fetch coach session limits from server, checking localStorage fallback",
+        error,
       );
 
       // Check localStorage for saved settings
       const storageKey = `coach_session_limits_${coachId}${programId ? `_${programId}` : ""}`;
+      console.log("API: Checking localStorage with key:", storageKey);
+
       const storedLimits = localStorage.getItem(storageKey);
 
       if (storedLimits) {
         try {
-          return JSON.parse(storedLimits);
+          const parsedLimits = JSON.parse(storedLimits);
+          console.log(
+            "API: Successfully loaded session limits from localStorage:",
+            parsedLimits,
+          );
+          return parsedLimits;
         } catch (parseError) {
-          console.warn("Failed to parse stored session limits");
+          console.warn(
+            "API: Failed to parse stored session limits:",
+            parseError,
+          );
         }
+      } else {
+        console.log("API: No stored session limits found in localStorage");
       }
 
       // Return default limits
-      return {
+      const defaultLimits = {
         id: `default-${coachId}`,
         coachId,
         programId,
@@ -800,12 +821,17 @@ class ApiService {
         coachHourlyRate: 150,
         isAvailable: true,
       };
+
+      console.log("API: Returning default session limits:", defaultLimits);
+      return defaultLimits;
     }
   }
 
   async updateCoachSessionLimits(
     limits: CoachSessionLimits,
   ): Promise<CoachSessionLimits> {
+    console.log("API: Updating session limits:", limits);
+
     try {
       const response = await this.request<CoachSessionLimits>(
         `/coaches/${limits.coachId}/session-limits`,
@@ -814,10 +840,14 @@ class ApiService {
           body: JSON.stringify(limits),
         },
       );
+      console.log(
+        "API: Successfully updated session limits on server:",
+        response.data,
+      );
       return response.data;
     } catch (error) {
       console.warn(
-        "Failed to update coach session limits, using local storage fallback:",
+        "API: Failed to update coach session limits on server, using localStorage fallback:",
         error,
       );
 
@@ -829,7 +859,14 @@ class ApiService {
         updatedAt: new Date().toISOString(),
       };
 
+      console.log(
+        "API: Saving to localStorage with key:",
+        storageKey,
+        "data:",
+        updatedLimits,
+      );
       localStorage.setItem(storageKey, JSON.stringify(updatedLimits));
+      console.log("API: Session limits saved to localStorage successfully");
 
       return updatedLimits;
     }

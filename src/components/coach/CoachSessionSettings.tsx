@@ -50,19 +50,43 @@ export function CoachSessionSettings({
   // Load existing settings
   useEffect(() => {
     const loadSettings = async () => {
-      if (!user?.id) return;
+      if (!user?.id) {
+        console.warn("No user ID available, cannot load session settings");
+        return;
+      }
 
+      console.log(
+        `Loading session settings for coach: ${user.id}${programId ? `, program: ${programId}` : ""}`,
+      );
       setIsLoading(true);
+
       try {
         const existingSettings = await api.getCoachSessionLimits(
           user.id,
           programId,
         );
+
         if (existingSettings) {
+          console.log(
+            "Successfully loaded session settings:",
+            existingSettings,
+          );
           setSettings(existingSettings);
+
+          // Show user feedback about where settings were loaded from
+          if (existingSettings.id?.startsWith("local-")) {
+            toast.info("Loaded session settings from local storage");
+          } else if (existingSettings.id?.startsWith("default-")) {
+            toast.info("Using default session settings");
+          } else {
+            toast.success("Loaded session settings from database");
+          }
+        } else {
+          console.warn("No existing settings found, using defaults");
         }
       } catch (error) {
-        console.warn("Failed to load session settings, using defaults");
+        console.error("Failed to load session settings:", error);
+        toast.error("Failed to load session settings");
       } finally {
         setIsLoading(false);
       }

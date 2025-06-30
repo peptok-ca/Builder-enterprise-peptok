@@ -509,9 +509,13 @@ export default function MentorshipRequestDetails() {
                             ) : (
                               <div>Rate: ${coach.hourlyRate}/hr</div>
                             )}
-                          >
-                            {coach.availability}
-                          </Badge>
+                          </div>
+                        </div>
+                        <Badge
+                          className={getAvailabilityColor(coach.availability)}
+                        >
+                          {coach.availability}
+                        </Badge>
                         </div>
                       </div>
 

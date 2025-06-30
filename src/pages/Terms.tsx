@@ -28,12 +28,13 @@ export default function Terms() {
       icon: <FileText className="w-5 h-5" />,
       content: `By accessing and using this mentorship platform ("Service"), you accept and agree to be bound by the terms and provision of this agreement, including all pricing, payment, and refund policies outlined herein. If you do not agree to abide by the above, please do not use this service.
 
-These Terms of Service govern your use of our platform and form a legally binding agreement between you and our company. By booking coaching sessions, you acknowledge understanding of our session-based pricing structure, platform service fees, and cancellation policies.
+These Terms of Service govern your use of our platform and form a legally binding agreement between you and our company. By booking coaching sessions or providing coaching services, you acknowledge understanding of our session-based pricing structure, commission rates, and fee policies.
 
 PRICING ACKNOWLEDGMENT:
 • All prices listed are in Canadian Dollars (CAD)
 • Session pricing subject to change with 30-day notice
-• Platform service fees (15%) apply to all session bookings
+• For Companies: 10% service fee applies to all session bookings
+• For Coaches: 20% commission applies to all earnings
 • Additional participant fees ($25 CAD) apply beyond first participant
 
 Please read these terms carefully before using our services, especially the payment and refund sections.
@@ -88,18 +89,24 @@ We strive to maintain service availability but do not guarantee uninterrupted ac
       icon: <CreditCard className="w-5 h-5" />,
       content: `SESSION-BASED PRICING:
 
-Standard Sessions - $150 CAD base rate:
-• 1-hour coaching sessions (professional rate varies by coach)
+FOR COMPANIES:
+• Coach-set hourly rates (typically $100-300 CAD/hour)
 • Additional participants: $25 CAD per person beyond first participant
-�� Platform service charge: 15% of total session cost
-• Includes session recordings and progress tracking
+• Platform service fee: 10% of total session cost
+• Includes session recordings, progress tracking, and platform support
 
-Extended Sessions:
-• 90-minute sessions: $225 CAD base rate + additional participant fees
-• 2-hour sessions: $300 CAD base rate + additional participant fees
-• Group sessions (3+ participants): Base rate + $25 CAD per additional participant
+FOR COACHES:
+• Set your own hourly rates
+• Platform commission: 20% of session earnings
+• Payment processing within 7 business days after session completion
+• Access to client matching, scheduling tools, and platform features
 
-Enterprise Custom Packages:
+Extended Sessions Available:
+• 30-minute, 60-minute, 90-minute, or 2-hour sessions
+• Group sessions supported with additional participant pricing
+• Custom session lengths available by arrangement
+
+Enterprise Packages:
 • Bulk session packages available for companies
 • Volume discounts for 10+ sessions booked in advance
 • Custom coaching programs with dedicated support
@@ -108,12 +115,12 @@ Enterprise Custom Packages:
 PAYMENT PROCESSING:
 
 • All payments processed securely through certified payment partners
-• Coach payments: Processed within 7 business days after session completion
-• Platform fees: Automatically deducted from total session cost
-• Client billing: Charged immediately upon session booking
+• Coach payments: Processed weekly for completed sessions
+• Company billing: Charged immediately upon session booking
+• Platform fees/commissions: Automatically calculated and applied
 • Currency: All prices in Canadian Dollars (CAD) unless specified
 • Refunds: Available according to cancellation policy outlined below
-• Price changes: 30 days advance notice for session rate modifications`,
+• Price changes: 30 days advance notice for rate modifications`,
     },
     {
       id: "content",
@@ -165,10 +172,11 @@ For detailed privacy information, please review our Privacy Policy.`,
       id: "liability",
       title: "9. Limitation of Liability",
       icon: <Scale className="w-5 h-5" />,
-      content: `PLATFORM SERVICE ARRANGEMENT:
+PLATFORM SERVICE ARRANGEMENT:
 
 • We facilitate connections between coaches and clients through our platform
-• Platform service fee (15%) covers technology, support, and administrative costs
+• For companies: 10% service fee covers technology, support, and administrative costs
+• For coaches: 20% commission covers client acquisition, payment processing, and platform access
 • We are not responsible for the quality or results of individual coaching services
 • Coaches are independent contractors providing professional services
 • We provide the platform technology "as is" without warranties of coaching outcomes
@@ -176,10 +184,9 @@ For detailed privacy information, please review our Privacy Policy.`,
 FINANCIAL RESPONSIBILITY:
 
 • Session fees are final once session is completed
-• Platform service charges are non-refundable processing fees
+• Platform service charges and commissions are non-refundable processing fees
 • Enterprise custom packages subject to separate contract terms
 • No recurring billing or automatic charges beyond booked sessions
-
 LIABILITY LIMITATIONS:
 
 • Our liability is limited to the amount paid for sessions in the last 12 months
@@ -223,7 +230,7 @@ ACCOUNT TERMINATION:
 REFUND PROCESSING:
 
 • Session refunds: 3-5 business days to original payment method
-• Platform service fees: Non-refundable (15% of session costs)
+• Platform service fees/commissions: Non-refundable (10% for companies, 20% for coaches)
 • Currency conversion fees: Customer responsibility for international payments
 • Processing fees: 5% processing fee applies to all refunds
 

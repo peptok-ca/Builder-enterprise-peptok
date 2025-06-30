@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { SessionRatingModal } from "@/components/sessions/SessionRatingModal";
+import { api } from "@/services/api";
 import { toast } from "sonner";
 
 interface TeamMemberSession {

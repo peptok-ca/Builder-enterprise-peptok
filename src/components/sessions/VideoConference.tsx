@@ -242,7 +242,18 @@ export default function VideoConference() {
         localStream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, []);
+  }, []); // Empty dependency array is intentional for mount/unmount only
+
+  const requestCameraAccess = async () => {
+    try {
+      await initializeMedia();
+      toast.success("Camera access granted!");
+    } catch (error) {
+      toast.error(
+        "Unable to access camera. Please check your browser permissions.",
+      );
+    }
+  };
 
   const initializeMedia = async () => {
     try {

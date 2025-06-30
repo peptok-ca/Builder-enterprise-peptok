@@ -108,6 +108,21 @@ const App: React.FC = () => {
                 }
               />
               <Route
+                path="/session/video"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "coach",
+                      "team_member",
+                      "company_admin",
+                      "platform_admin",
+                    ]}
+                  >
+                    <VideoConference />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/mentorship/new"
                 element={
                   <ProtectedRoute

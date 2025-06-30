@@ -17,6 +17,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import BusinessOnboarding from "./pages/onboarding/BusinessOnboarding";
+import CoachOnboarding from "./pages/onboarding/CoachOnboarding";
 import CreateMentorshipRequest from "./pages/mentorship/CreateMentorshipRequest";
 import MentorshipRequestDetails from "./pages/mentorship/MentorshipRequestDetails";
 import { CoachMatching } from "./pages/coach/CoachMatching";

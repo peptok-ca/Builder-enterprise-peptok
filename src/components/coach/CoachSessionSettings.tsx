@@ -131,6 +131,34 @@ export function CoachSessionSettings({
 
   const { minEarnings, maxEarnings } = calculateEarnings();
 
+  // Debug utility to check localStorage
+  const checkLocalStorage = () => {
+    if (!user?.id) return;
+
+    const storageKey = `coach_session_limits_${user.id}${programId ? `_${programId}` : ""}`;
+    const storedData = localStorage.getItem(storageKey);
+
+    console.log("=== Session Settings Debug Info ===");
+    console.log("Storage key:", storageKey);
+    console.log("Stored data:", storedData);
+    console.log("Current settings:", settings);
+    console.log("User ID:", user.id);
+    console.log("Program ID:", programId);
+
+    if (storedData) {
+      try {
+        const parsed = JSON.parse(storedData);
+        console.log("Parsed data:", parsed);
+        toast.success("Check console for localStorage debug info");
+      } catch (e) {
+        console.error("Failed to parse stored data:", e);
+        toast.error("Failed to parse stored session settings");
+      }
+    } else {
+      toast.info("No session settings found in localStorage");
+    }
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -323,6 +351,18 @@ export function CoachSessionSettings({
           <p className="text-sm text-muted-foreground text-center">
             Enable availability to save your session settings
           </p>
+        )}
+
+        {/* Debug Button (only in development) */}
+        {process.env.NODE_ENV === "development" && (
+          <Button
+            onClick={checkLocalStorage}
+            variant="outline"
+            size="sm"
+            className="w-full mt-2"
+          >
+            Debug: Check Saved Settings
+          </Button>
         )}
       </CardContent>
     </Card>

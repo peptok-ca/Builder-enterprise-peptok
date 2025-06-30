@@ -550,16 +550,24 @@ export default function PlatformAdminDashboard() {
                       Manage all platform users and their permissions
                     </CardDescription>
                   </div>
-                  <Dialog
-                    open={isCreateUserOpen}
-                    onOpenChange={setIsCreateUserOpen}
-                  >
-                    <DialogTrigger asChild>
-                      <Button>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Create User
-                      </Button>
-                    </DialogTrigger>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsCSVUploadOpen(true)}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Import CSV
+                    </Button>
+                    <Dialog
+                      open={isCreateUserOpen}
+                      onOpenChange={setIsCreateUserOpen}
+                    >
+                      <DialogTrigger asChild>
+                        <Button>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Create User
+                        </Button>
+                      </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>Create New User</DialogTitle>

@@ -81,11 +81,21 @@ export default function CreateMentorshipRequest() {
     setIsSubmitting(true);
 
     try {
+      // Check if we have employees from either the separate employee state or form data
+      const currentEmployees =
+        employees.length > 0 ? employees : data.teamMembers;
+
+      if (currentEmployees.length === 0) {
+        toast.error("Please add at least one employee to the program");
+        setIsSubmitting(false);
+        return;
+      }
+
       // Note: With session-based pricing, team size validation is less restrictive
       // Pricing is calculated per session with additional participant fees
-      const teamSize = data.teamMembers.length;
+      const teamSize = currentEmployees.length;
       console.log(
-        `Creating program for ${teamSize} team members with session-based pricing`,
+        `Creating program for ${teamSize} employees with session-based pricing`,
       );
 
       // Create the request object
@@ -95,7 +105,7 @@ export default function CreateMentorshipRequest() {
         description: data.description,
         goals: data.goals,
         metricsToTrack: data.metricsToTrack,
-        teamMembers: employees.length > 0 ? employees : data.teamMembers,
+        teamMembers: currentEmployees,
         preferredExpertise: data.preferredExpertise,
         budget: data.budget,
         timeline: data.timeline,
@@ -120,13 +130,14 @@ export default function CreateMentorshipRequest() {
         };
 
         // Send email to each employee
-        const currentEmployees =
-          employees.length > 0 ? employees : data.teamMembers;
         const emailPromises = currentEmployees.map((member) =>
           emailService.sendProgramDetails(member.email, programDetails),
         );
 
         await Promise.all(emailPromises);
+        console.log(
+          `📧 Program details sent to ${currentEmployees.length} employees`,
+        );
         console.log(
           `📧 Program details sent to ${currentEmployees.length} employees`,
         );

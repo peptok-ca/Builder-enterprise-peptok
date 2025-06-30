@@ -90,7 +90,7 @@ export default function VideoConference() {
         try {
           // Attempt to get real session data
           const requests = await api.getMentorshipRequests();
-          const program = requests.find(r => r.id === programId);
+          const program = requests.find((r) => r.id === programId);
 
           if (program) {
             sessionData = {
@@ -117,9 +117,9 @@ export default function VideoConference() {
                   audioEnabled: true,
                 },
                 // Add all team members from the program
-                ...program.teamMembers.map(member => ({
+                ...program.teamMembers.map((member) => ({
                   id: member.id,
-                  name: member.name || member.email.split('@')[0],
+                  name: member.name || member.email.split("@")[0],
                   email: member.email,
                   role: member.role,
                   userType: "team_member" as const,
@@ -127,7 +127,7 @@ export default function VideoConference() {
                   videoEnabled: true,
                   audioEnabled: true,
                   joinedAt: undefined,
-                }))
+                })),
               ],
             };
           } else {
@@ -139,7 +139,8 @@ export default function VideoConference() {
           sessionData = {
             id: sessionId,
             title: "React Development Training Session",
-            description: "Help our team improve their React skills and best practices",
+            description:
+              "Help our team improve their React skills and best practices",
             coach: {
               name: "Sarah Johnson",
               avatar: "https://avatar.vercel.sh/sarah@example.com",
@@ -182,10 +183,11 @@ export default function VideoConference() {
             ],
           };
         }
-          meetingId: `meeting-${sessionId}`,
-        };
 
-        setSession(mockSession);
+        // Add meeting ID to session data
+        sessionData.meetingId = `meeting-${sessionId}`;
+
+        setSession(sessionData);
 
         // Check if user can manage session (coach or admin)
         const userCanManage =

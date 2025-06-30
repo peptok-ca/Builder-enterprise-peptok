@@ -171,6 +171,7 @@ const App: React.FC = () => {
               />
               <Route path="/invitation/accept" element={<InvitationAccept />} />
               <Route path="/test-permissions" element={<TestPermissions />} />
+              <Route path="/terms" element={<Terms />} />
               <Route
                 path="/connections"
                 element={

@@ -217,9 +217,23 @@ export const CoachDashboard: React.FC = () => {
 
   const handleAcceptRequest = async (requestId: string) => {
     try {
-      // TODO: Implement actual API call
+      if (!user?.id) {
+        toast.error("User not found");
+        return;
+      }
+
+      console.log("Accepting request:", requestId);
+      const result = await api.acceptCoachingRequest(
+        requestId,
+        user.id,
+        "Thank you for choosing me as your coach. I'm excited to work with your team!",
+      );
+
       setPendingRequests((prev) => prev.filter((req) => req.id !== requestId));
-      toast.success("Coaching request accepted!");
+      toast.success("Coaching request accepted successfully!");
+
+      // Reload dashboard data to get updated stats
+      loadDashboardData();
     } catch (error) {
       console.error("Error accepting request:", error);
       toast.error("Failed to accept request");
@@ -228,12 +242,26 @@ export const CoachDashboard: React.FC = () => {
 
   const handleRejectRequest = async (requestId: string) => {
     try {
-      // TODO: Implement actual API call
+      if (!user?.id) {
+        toast.error("User not found");
+        return;
+      }
+
+      console.log("Declining request:", requestId);
+      const result = await api.declineCoachingRequest(
+        requestId,
+        user.id,
+        "Thank you for your interest. Unfortunately, I'm not available for this project at the moment.",
+      );
+
       setPendingRequests((prev) => prev.filter((req) => req.id !== requestId));
       toast.success("Request declined");
+
+      // Reload dashboard data to get updated stats
+      loadDashboardData();
     } catch (error) {
       console.error("Error rejecting request:", error);
-      toast.error("Failed to reject request");
+      toast.error("Failed to decline request");
     }
   };
 

@@ -223,8 +223,8 @@ export function TeamManagement({
           </Badge>
         </CardTitle>
         <CardDescription>
-          Add team members to participate in the mentorship program. Team members will
-          receive invitation emails to join the program.
+          Add team members to participate in the mentorship program. Team
+          members will receive invitation emails to join the program.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -450,8 +450,8 @@ export function TeamManagement({
             <DollarSign className="h-4 w-4" />
             <AlertDescription>
               You're using {Math.round((currentMemberCount / userCap) * 100)}%
-              of your team member allowance. Consider upgrading your plan for more
-              more capacity and advanced features.
+              of your team member allowance. Consider upgrading your plan for
+              more more capacity and advanced features.
               <Button
                 variant="link"
                 className="p-0 h-auto font-semibold text-primary ml-1"
@@ -483,8 +483,11 @@ export function TeamManagement({
               No team members added to this program yet.
             </p>
             <p className="text-sm">
-              Add team members by email to include them in the mentorship program.
+              Add team members by email to include them in the mentorship
+              program.
             </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

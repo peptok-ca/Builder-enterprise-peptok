@@ -268,7 +268,7 @@ export default function Pricing() {
                       costs.additionalParticipantsCost > 0 && (
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">
-                            Additional participants ({sessions} ×{" "}
+                            Additional participants ({sessions} ��{" "}
                             {participants - 1} × $
                             {pricingConfig.additionalParticipantFee})
                           </span>
@@ -492,7 +492,9 @@ export default function Pricing() {
                 className="text-white border-white hover:bg-white/10"
                 asChild
               >
-                <Link to="/contact">Contact Sales</Link>
+                <a href="mailto:sales@peptok.ca?subject=Sales Inquiry - Pricing Information">
+                  Contact Sales
+                </a>
               </Button>
             </div>
           </div>

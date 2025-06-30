@@ -127,7 +127,7 @@ export function TeamManagement({
       setNewMemberRole("participant");
 
       toast.success(
-        `✅ Invitation email sent to ${newMemberEmail}! Check the browser console to see the email preview.`,
+        `✅ Employee invitation sent to ${newMemberEmail}! They will receive an email to join the program.`,
         { duration: 5000 },
       );
     } catch (error) {
@@ -142,7 +142,7 @@ export function TeamManagement({
     const member = teamMembers.find((m) => m.id === memberId);
     if (member) {
       onUpdateTeamMembers(teamMembers.filter((m) => m.id !== memberId));
-      toast.success(`Removed ${member.email} from the team`);
+      toast.success(`Removed ${member.email} from the program`);
     }
   };
 
@@ -154,7 +154,7 @@ export function TeamManagement({
       member.id === memberId ? { ...member, role: newRole } : member,
     );
     onUpdateTeamMembers(updatedMembers);
-    toast.success("Member role updated successfully");
+    toast.success("Employee role updated successfully");
   };
 
   const resendInvitation = async (memberId: string) => {

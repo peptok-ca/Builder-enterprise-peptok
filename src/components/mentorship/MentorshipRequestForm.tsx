@@ -630,14 +630,30 @@ export function MentorshipRequestForm({
       </Card>
 
       {/* Team Management */}
-      <TeamManagement
-        teamMembers={formData.teamMembers}
-        onUpdateTeamMembers={(members) =>
-          setFormData((prev) => ({ ...prev, teamMembers: members }))
-        }
-        subscriptionTier={subscriptionTier}
-        onUpgradePrompt={onUpgradePrompt}
-      />
+      {(subscriptionTier || sessionPricingTier) && (
+        <TeamManagement
+          teamMembers={formData.teamMembers}
+          onUpdateTeamMembers={(members) =>
+            setFormData((prev) => ({ ...prev, teamMembers: members }))
+          }
+          subscriptionTier={
+            subscriptionTier || // Convert session pricing to subscription tier format for compatibility
+            {
+              id: sessionPricingTier?.id || "standard",
+              name: sessionPricingTier?.name || "Standard",
+              userCap: 999999, // No user cap with session pricing
+              features: sessionPricingTier?.features || [],
+              analytics: sessionPricingTier?.analytics || "basic",
+              supportLevel: sessionPricingTier?.supportLevel || "basic",
+              customizations: sessionPricingTier?.customizations || false,
+              price: 0,
+              billingPeriod: "monthly" as const,
+              metricsIncluded: [],
+            }
+          }
+          onUpgradePrompt={onUpgradePrompt}
+        />
+      )}
       {errors.team && <p className="text-sm text-destructive">{errors.team}</p>}
 
       {/* Preferred Expertise */}

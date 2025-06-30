@@ -76,10 +76,17 @@ export function CoachSessionSettings({
     try {
       const updatedSettings = await api.updateCoachSessionLimits(settings);
       setSettings(updatedSettings);
-      toast.success("Session settings updated successfully!");
+
+      // Check if settings were saved to backend or localStorage
+      if (updatedSettings.id?.startsWith("local-")) {
+        toast.success("Session settings saved locally (will sync when online)");
+      } else {
+        toast.success("Session settings updated successfully!");
+      }
+
       onSettingsUpdated?.(updatedSettings);
     } catch (error) {
-      toast.error("Failed to update session settings");
+      toast.error("Failed to update session settings. Please try again.");
       console.error("Error updating session settings:", error);
     } finally {
       setIsSaving(false);

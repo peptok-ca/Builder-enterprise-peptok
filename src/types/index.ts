@@ -105,7 +105,8 @@ export interface User {
   lastName?: string;
   picture?: string;
   provider: "email" | "google" | "microsoft";
-  userType: "platform_admin" | "company_admin" | "coach";
+  userType: "platform_admin" | "company_admin" | "coach" | "team_member";
+  role?: "participant" | "observer" | "admin";
   status?: "active" | "suspended" | "inactive";
   company?: string;
   companyId?: string;

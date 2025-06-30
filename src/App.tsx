@@ -19,6 +19,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import BusinessOnboarding from "./pages/onboarding/BusinessOnboarding";
 import CoachOnboarding from "./pages/onboarding/CoachOnboarding";
 import TeamMemberDashboard from "./pages/TeamMemberDashboard";
+import VideoConference from "./components/sessions/VideoConference";
 import CreateMentorshipRequest from "./pages/mentorship/CreateMentorshipRequest";
 import MentorshipRequestDetails from "./pages/mentorship/MentorshipRequestDetails";
 import { CoachMatching } from "./pages/coach/CoachMatching";

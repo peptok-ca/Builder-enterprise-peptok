@@ -157,17 +157,29 @@ export default function VideoConference() {
           }
         } catch (error) {
           console.warn("Using fallback session data:", error);
+
+          // Use actual coach data if current user is a coach
+          const fallbackCoachData =
+            user?.userType === "coach"
+              ? {
+                  name: user.name || user.email.split("@")[0],
+                  avatar:
+                    user.avatar || `https://avatar.vercel.sh/${user.email}`,
+                  title: user.title || "Coach",
+                }
+              : {
+                  name: "Sarah Johnson",
+                  avatar: "https://avatar.vercel.sh/sarah@example.com",
+                  title: "Senior Leadership Coach",
+                };
+
           // Fallback to mock data
           sessionData = {
             id: sessionId,
             title: "React Development Training Session",
             description:
               "Help our team improve their React skills and best practices",
-            coach: {
-              name: "Sarah Johnson",
-              avatar: "https://avatar.vercel.sh/sarah@example.com",
-              title: "Senior Leadership Coach",
-            },
+            coach: fallbackCoachData,
             startTime: new Date().toISOString(),
             duration: 60,
             status: "upcoming",

@@ -185,12 +185,13 @@ export default function VideoConference() {
             status: "upcoming",
             participants: [
               {
-                id: "coach-1",
-                name: "Sarah Johnson",
-                email: "sarah@example.com",
+                id: user?.userType === "coach" ? user.id : "coach-1",
+                name: fallbackCoachData.name,
+                email:
+                  user?.userType === "coach" ? user.email : "sarah@example.com",
                 role: "coach",
                 userType: "coach",
-                isOnline: true,
+                isOnline: user?.userType === "coach",
                 videoEnabled: true,
                 audioEnabled: true,
               },

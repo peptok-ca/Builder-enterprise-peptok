@@ -166,17 +166,36 @@ For detailed privacy information, please review our Privacy Policy.`,
       id: "liability",
       title: "9. Limitation of Liability",
       icon: <Scale className="w-5 h-5" />,
-      content: `Service Limitations:
+      content: `PLATFORM SERVICE ARRANGEMENT:
 
-• Our platform facilitates connections but does not guarantee outcomes
-• We are not responsible for the quality or results of coaching services
-• Coaches are independent contractors, not our employees
-• We provide the platform "as is" without warranties of any kind
+• We facilitate connections between coaches and clients through our platform
+• Platform service fee (15%) covers technology, support, and administrative costs
+• We are not responsible for the quality or results of individual coaching services
+• Coaches are independent contractors providing professional services
+• We provide the platform technology "as is" without warranties of coaching outcomes
 
-Liability Limits:
-• Our liability is limited to the amount paid for services in the last 12 months
+FINANCIAL RESPONSIBILITY:
+
+• Subscription fees are non-refundable except within initial 30-day period
+• Session fees are final once session is completed
+• Platform service charges are non-refundable processing fees
+• Unused subscription minutes do not roll over to following billing periods
+• Enterprise custom pricing subject to separate contract terms
+
+LIABILITY LIMITATIONS:
+
+• Our liability is limited to the amount paid for platform services in the last 12 months
+• Maximum liability per incident: $10,000 CAD
 • We are not liable for indirect, incidental, or consequential damages
-• Some jurisdictions do not allow liability limitations, so these may not apply to you`,
+• Not responsible for coach-client relationship outcomes or disputes
+• Platform downtime exceeding 24 hours may qualify for service credits
+• Some jurisdictions do not allow liability limitations, so these may not apply to you
+
+DISPUTE RESOLUTION:
+
+• Payment disputes must be reported within 30 days of charge
+• Coaching quality concerns handled through our resolution process
+• Platform technical issues eligible for service credits as appropriate`,
     },
     {
       id: "termination",

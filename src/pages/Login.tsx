@@ -47,12 +47,12 @@ const Login = () => {
     setFormData({
       email: "demo@platform.com",
       password: "password123",
-      rememberMe: false
+      rememberMe: false,
     });
 
     // Small delay to let state update
     setTimeout(() => {
-      document.querySelector('form')?.requestSubmit();
+      document.querySelector("form")?.requestSubmit();
     }, 100);
   };
 
@@ -68,60 +68,35 @@ const Login = () => {
         return;
       }
 
-      if (!formData.email.includes("@")) {
-        setError("Please enter a valid email address");
-        return;
-      }
+      // Use the login function from auth context
+      const result = await login(formData.email, formData.password);
 
-      // Attempt login using AuthContext
-      const response = await login(formData.email, formData.password);
-
-      if (response.success) {
-        toast.success("Successfully signed in!");
-
-        // Get the current user to determine redirect path
-        const currentUser = authService.getCurrentUser();
-        if (currentUser) {
-          // Redirect based on user type
-          let redirectPath = "/dashboard"; // default for company admin
-          switch (currentUser.userType) {
-            case "platform_admin":
-              redirectPath = "/platform-admin";
-              break;
-            case "coach":
-              redirectPath = "/coach/dashboard";
-              break;
-            case "company_admin":
-            default:
-              redirectPath = "/dashboard";
-              break;
-          }
-          navigate(redirectPath);
-        }
+      if (result.success) {
+        // Redirect based on user role or intended destination
+        navigate("/dashboard");
       } else {
-        setError(response.error || "Login failed. Please try again.");
+        setError(result.error || "Login failed. Please try again.");
       }
     } catch (error) {
-      console.error("Login error:", error);
       setError("An unexpected error occurred. Please try again.");
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (error) setError("");
-  };
-
   const handleGoogleLogin = async () => {
     setIsOAuthLoading("google");
     try {
-      await authService.loginWithGoogle();
+      // Simulate OAuth flow
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // For demo purposes, simulate successful OAuth login
+      const result = await login("demo@google.com", "oauth_token");
+      if (result.success) {
+        navigate("/dashboard");
+      }
     } catch (error) {
-      console.error("Google login error:", error);
-      toast.error("Failed to connect with Google. Please try again.");
+      setError("Google login failed. Please try again.");
     } finally {
       setIsOAuthLoading(null);
     }
@@ -130,33 +105,27 @@ const Login = () => {
   const handleMicrosoftLogin = async () => {
     setIsOAuthLoading("microsoft");
     try {
-      await authService.loginWithMicrosoft();
+      // Simulate OAuth flow
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // For demo purposes, simulate successful OAuth login
+      const result = await login("demo@microsoft.com", "oauth_token");
+      if (result.success) {
+        navigate("/dashboard");
+      }
     } catch (error) {
-      console.error("Microsoft login error:", error);
-      toast.error("Failed to connect with Microsoft. Please try again.");
+      setError("Microsoft login failed. Please try again.");
     } finally {
       setIsOAuthLoading(null);
     }
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Enhanced Professional Background */}
-      <div className="absolute inset-0 bg-gradient-to-bl from-blue-50 via-white to-blue-100">
-        {/* Animated gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-l from-blue-400/10 via-transparent to-blue-600/10 animate-pulse"></div>
-
-        {/* Geometric shapes */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute top-20 left-20 w-60 h-60 bg-blue-600/8 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-400/6 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-700/7 rounded-full blur-3xl"></div>
-        </div>
-
-        {/* Subtle dot pattern */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100/30 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Grid pattern */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 opacity-40"
           style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, rgb(59 130 246 / 0.1) 1px, transparent 0)`,
             backgroundSize: "40px 40px",
@@ -247,9 +216,11 @@ const Login = () => {
               </Alert>
 
               {/* Debug Section - Only in development */}
-              {process.env.NODE_ENV === 'development' && (
+              {process.env.NODE_ENV === "development" && (
                 <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm font-medium text-yellow-800 mb-3">Debug Tools:</p>
+                  <p className="text-sm font-medium text-yellow-800 mb-3">
+                    Debug Tools:
+                  </p>
                   <div className="flex gap-2 flex-wrap">
                     <Button
                       type="button"
@@ -270,6 +241,9 @@ const Login = () => {
                   </div>
                 </div>
               )}
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm font-medium">
@@ -280,12 +254,12 @@ const Login = () => {
                     <Input
                       id="email"
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder="john@company.com"
                       value={formData.email}
                       onChange={(e) =>
-                        handleInputChange("email", e.target.value)
+                        setFormData({ ...formData, email: e.target.value })
                       }
-                      className="pl-10 transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm"
+                      className="pl-10 h-12 border-gray-200 focus:border-blue-500 transition-colors"
                       disabled={isLoading}
                       required
                     />
@@ -302,42 +276,45 @@ const Login = () => {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder="••••••••"
                       value={formData.password}
                       onChange={(e) =>
-                        handleInputChange("password", e.target.value)
+                        setFormData({ ...formData, password: e.target.value })
                       }
-                      className="pl-10 pr-10 transition-all duration-200 focus:scale-105 focus:shadow-md bg-white/70 backdrop-blur-sm"
+                      className="pl-10 pr-10 h-12 border-gray-200 focus:border-blue-500 transition-colors"
                       disabled={isLoading}
                       required
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-12 px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      disabled={isLoading}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                       )}
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
-                {/* Remember Me & Forgot Password */}
+                {/* Remember me & Forgot password */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="remember"
                       checked={formData.rememberMe}
                       onCheckedChange={(checked) =>
-                        handleInputChange("rememberMe", checked as boolean)
+                        setFormData({ ...formData, rememberMe: !!checked })
                       }
-                      disabled={isLoading}
                     />
-                    <Label htmlFor="remember" className="text-sm">
+                    <Label
+                      htmlFor="remember"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
                       Remember me
                     </Label>
                   </div>

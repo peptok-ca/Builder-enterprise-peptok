@@ -773,7 +773,21 @@ class ApiService {
       );
       return response.data;
     } catch (error) {
-      console.warn("Failed to fetch coach session limits, using defaults");
+      console.warn(
+        "Failed to fetch coach session limits, checking localStorage fallback",
+      );
+
+      // Check localStorage for saved settings
+      const storageKey = `coach_session_limits_${coachId}${programId ? `_${programId}` : ""}`;
+      const storedLimits = localStorage.getItem(storageKey);
+
+      if (storedLimits) {
+        try {
+          return JSON.parse(storedLimits);
+        } catch (parseError) {
+          console.warn("Failed to parse stored session limits");
+        }
+      }
 
       // Return default limits
       return {
@@ -802,8 +816,22 @@ class ApiService {
       );
       return response.data;
     } catch (error) {
-      console.warn("Failed to update coach session limits");
-      throw error;
+      console.warn(
+        "Failed to update coach session limits, using local storage fallback:",
+        error,
+      );
+
+      // Store in localStorage as fallback
+      const storageKey = `coach_session_limits_${limits.coachId}${limits.programId ? `_${limits.programId}` : ""}`;
+      const updatedLimits = {
+        ...limits,
+        id: limits.id || `local-${limits.coachId}-${Date.now()}`,
+        updatedAt: new Date().toISOString(),
+      };
+
+      localStorage.setItem(storageKey, JSON.stringify(updatedLimits));
+
+      return updatedLimits;
     }
   }
 

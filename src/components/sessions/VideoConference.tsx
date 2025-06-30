@@ -78,6 +78,7 @@ export default function VideoConference() {
   const [cameraError, setCameraError] = useState(false);
   const [hasStreamAccess, setHasStreamAccess] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationRef = useRef<number>();

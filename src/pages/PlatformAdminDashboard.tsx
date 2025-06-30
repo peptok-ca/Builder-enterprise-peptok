@@ -119,6 +119,7 @@ export default function PlatformAdminDashboard() {
   const [filterUserType, setFilterUserType] = useState("all");
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
   const [isCreateCompanyOpen, setIsCreateCompanyOpen] = useState(false);
+  const [isCSVUploadOpen, setIsCSVUploadOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isUserDetailsOpen, setIsUserDetailsOpen] = useState(false);
 

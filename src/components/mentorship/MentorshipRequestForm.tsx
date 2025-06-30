@@ -57,6 +57,7 @@ interface MentorshipRequestFormProps {
   onUpgradePrompt: () => void;
   initialData?: Partial<MentorshipRequestFormData>;
   isLoading?: boolean;
+  onFormDataChange?: (data: MentorshipRequestFormData) => void;
 }
 
 export interface MentorshipRequestFormData {
@@ -153,6 +154,7 @@ export function MentorshipRequestForm({
   onUpgradePrompt,
   initialData,
   isLoading,
+  onFormDataChange,
 }: MentorshipRequestFormProps) {
   const [formData, setFormData] = useState<MentorshipRequestFormData>({
     title: initialData?.title || "",
@@ -178,6 +180,13 @@ export function MentorshipRequestForm({
   });
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+
+  // Notify parent component when form data changes
+  useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange(formData);
+    }
+  }, [formData, onFormDataChange]);
 
   // Determine which pricing model we're using
   const useSessionPricing =
@@ -637,8 +646,7 @@ export function MentorshipRequestForm({
             setFormData((prev) => ({ ...prev, teamMembers: members }))
           }
           subscriptionTier={
-            subscriptionTier || // Convert session pricing to subscription tier format for compatibility
-            {
+            subscriptionTier || { // Convert session pricing to subscription tier format for compatibility
               id: sessionPricingTier?.id || "standard",
               name: sessionPricingTier?.name || "Standard",
               userCap: 999999, // No user cap with session pricing

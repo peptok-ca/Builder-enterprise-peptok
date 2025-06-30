@@ -111,6 +111,67 @@ export default function MentorshipRequestDetails() {
         };
 
         setRequest(mockRequest);
+
+        // Mock matched coaches data
+        const mockMatchedCoaches: MatchedCoach[] = [
+          {
+            id: "coach-1",
+            name: "Sarah Johnson",
+            email: "sarah.johnson@example.com",
+            title: "Senior Leadership Coach",
+            company: "Executive Coaching Solutions",
+            location: "New York, NY",
+            rating: 4.9,
+            expertise: [
+              "Leadership Development",
+              "Strategic Planning",
+              "Team Management",
+            ],
+            hourlyRate: 250,
+            availability: "available",
+            matchScore: 95,
+            bio: "Sarah is a seasoned executive coach with over 15 years of experience helping leaders transform their organizations.",
+            isSelected: true,
+          },
+          {
+            id: "coach-2",
+            name: "Michael Chen",
+            email: "michael.chen@example.com",
+            title: "Strategic Leadership Advisor",
+            company: "Leadership Excellence Group",
+            location: "San Francisco, CA",
+            rating: 4.8,
+            expertise: [
+              "Strategic Planning",
+              "Executive Presence",
+              "Change Management",
+            ],
+            hourlyRate: 275,
+            availability: "available",
+            matchScore: 92,
+            bio: "Michael specializes in helping executives develop strategic thinking and lead organizational transformation.",
+          },
+          {
+            id: "coach-3",
+            name: "Dr. Emily Rodriguez",
+            email: "emily.rodriguez@example.com",
+            title: "Leadership Development Expert",
+            company: "Peak Performance Coaching",
+            location: "Austin, TX",
+            rating: 4.7,
+            expertise: [
+              "Leadership",
+              "Team Management",
+              "Performance Optimization",
+            ],
+            hourlyRate: 230,
+            availability: "limited",
+            matchScore: 88,
+            bio: "Dr. Rodriguez combines psychology and business expertise to help leaders unlock their full potential.",
+          },
+        ];
+
+        setMatchedCoaches(mockMatchedCoaches);
       } catch (error) {
         console.error("Failed to fetch mentorship request:", error);
       } finally {

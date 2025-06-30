@@ -133,6 +133,14 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/connections/:id"
+                element={
+                  <ProtectedRoute>
+                    <ConnectionDetails />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />

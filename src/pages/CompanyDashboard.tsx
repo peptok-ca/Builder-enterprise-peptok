@@ -781,6 +781,25 @@ const CompanyDashboard = () => {
               <TabsContent value="analytics" className="space-y-6">
                 <MetricsOverview />
               </TabsContent>
+
+              {/* Testing Tab */}
+              <TabsContent value="testing" className="space-y-6">
+                <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      Button Functionality Validation
+                    </CardTitle>
+                    <CardDescription>
+                      Test and validate that Join Session, Details, and Message
+                      buttons are working properly with backend integration
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ButtonValidationTest />
+                  </CardContent>
+                </Card>
+              </TabsContent>
             </Tabs>
           </div>
         </main>

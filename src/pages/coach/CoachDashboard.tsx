@@ -20,6 +20,7 @@ import { MentorshipRequest } from "../../types";
 import { Session } from "../../types/session";
 import { CoachSessionSettings } from "../../components/coach/CoachSessionSettings";
 import { SessionManagement } from "../../components/sessions/SessionManagement";
+import { api } from "../../services/api";
 import { toast } from "sonner";
 
 interface PendingRequest {

@@ -579,31 +579,6 @@ class ApiService {
           analytics: "basic",
           currency: "CAD",
         },
-
-        {
-          id: "enterprise",
-          name: "Enterprise Sessions",
-          slug: "enterprise",
-          description: "Custom sessions for large organizations",
-          baseSessionPrice: 0, // Custom pricing
-          participantFee: 0,
-          maxParticipantsIncluded: 999,
-          platformServiceCharge: 10, // 10% platform fee (best rate)
-          features: [
-            "All Premium features",
-            "Unlimited participants per session",
-            "Custom session durations",
-            "Dedicated account manager",
-            "White-label options",
-            "API integration",
-            "SLA guarantees",
-          ],
-          supportLevel: "enterprise",
-          customizations: true,
-          analytics: "enterprise",
-          customPricing: true,
-          currency: "CAD",
-        },
       ];
 
       // Simulate API delay

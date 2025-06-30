@@ -264,6 +264,9 @@ export default function VideoConference() {
         videoRef.current.srcObject = stream;
       }
 
+      // Set up audio level monitoring
+      setupAudioLevelMonitoring(stream);
+
       return stream;
     } catch (error: any) {
       console.error("Failed to access media devices:", error);

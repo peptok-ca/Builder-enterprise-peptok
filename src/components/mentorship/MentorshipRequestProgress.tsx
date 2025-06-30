@@ -394,13 +394,21 @@ export function MentorshipRequestProgress({
                       variant="outline"
                       size="sm"
                       onClick={() => handleSendMessage(request.id)}
+                      disabled={loadingStates[`message-${request.id}`]}
                     >
                       <MessageSquare className="w-4 h-4 mr-1" />
-                      Message
+                      {loadingStates[`message-${request.id}`]
+                        ? "Loading..."
+                        : "Message"}
                     </Button>
                   )}
 
-                  <Button variant="outline" size="sm" asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    onClick={() => handleViewDetails(request.id)}
+                  >
                     <Link to={`/mentorship/requests/${request.id}`}>
                       View Details
                       <ArrowRight className="w-4 h-4 ml-1" />
@@ -411,9 +419,12 @@ export function MentorshipRequestProgress({
                     <Button
                       size="sm"
                       onClick={() => handleJoinSession(request.id)}
+                      disabled={loadingStates[`join-${request.id}`]}
                     >
                       <Play className="w-4 h-4 mr-1" />
-                      Join Session
+                      {loadingStates[`join-${request.id}`]
+                        ? "Joining..."
+                        : "Join Session"}
                     </Button>
                   )}
                 </div>

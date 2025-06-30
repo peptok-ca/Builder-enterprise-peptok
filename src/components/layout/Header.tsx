@@ -159,10 +159,98 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
               </Button>
 
               {/* Notifications */}
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-4 w-4" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 text-xs"></span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-4 w-4" />
+                    {notifications.filter((n) => !n.read).length > 0 && (
+                      <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-xs text-white flex items-center justify-center">
+                        {notifications.filter((n) => !n.read).length > 9
+                          ? "9+"
+                          : notifications.filter((n) => !n.read).length}
+                      </span>
+                    )}
+                    {isConnected && (
+                      <span className="absolute -bottom-1 -right-1 h-2 w-2 rounded-full bg-green-500"></span>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-80" align="end">
+                  <div className="flex items-center justify-between p-2 border-b">
+                    <h3 className="font-semibold">Notifications</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setNotifications((prev) =>
+                          prev.map((n) => ({ ...n, read: true })),
+                        )
+                      }
+                    >
+                      Mark all read
+                    </Button>
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className={`p-3 border-b hover:bg-gray-50 cursor-pointer ${
+                            !notification.read ? "bg-blue-50" : ""
+                          }`}
+                          onClick={() => {
+                            setNotifications((prev) =>
+                              prev.map((n) =>
+                                n.id === notification.id
+                                  ? { ...n, read: true }
+                                  : n,
+                              ),
+                            );
+                            websocketService.markNotificationAsRead(
+                              notification.id,
+                            );
+                          }}
+                        >
+                          <div className="flex items-start gap-2">
+                            <div
+                              className={`w-2 h-2 rounded-full mt-2 ${
+                                !notification.read
+                                  ? "bg-blue-500"
+                                  : "bg-gray-300"
+                              }`}
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-sm">
+                                {notification.title}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                {new Date(
+                                  notification.timestamp,
+                                ).toLocaleTimeString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-gray-500">
+                        No notifications yet
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-2 border-t">
+                    <Link to="/messages">
+                      <Button variant="ghost" size="sm" className="w-full">
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        View all messages
+                      </Button>
+                    </Link>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               {/* User Menu */}
               <DropdownMenu>

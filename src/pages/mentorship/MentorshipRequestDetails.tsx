@@ -45,6 +45,10 @@ export default function MentorshipRequestDetails() {
   const [matchedCoaches, setMatchedCoaches] = useState<MatchedCoach[]>([]);
   const [loading, setLoading] = useState(true);
 
+  console.log("MentorshipRequestDetails component rendering");
+  console.log("ID from params:", id);
+  console.log("User:", user);
+
   useEffect(() => {
     const fetchRequest = async () => {
       if (!id) return;

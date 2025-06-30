@@ -42,6 +42,8 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
         return "/platform-admin";
       case "coach":
         return "/coach/dashboard";
+      case "team_member":
+        return "/team-member/dashboard";
       case "company_admin":
       default:
         return "/dashboard";

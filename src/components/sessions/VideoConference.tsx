@@ -76,6 +76,10 @@ export default function VideoConference() {
   const [canManageSession, setCanManageSession] = useState(false);
   const [cameraError, setCameraError] = useState(false);
   const [hasStreamAccess, setHasStreamAccess] = useState(false);
+  const [audioLevel, setAudioLevel] = useState(0);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationRef = useRef<number>();
 
   useEffect(() => {
     if (!sessionId) {

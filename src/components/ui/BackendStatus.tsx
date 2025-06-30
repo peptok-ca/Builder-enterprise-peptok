@@ -15,6 +15,13 @@ export function BackendStatus({ className }: BackendStatusProps) {
 
   useEffect(() => {
     const checkBackendConnection = async () => {
+      // In deployed environments without explicit API URL, skip fetch attempts entirely
+      if (Environment.isProduction() && !import.meta.env.VITE_API_URL) {
+        setIsBackendConnected(false);
+        setLastChecked(new Date());
+        return;
+      }
+
       try {
         // Don't try to connect to backend in deployed environments unless configured
         if (!Environment.shouldTryBackend()) {
@@ -28,7 +35,7 @@ export function BackendStatus({ className }: BackendStatusProps) {
 
         // Create abort controller for timeout (fallback for older browsers)
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // Reduced timeout
 
         const response = await fetch(`${backendUrl}/health`, {
           method: "GET",
@@ -50,7 +57,7 @@ export function BackendStatus({ className }: BackendStatusProps) {
         // Silently handle fetch errors in deployed environment
         if (Environment.isProduction()) {
           console.log(
-            "Backend connection check failed (expected in deployed environment)",
+            "Backend connection check skipped (deployed environment without API URL)",
           );
         } else {
           console.warn("Backend connection failed:", error);
@@ -60,8 +67,14 @@ export function BackendStatus({ className }: BackendStatusProps) {
       setLastChecked(new Date());
     };
 
-    // Check on mount
-    checkBackendConnection();
+    // Check on mount only if we should try backend
+    if (Environment.shouldTryBackend()) {
+      checkBackendConnection();
+    } else {
+      // Immediately set to false for deployed environments
+      setIsBackendConnected(false);
+      setLastChecked(new Date());
+    }
 
     // Only set interval for environments where backend is expected
     let interval: NodeJS.Timeout | null = null;

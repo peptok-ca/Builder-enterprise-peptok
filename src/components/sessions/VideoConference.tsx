@@ -805,11 +805,15 @@ export default function VideoConference() {
                   variant={audioEnabled ? "default" : "destructive"}
                   size="sm"
                   onClick={toggleAudio}
+                  className="relative"
                 >
                   {audioEnabled ? (
                     <Mic className="w-4 h-4" />
                   ) : (
                     <MicOff className="w-4 h-4" />
+                  )}
+                  {audioEnabled && audioLevel > 10 && (
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                   )}
                 </Button>
                 <Button variant="outline" size="sm">

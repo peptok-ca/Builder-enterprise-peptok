@@ -14,7 +14,7 @@ import {
   MentorshipRequestForm,
   MentorshipRequestFormData,
 } from "@/components/mentorship/MentorshipRequestForm";
-import { TeamMemberManagementCard } from "@/components/mentorship/EmployeeManagementCard";
+import { TeamMemberManagementCard } from "@/components/mentorship/TeamMemberManagementCard";
 
 import Header from "@/components/layout/Header";
 import { ArrowLeft, CheckCircle, Clock, AlertTriangle } from "lucide-react";

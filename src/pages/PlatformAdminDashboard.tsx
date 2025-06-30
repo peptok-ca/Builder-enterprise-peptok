@@ -570,116 +570,122 @@ export default function PlatformAdminDashboard() {
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                        <DialogTitle>Create New User</DialogTitle>
-                        <DialogDescription>
-                          Add a new user to the platform
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                          <DialogTitle>Create New User</DialogTitle>
+                          <DialogDescription>
+                            Add a new user to the platform
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="firstName">First Name *</Label>
+                              <Input
+                                id="firstName"
+                                value={newUser.firstName}
+                                onChange={(e) =>
+                                  setNewUser({
+                                    ...newUser,
+                                    firstName: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="lastName">Last Name *</Label>
+                              <Input
+                                id="lastName"
+                                value={newUser.lastName}
+                                onChange={(e) =>
+                                  setNewUser({
+                                    ...newUser,
+                                    lastName: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                          </div>
                           <div>
-                            <Label htmlFor="firstName">First Name *</Label>
+                            <Label htmlFor="email">Email *</Label>
                             <Input
-                              id="firstName"
-                              value={newUser.firstName}
+                              id="email"
+                              type="email"
+                              value={newUser.email}
                               onChange={(e) =>
                                 setNewUser({
                                   ...newUser,
-                                  firstName: e.target.value,
+                                  email: e.target.value,
                                 })
                               }
                             />
                           </div>
                           <div>
-                            <Label htmlFor="lastName">Last Name *</Label>
-                            <Input
-                              id="lastName"
-                              value={newUser.lastName}
-                              onChange={(e) =>
-                                setNewUser({
-                                  ...newUser,
-                                  lastName: e.target.value,
-                                })
+                            <Label htmlFor="userType">User Type *</Label>
+                            <Select
+                              value={newUser.userType}
+                              onValueChange={(value: any) =>
+                                setNewUser({ ...newUser, userType: value })
                               }
-                            />
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="platform_admin">
+                                  Platform Admin
+                                </SelectItem>
+                                <SelectItem value="company_admin">
+                                  Company Admin
+                                </SelectItem>
+                                <SelectItem value="coach">Coach</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="email">Email *</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            value={newUser.email}
-                            onChange={(e) =>
-                              setNewUser({ ...newUser, email: e.target.value })
-                            }
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="userType">User Type *</Label>
-                          <Select
-                            value={newUser.userType}
-                            onValueChange={(value: any) =>
-                              setNewUser({ ...newUser, userType: value })
-                            }
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="platform_admin">
-                                Platform Admin
-                              </SelectItem>
-                              <SelectItem value="company_admin">
-                                Company Admin
-                              </SelectItem>
-                              <SelectItem value="coach">Coach</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        {newUser.userType === "company_admin" && (
+                          {newUser.userType === "company_admin" && (
+                            <div>
+                              <Label htmlFor="company">Company</Label>
+                              <Input
+                                id="company"
+                                value={newUser.company}
+                                onChange={(e) =>
+                                  setNewUser({
+                                    ...newUser,
+                                    company: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                          )}
                           <div>
-                            <Label htmlFor="company">Company</Label>
+                            <Label htmlFor="password">
+                              Temporary Password *
+                            </Label>
                             <Input
-                              id="company"
-                              value={newUser.company}
+                              id="password"
+                              type="password"
+                              value={newUser.password}
                               onChange={(e) =>
                                 setNewUser({
                                   ...newUser,
-                                  company: e.target.value,
+                                  password: e.target.value,
                                 })
                               }
                             />
                           </div>
-                        )}
-                        <div>
-                          <Label htmlFor="password">Temporary Password *</Label>
-                          <Input
-                            id="password"
-                            type="password"
-                            value={newUser.password}
-                            onChange={(e) =>
-                              setNewUser({
-                                ...newUser,
-                                password: e.target.value,
-                              })
-                            }
-                          />
+                          <div className="flex justify-end space-x-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => setIsCreateUserOpen(false)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button onClick={handleCreateUser}>
+                              Create User
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => setIsCreateUserOpen(false)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button onClick={handleCreateUser}>
-                            Create User
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>

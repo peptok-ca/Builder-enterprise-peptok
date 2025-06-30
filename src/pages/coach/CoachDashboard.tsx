@@ -198,10 +198,15 @@ export const CoachDashboard: React.FC = () => {
         },
       ];
 
-      setPendingRequests(mockRequests);
-      setStats(mockStats);
-      setRecentActivity(mockActivity);
-      setSessions(mockSessions);
+      // Update state with fetched data
+      setPendingRequests(pendingRequestsData);
+      setStats(statsData);
+      setRecentActivity(mockActivity); // Keep for now, can be updated later
+      setSessions(mockSessions); // Keep for now, can be updated later
+
+      toast.success(
+        `Loaded ${pendingRequestsData.length} pending requests from backend`,
+      );
     } catch (error) {
       console.error("Error loading dashboard data:", error);
       toast.error("Failed to load dashboard data");

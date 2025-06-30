@@ -821,20 +821,20 @@ export function MentorshipRequestForm({
               <div className="px-2">
                 <Slider
                   value={[
-                    formData.budget?.min || 5000,
-                    formData.budget?.max || 15000,
+                    formData.budget?.min || 10000,
+                    formData.budget?.max || 25000,
                   ]}
                   onValueChange={updateBudget}
-                  max={50000}
-                  min={1000}
-                  step={500}
+                  max={100000}
+                  min={2500}
+                  step={1000}
                   className="w-full"
                 />
               </div>
 
               <div className="flex justify-between text-sm">
-                <span>${(formData.budget?.min || 5000).toLocaleString()}</span>
-                <span>${(formData.budget?.max || 15000).toLocaleString()}</span>
+                <span>${(formData.budget?.min || 10000).toLocaleString()}</span>
+                <span>${(formData.budget?.max || 25000).toLocaleString()}</span>
               </div>
 
               <p className="text-sm text-muted-foreground">

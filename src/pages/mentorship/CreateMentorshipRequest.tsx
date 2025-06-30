@@ -339,6 +339,53 @@ export default function CreateMentorshipRequest() {
                   onUpdateEmployees={setEmployees}
                   programTitle={formData?.title || "New Mentorship Program"}
                 />
+
+                {/* Form Actions at Bottom */}
+                <div className="flex justify-between items-center pt-8 border-t bg-white sticky bottom-0 pb-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      handleSaveDraft(
+                        formData || {
+                          title: "",
+                          description: "",
+                          goals: [],
+                          metricsToTrack: [],
+                          teamMembers: employees,
+                          preferredExpertise: [],
+                          timeline: {
+                            startDate: "",
+                            endDate: "",
+                            sessionFrequency: "bi-weekly",
+                          },
+                        },
+                      )
+                    }
+                    disabled={isSubmitting}
+                  >
+                    Save as Draft
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (formData) {
+                        handleSubmitRequest({
+                          ...formData,
+                          teamMembers:
+                            employees.length > 0
+                              ? employees
+                              : formData.teamMembers,
+                        });
+                      } else {
+                        toast.error("Please fill in the program details first");
+                      }
+                    }}
+                    disabled={isSubmitting || !formData}
+                    className="min-w-[140px]"
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit Request"}
+                  </Button>
+                </div>
               </div>
             )}
           </div>

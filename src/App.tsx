@@ -28,6 +28,7 @@ import { CoachDashboard } from "./pages/coach/CoachDashboard";
 import InvitationAccept from "./pages/InvitationAccept";
 import TestPermissions from "./pages/TestPermissions";
 import Terms from "./pages/Terms";
+import PricingConfig from "./pages/admin/PricingConfig";
 import Connections from "./pages/Connections";
 import ConnectionDetails from "./pages/ConnectionDetails";
 import NotFound from "./pages/NotFound";
@@ -172,6 +173,7 @@ const App: React.FC = () => {
               <Route path="/invitation/accept" element={<InvitationAccept />} />
               <Route path="/test-permissions" element={<TestPermissions />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/admin/pricing-config" element={<PricingConfig />} />
               <Route
                 path="/connections"
                 element={

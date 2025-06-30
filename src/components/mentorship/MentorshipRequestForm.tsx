@@ -646,7 +646,8 @@ export function MentorshipRequestForm({
             setFormData((prev) => ({ ...prev, teamMembers: members }))
           }
           subscriptionTier={
-            subscriptionTier || { // Convert session pricing to subscription tier format for compatibility
+            subscriptionTier || {
+              // Convert session pricing to subscription tier format for compatibility
               id: sessionPricingTier?.id || "standard",
               name: sessionPricingTier?.name || "Standard",
               userCap: 999999, // No user cap with session pricing
@@ -843,16 +844,6 @@ export function MentorshipRequestForm({
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Form Actions */}
-      <div className="flex justify-between pt-6">
-        <Button type="button" variant="outline" onClick={handleSaveDraft}>
-          Save as Draft
-        </Button>
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Submitting..." : "Submit Request"}
-        </Button>
       </div>
     </form>
   );

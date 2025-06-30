@@ -82,41 +82,106 @@ export default function VideoConference() {
 
     const loadSessionData = async () => {
       try {
-        // Mock session data - in real app, fetch from API
-        const mockSession: SessionData = {
-          id: sessionId,
-          title: "Leadership Fundamentals Session",
-          description: "Introduction to leadership principles and goal setting",
-          coach: {
-            name: "Sarah Johnson",
-            avatar: "https://avatar.vercel.sh/sarah@example.com",
-            title: "Senior Leadership Coach",
-          },
-          startTime: new Date().toISOString(),
-          duration: 60,
-          status: "upcoming",
-          participants: [
-            {
-              id: "coach-1",
+        // Try to fetch real session data from API
+        const programId = searchParams.get("programId");
+
+        let sessionData: SessionData;
+
+        try {
+          // Attempt to get real session data
+          const requests = await api.getMentorshipRequests();
+          const program = requests.find(r => r.id === programId);
+
+          if (program) {
+            sessionData = {
+              id: sessionId,
+              title: `${program.title} Session`,
+              description: program.description,
+              coach: {
+                name: "Sarah Johnson", // This would come from assigned coach
+                avatar: "https://avatar.vercel.sh/sarah@example.com",
+                title: "Senior Leadership Coach",
+              },
+              startTime: new Date().toISOString(),
+              duration: 60,
+              status: "upcoming",
+              participants: [
+                {
+                  id: "coach-1",
+                  name: "Sarah Johnson",
+                  email: "sarah@example.com",
+                  role: "coach",
+                  userType: "coach",
+                  isOnline: true,
+                  videoEnabled: true,
+                  audioEnabled: true,
+                },
+                // Add all team members from the program
+                ...program.teamMembers.map(member => ({
+                  id: member.id,
+                  name: member.name || member.email.split('@')[0],
+                  email: member.email,
+                  role: member.role,
+                  userType: "team_member" as const,
+                  isOnline: member.id === user?.id, // Only current user is marked as online initially
+                  videoEnabled: true,
+                  audioEnabled: true,
+                  joinedAt: undefined,
+                }))
+              ],
+            };
+          } else {
+            throw new Error("Program not found");
+          }
+        } catch (error) {
+          console.warn("Using fallback session data:", error);
+          // Fallback to mock data
+          sessionData = {
+            id: sessionId,
+            title: "React Development Training Session",
+            description: "Help our team improve their React skills and best practices",
+            coach: {
               name: "Sarah Johnson",
-              email: "sarah@example.com",
-              role: "coach",
-              userType: "coach",
-              isOnline: true,
-              videoEnabled: true,
-              audioEnabled: true,
+              avatar: "https://avatar.vercel.sh/sarah@example.com",
+              title: "Senior Leadership Coach",
             },
-            {
-              id: user?.id || "user-1",
-              name: user?.name || "Current User",
-              email: user?.email || "user@example.com",
-              role: user?.role || "participant",
-              userType: user?.userType || "team_member",
-              isOnline: false,
-              videoEnabled: true,
-              audioEnabled: true,
-            },
-          ],
+            startTime: new Date().toISOString(),
+            duration: 60,
+            status: "upcoming",
+            participants: [
+              {
+                id: "coach-1",
+                name: "Sarah Johnson",
+                email: "sarah@example.com",
+                role: "coach",
+                userType: "coach",
+                isOnline: true,
+                videoEnabled: true,
+                audioEnabled: true,
+              },
+              {
+                id: "member_1",
+                name: "John Doe",
+                email: "john.doe@company.com",
+                role: "participant",
+                userType: "team_member",
+                isOnline: user?.id === "member_1",
+                videoEnabled: true,
+                audioEnabled: true,
+              },
+              {
+                id: user?.id || "current-user",
+                name: user?.name || "Current User",
+                email: user?.email || "user@example.com",
+                role: user?.role || "participant",
+                userType: user?.userType || "team_member",
+                isOnline: false,
+                videoEnabled: true,
+                audioEnabled: true,
+              },
+            ],
+          };
+        }
           meetingId: `meeting-${sessionId}`,
         };
 

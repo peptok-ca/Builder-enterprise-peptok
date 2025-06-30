@@ -1092,6 +1092,70 @@ class ApiService {
     });
   }
 
+  // Expert/Coach directory methods
+  async getAllExperts(): Promise<any[]> {
+    try {
+      const response = await this.request<any[]>("/experts");
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock experts:", error);
+
+      // Return mock experts for demo
+      return [
+        {
+          id: "expert-1",
+          name: "Dr. Sarah Chen",
+          title: "Senior Software Architect",
+          company: "Tech Innovations Inc.",
+          expertise: ["React", "Node.js", "System Design", "Leadership"],
+          experience: 12,
+          avatar: "https://avatar.vercel.sh/sarah-chen",
+          bio: "Passionate about building scalable web applications and mentoring the next generation of developers.",
+          rating: 4.9,
+          totalSessions: 347,
+          availableSlots: ["Mon 9-5", "Wed 9-5", "Fri 9-5"],
+          hourlyRate: 150,
+          location: "San Francisco, CA",
+        },
+        {
+          id: "expert-2",
+          name: "Michael Rodriguez",
+          title: "Product Strategy Lead",
+          company: "Innovation Labs",
+          expertise: [
+            "Product Management",
+            "Strategy",
+            "UX Design",
+            "Analytics",
+          ],
+          experience: 8,
+          avatar: "https://avatar.vercel.sh/michael-rodriguez",
+          bio: "Expert in product strategy and user experience design with a track record of launching successful products.",
+          rating: 4.8,
+          totalSessions: 289,
+          availableSlots: ["Tue 10-6", "Thu 10-6"],
+          hourlyRate: 175,
+          location: "New York, NY",
+        },
+        {
+          id: "expert-3",
+          name: "Emily Johnson",
+          title: "Data Science Director",
+          company: "Analytics Pro",
+          expertise: ["Machine Learning", "Python", "Data Analysis", "AI"],
+          experience: 10,
+          avatar: "https://avatar.vercel.sh/emily-johnson",
+          bio: "Specializing in machine learning and data analytics with extensive experience in AI implementations.",
+          rating: 4.9,
+          totalSessions: 412,
+          availableSlots: ["Mon 1-7", "Wed 1-7", "Fri 1-7"],
+          hourlyRate: 200,
+          location: "Austin, TX",
+        },
+      ];
+    }
+  }
+
   // Coach-specific API methods
   async getCoachPendingRequests(coachId: string): Promise<any[]> {
     try {

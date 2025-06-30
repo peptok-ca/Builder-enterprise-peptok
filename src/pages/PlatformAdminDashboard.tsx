@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/layout/Header";
+import { CSVUserUpload } from "@/components/admin/CSVUserUpload";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {

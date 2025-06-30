@@ -84,6 +84,106 @@ class ApiService {
     }
   }
 
+  // Platform admin API methods
+  async getPlatformStats(): Promise<any> {
+    try {
+      const response = await this.request<any>("/admin/platform-stats");
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock platform stats:", error);
+
+      return {
+        totalUsers: 1247,
+        totalCoaches: 89,
+        totalCompanies: 156,
+        activeSessions: 67,
+        totalSessions: 5432,
+        revenue: 234567,
+        growthRate: 12.5,
+        newUsersThisMonth: 234,
+        activeSubscriptions: 89,
+        pendingRequests: 23,
+      };
+    }
+  }
+
+  async getAllUsers(filters?: any): Promise<any[]> {
+    try {
+      const queryParams = filters
+        ? new URLSearchParams(filters).toString()
+        : "";
+      const response = await this.request<any[]>(`/admin/users?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock users:", error);
+
+      return [
+        {
+          id: "user-1",
+          name: "John Smith",
+          email: "john@example.com",
+          userType: "company_admin",
+          company: "TechCorp Inc.",
+          status: "active",
+          joinedAt: "2024-01-15",
+          lastActive: "2024-01-20",
+        },
+        {
+          id: "user-2",
+          name: "Sarah Johnson",
+          email: "sarah@example.com",
+          userType: "coach",
+          company: "Independent",
+          status: "active",
+          joinedAt: "2024-01-10",
+          lastActive: "2024-01-20",
+        },
+        {
+          id: "user-3",
+          name: "Mike Chen",
+          email: "mike@example.com",
+          userType: "team_member",
+          company: "StartupXYZ",
+          status: "active",
+          joinedAt: "2024-01-18",
+          lastActive: "2024-01-19",
+        },
+      ];
+    }
+  }
+
+  async getAllCompanies(): Promise<any[]> {
+    try {
+      const response = await this.request<any[]>("/admin/companies");
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock companies:", error);
+
+      return [
+        {
+          id: "company-1",
+          name: "TechCorp Inc.",
+          industry: "Technology",
+          employeeCount: 150,
+          activeUsers: 45,
+          subscriptionTier: "growth",
+          monthlySpend: 8500,
+          joinedAt: "2024-01-01",
+        },
+        {
+          id: "company-2",
+          name: "StartupXYZ",
+          industry: "Fintech",
+          employeeCount: 25,
+          activeUsers: 12,
+          subscriptionTier: "starter",
+          monthlySpend: 1200,
+          joinedAt: "2024-01-15",
+        },
+      ];
+    }
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {},

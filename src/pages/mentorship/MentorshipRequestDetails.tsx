@@ -503,10 +503,19 @@ export default function MentorshipRequestDetails() {
                           coaching
                         </div>
                         {coach.isSelected ? (
-                          <Badge className="bg-green-100 text-green-800">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Selected
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge className="bg-green-100 text-green-800">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Selected
+                            </Badge>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleSelectCoach(coach.id)}
+                            >
+                              Deselect
+                            </Button>
+                          </div>
                         ) : (
                           <Button
                             variant="outline"

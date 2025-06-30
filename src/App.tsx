@@ -26,6 +26,7 @@ import MentorshipRequestDetails from "./pages/mentorship/MentorshipRequestDetail
 import { CoachMatching } from "./pages/coach/CoachMatching";
 import { CoachDashboard } from "./pages/coach/CoachDashboard";
 import InvitationAccept from "./pages/InvitationAccept";
+import TestPermissions from "./pages/TestPermissions";
 import Connections from "./pages/Connections";
 import ConnectionDetails from "./pages/ConnectionDetails";
 import NotFound from "./pages/NotFound";

@@ -519,51 +519,71 @@ export default function VideoConference() {
                       muted
                       playsInline
                       className="w-full h-64 bg-gray-900 rounded-lg object-cover"
+                      style={{ display: hasStreamAccess ? "block" : "none" }}
                     />
 
-                    {/* Camera Error Overlay */}
-                    {cameraError && !hasStreamAccess && (
+                    {/* Initial Camera Setup or Error State */}
+                    {!hasStreamAccess && (
                       <div className="absolute inset-0 bg-gray-900 rounded-lg flex items-center justify-center">
                         <div className="text-center text-white p-4">
-                          <VideoOff className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                          <p className="text-sm mb-3">Camera access needed</p>
+                          <Video className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                          <p className="text-sm mb-1">Camera Preview</p>
+                          <p className="text-xs text-gray-400 mb-4">
+                            {cameraError
+                              ? "Camera access required for this session"
+                              : "Click to test your camera and microphone"}
+                          </p>
                           <Button
                             onClick={requestCameraAccess}
                             size="sm"
                             className="bg-blue-600 hover:bg-blue-700"
                           >
-                            Enable Camera
+                            <Video className="w-4 h-4 mr-2" />
+                            Test Camera
                           </Button>
+
+                          {cameraError && (
+                            <div className="mt-4 text-xs text-gray-400">
+                              <p>If camera access is blocked:</p>
+                              <p>
+                                1. Click the camera icon in your browser's
+                                address bar
+                              </p>
+                              <p>2. Select "Allow" for camera and microphone</p>
+                              <p>3. Refresh this page</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
 
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                      <Button
-                        variant={videoEnabled ? "default" : "destructive"}
-                        size="sm"
-                        onClick={toggleVideo}
-                        disabled={!hasStreamAccess}
-                      >
-                        {videoEnabled ? (
-                          <Video className="w-4 h-4" />
-                        ) : (
-                          <VideoOff className="w-4 h-4" />
-                        )}
-                      </Button>
-                      <Button
-                        variant={audioEnabled ? "default" : "destructive"}
-                        size="sm"
-                        onClick={toggleAudio}
-                        disabled={!hasStreamAccess}
-                      >
-                        {audioEnabled ? (
-                          <Mic className="w-4 h-4" />
-                        ) : (
-                          <MicOff className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </div>
+                    {/* Camera Controls */}
+                    {hasStreamAccess && (
+                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                        <Button
+                          variant={videoEnabled ? "default" : "destructive"}
+                          size="sm"
+                          onClick={toggleVideo}
+                        >
+                          {videoEnabled ? (
+                            <Video className="w-4 h-4" />
+                          ) : (
+                            <VideoOff className="w-4 h-4" />
+                          )}
+                        </Button>
+                        <Button
+                          variant={audioEnabled ? "default" : "destructive"}
+                          size="sm"
+                          onClick={toggleAudio}
+                        >
+                          {audioEnabled ? (
+                            <Mic className="w-4 h-4" />
+                          ) : (
+                            <MicOff className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

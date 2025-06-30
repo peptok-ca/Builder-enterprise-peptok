@@ -101,15 +101,26 @@ export default function VideoConference() {
           const program = requests.find((r) => r.id === programId);
 
           if (program) {
+            // Use actual coach data if current user is a coach, otherwise use assigned coach
+            const coachData =
+              user?.userType === "coach"
+                ? {
+                    name: user.name || user.email.split("@")[0],
+                    avatar:
+                      user.avatar || `https://avatar.vercel.sh/${user.email}`,
+                    title: user.title || "Coach",
+                  }
+                : {
+                    name: "Sarah Johnson", // Placeholder for assigned coach
+                    avatar: "https://avatar.vercel.sh/sarah@example.com",
+                    title: "Senior Leadership Coach",
+                  };
+
             sessionData = {
               id: sessionId,
               title: `${program.title} Session`,
               description: program.description,
-              coach: {
-                name: "Sarah Johnson", // This would come from assigned coach
-                avatar: "https://avatar.vercel.sh/sarah@example.com",
-                title: "Senior Leadership Coach",
-              },
+              coach: coachData,
               startTime: new Date().toISOString(),
               duration: 60,
               status: "upcoming",

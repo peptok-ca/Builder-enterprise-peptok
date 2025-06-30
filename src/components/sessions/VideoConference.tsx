@@ -697,6 +697,124 @@ export default function VideoConference() {
           {/* Participants Panel */}
           <div className="lg:col-span-1">
             <Card className="bg-gray-800 border-gray-700 h-full">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    Participants (
+                    {session.participants.filter((p) => p.isOnline).length}/
+                    {session.participants.length})
+                  </CardTitle>
+                  {canManageSession && (
+                    <Button
+                      onClick={remindParticipants}
+                      size="sm"
+                      variant="outline"
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                    >
+                      Remind All
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2 max-h-96 overflow-y-auto">
+                {session.participants.map((participant) => (
+                  <div
+                    key={participant.id}
+                    className={`flex items-center justify-between p-2 rounded-lg ${
+                      participant.isOnline
+                        ? "bg-green-900/30 border border-green-700"
+                        : "bg-gray-700/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage src={participant.avatar} />
+                        <AvatarFallback className="text-xs">
+                          {participant.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-medium text-white">
+                          {participant.name}
+                          {participant.id === user?.id && " (You)"}
+                        </p>
+                        <div className="flex items-center gap-1">
+                          <Badge
+                            variant="outline"
+                            className={`text-xs ${
+                              participant.role === "coach"
+                                ? "border-blue-500 text-blue-300"
+                                : "border-gray-500 text-gray-300"
+                            }`}
+                          >
+                            {participant.role}
+                          </Badge>
+                          {participant.isOnline && (
+                            <Badge className="text-xs bg-green-600">
+                              Online
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      {participant.isOnline && (
+                        <>
+                          {participant.videoEnabled ? (
+                            <Video className="w-3 h-3 text-green-400" />
+                          ) : (
+                            <VideoOff className="w-3 h-3 text-red-400" />
+                          )}
+                          {participant.audioEnabled ? (
+                            <Mic className="w-3 h-3 text-green-400" />
+                          ) : (
+                            <MicOff className="w-3 h-3 text-red-400" />
+                          )}
+                        </>
+                      )}
+                      {!participant.isOnline && canManageSession && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-6 px-2 text-xs border-gray-600 text-gray-300 hover:bg-gray-700"
+                          onClick={() => {
+                            toast.success(
+                              `Reminder sent to ${participant.name}`,
+                            );
+                          }}
+                        >
+                          Remind
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {session.participants.filter((p) => !p.isOnline).length > 0 && (
+                  <div className="mt-4 p-3 bg-yellow-900/30 border border-yellow-700 rounded-lg">
+                    <p className="text-xs text-yellow-300">
+                      {session.participants.filter((p) => !p.isOnline).length}{" "}
+                      participant(s) haven't joined yet
+                    </p>
+                    {canManageSession && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full mt-2 h-7 text-xs border-yellow-600 text-yellow-300 hover:bg-yellow-700/20"
+                        onClick={remindParticipants}
+                      >
+                        Send Reminder to All Offline
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </CardContent>
               <CardHeader>
                 <CardTitle className="text-white text-sm">
                   Participants ({session.participants.length})

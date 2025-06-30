@@ -58,10 +58,30 @@ const CoachDirectory = () => {
     location: "",
   });
 
+  useEffect(() => {
+    const loadCoaches = async () => {
+      try {
+        console.log("Loading coaches from API...");
+        const coachesData = await api.getAllCoaches();
+        console.log("Fetched coaches:", coachesData);
+
+        setAllCoaches(coachesData);
+        setFilteredCoaches(coachesData);
+      } catch (error) {
+        console.error("Failed to load coaches:", error);
+        // Keep empty arrays - API handles fallback
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCoaches();
+  }, []);
+
   const handleSearch = (newFilters: SearchFilters) => {
     setFilters(newFilters);
 
-    let filtered = mockCoaches;
+    let filtered = allCoaches;
 
     // Text search
     if (newFilters.query) {

@@ -35,6 +35,27 @@ const Login = () => {
     rememberMe: false,
   });
 
+  // Debug function to test demo account
+  const debugDemoAccount = async () => {
+    console.log("🧪 Testing demo@platform.com login...");
+    const testResult = await authService.testDemoLogin("demo@platform.com");
+    toast.success("Check console for demo account debug info");
+  };
+
+  // Quick demo login function
+  const quickDemoLogin = async () => {
+    setFormData({
+      email: "demo@platform.com",
+      password: "password123",
+      rememberMe: false
+    });
+
+    // Small delay to let state update
+    setTimeout(() => {
+      document.querySelector('form')?.requestSubmit();
+    }, 100);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");

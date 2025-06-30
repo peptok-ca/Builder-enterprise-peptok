@@ -41,14 +41,34 @@ export function MentorshipRequestProgress({
   viewMode = "employee",
 }: MentorshipRequestProgressProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  const setLoading = (requestId: string, isLoading: boolean) => {
+    setLoadingStates((prev) => ({ ...prev, [requestId]: isLoading }));
+  };
 
   const handleJoinSession = async (requestId: string) => {
+    if (!user?.id) {
+      toast.error("Please log in to join sessions");
+      return;
+    }
+
+    setLoading(`join-${requestId}`, true);
+
     try {
-      // Check if there's an active session for this program
-      const activeSession = await api.getUpcomingSessions("current-user", 1);
-      if (activeSession.length > 0) {
+      // Track button click for analytics
+      await api.trackButtonClick("join_session", requestId, user.id);
+
+      // Validate session access and get session info
+      const validation = await api.validateSessionJoin(requestId);
+
+      if (validation.success && validation.sessionId) {
+        toast.success(validation.message);
         navigate(
-          `/session/video?sessionId=${activeSession[0].id}&programId=${requestId}`,
+          `/session/video?sessionId=${validation.sessionId}&programId=${requestId}`,
         );
       } else {
         toast.info(
@@ -58,11 +78,46 @@ export function MentorshipRequestProgress({
     } catch (error) {
       console.error("Failed to join session:", error);
       toast.error("Failed to join session. Please try again.");
+    } finally {
+      setLoading(`join-${requestId}`, false);
     }
   };
 
-  const handleSendMessage = (requestId: string) => {
-    navigate(`/messages?programId=${requestId}`);
+  const handleSendMessage = async (requestId: string) => {
+    if (!user?.id) {
+      toast.error("Please log in to send messages");
+      return;
+    }
+
+    setLoading(`message-${requestId}`, true);
+
+    try {
+      // Track button click for analytics
+      await api.trackButtonClick("message", requestId, user.id);
+
+      // Validate message access
+      const validation = await api.validateMessageAccess(requestId, user.id);
+
+      if (validation.success) {
+        toast.success(validation.message);
+        navigate(
+          `/messages?programId=${requestId}&conversationId=${validation.conversationId}`,
+        );
+      } else {
+        toast.error("Unable to access messaging for this program");
+      }
+    } catch (error) {
+      console.error("Failed to open messages:", error);
+      toast.error("Failed to open messages. Please try again.");
+    } finally {
+      setLoading(`message-${requestId}`, false);
+    }
+  };
+
+  const handleViewDetails = async (requestId: string) => {
+    if (user?.id) {
+      await api.trackButtonClick("view_details", requestId, user.id);
+    }
   };
   const getStatusColor = (status: string) => {
     switch (status) {

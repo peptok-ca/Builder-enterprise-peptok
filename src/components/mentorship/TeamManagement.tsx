@@ -342,6 +342,25 @@ export function TeamManagement({
             <h3 className="font-semibold">
               Program Team Members ({teamMembers.length})
             </h3>
+            <div className="space-y-3">
+              {teamMembers.map((member) => (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage
+                        src={`https://avatar.vercel.sh/${member.email}`}
+                        alt={member.name || member.email}
+                      />
+                      <AvatarFallback>
+                        {(member.name || member.email)
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 2)}
                       </AvatarFallback>
                     </Avatar>
 

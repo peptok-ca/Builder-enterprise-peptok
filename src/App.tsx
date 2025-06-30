@@ -18,10 +18,12 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import BusinessOnboarding from "./pages/onboarding/BusinessOnboarding";
 import CreateMentorshipRequest from "./pages/mentorship/CreateMentorshipRequest";
+import MentorshipRequestDetails from "./pages/mentorship/MentorshipRequestDetails";
 import { CoachMatching } from "./pages/coach/CoachMatching";
 import { CoachDashboard } from "./pages/coach/CoachDashboard";
 import InvitationAccept from "./pages/InvitationAccept";
 import Connections from "./pages/Connections";
+import ConnectionDetails from "./pages/ConnectionDetails";
 import NotFound from "./pages/NotFound";
 import PlatformAdminDashboard from "./pages/PlatformAdminDashboard";
 

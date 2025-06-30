@@ -407,16 +407,36 @@ const TeamMemberDashboard = () => {
                             <Badge className={getStatusColor(session.status)}>
                               {session.status}
                             </Badge>
-                            {session.meetingLink && (
-                              <Button size="sm" asChild>
-                                <a
-                                  href={session.meetingLink}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <Video className="w-4 h-4 mr-1" />
-                                  Join
-                                </a>
+                            {session.status === "live" ? (
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  navigate(
+                                    `/session/video?sessionId=${session.id}`,
+                                  )
+                                }
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                <Video className="w-4 h-4 mr-1" />
+                                Join Live
+                              </Button>
+                            ) : session.meetingLink ? (
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  navigate(
+                                    `/session/video?sessionId=${session.id}`,
+                                  )
+                                }
+                                variant="outline"
+                              >
+                                <Video className="w-4 h-4 mr-1" />
+                                Join Session
+                              </Button>
+                            ) : (
+                              <Button size="sm" variant="outline" disabled>
+                                <Clock className="w-4 h-4 mr-1" />
+                                Waiting for Host
                               </Button>
                             )}
                           </div>

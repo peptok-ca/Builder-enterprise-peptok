@@ -5,7 +5,7 @@ export interface EmailTemplate {
   textContent: string;
 }
 
-export interface TeamInvitationData {
+interface TeamInvitationData {
   inviterName: string;
   companyName: string;
   role: "participant" | "observer";
@@ -13,6 +13,31 @@ export interface TeamInvitationData {
   expiresAt: Date;
 }
 
+interface ProgramDetailsData {
+  programTitle: string;
+  programDescription: string;
+  startDate: string;
+  endDate: string;
+  sessionFrequency: string;
+  companyName: string;
+  adminName: string;
+  goals: string[];
+  metricsToTrack: string[];
+}
+
+interface CoachAcceptanceData {
+  programTitle: string;
+  coachName: string;
+  coachTitle: string;
+  coachExpertise: string[];
+  sessionSchedule: {
+    date: string;
+    time: string;
+    duration: string;
+  }[];
+  companyName: string;
+  employeeName: string;
+}
 export class EmailService {
   private async sendEmail(template: EmailTemplate): Promise<boolean> {
     // In development/demo mode, we'll log the email and show a success message

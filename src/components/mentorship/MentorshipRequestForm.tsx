@@ -813,7 +813,7 @@ export function MentorshipRequestForm({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="w-5 h-5" />
-              Budget Range (Optional)
+              Total Budget Range (Optional)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -821,25 +821,26 @@ export function MentorshipRequestForm({
               <div className="px-2">
                 <Slider
                   value={[
-                    formData.budget?.min || 100,
-                    formData.budget?.max || 300,
+                    formData.budget?.min || 5000,
+                    formData.budget?.max || 15000,
                   ]}
                   onValueChange={updateBudget}
-                  max={500}
-                  min={50}
-                  step={25}
+                  max={50000}
+                  min={1000}
+                  step={500}
                   className="w-full"
                 />
               </div>
 
               <div className="flex justify-between text-sm">
-                <span>${formData.budget?.min || 100}/hour</span>
-                <span>${formData.budget?.max || 300}/hour</span>
+                <span>${(formData.budget?.min || 5000).toLocaleString()}</span>
+                <span>${(formData.budget?.max || 15000).toLocaleString()}</span>
               </div>
 
               <p className="text-sm text-muted-foreground">
-                Set your preferred hourly rate range for mentor selection. This
-                helps us match you with experts within your budget.
+                Set your total program budget range. This helps us recommend
+                suitable coaches and program structures that fit your
+                investment.
               </p>
             </div>
           </CardContent>

@@ -281,14 +281,24 @@ export default function CreateMentorshipRequest() {
                 </CardContent>
               </Card>
             ) : (
-              <MentorshipRequestForm
-                onSubmit={handleSubmitRequest}
-                onSaveDraft={handleSaveDraft}
-                sessionPricingTier={sessionPricingTier}
-                onUpgradePrompt={handleUpgradePrompt}
-                initialData={savedDraft || undefined}
-                isLoading={isSubmitting}
-              />
+              <div className="space-y-8">
+                <MentorshipRequestForm
+                  onSubmit={handleSubmitRequest}
+                  onSaveDraft={handleSaveDraft}
+                  sessionPricingTier={sessionPricingTier}
+                  onUpgradePrompt={handleUpgradePrompt}
+                  initialData={savedDraft || undefined}
+                  isLoading={isSubmitting}
+                />
+
+                {/* Coach Search Section */}
+                <CoachSearch
+                  selectedExpertise={savedDraft?.preferredExpertise || []}
+                  budgetRange={savedDraft?.budget}
+                  onCoachSelect={handleCoachSelect}
+                  selectedCoaches={selectedCoaches}
+                />
+              </div>
             )}
           </div>
         </div>

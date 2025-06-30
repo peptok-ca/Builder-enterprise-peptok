@@ -201,48 +201,71 @@ class AuthService {
   async loginWithEmail(email: string, password: string): Promise<AuthResponse> {
     try {
       console.log(`🔐 Login attempt for email: ${email}`);
+      console.log(
+        `📋 All available users:`,
+        mockUsers.map((u) => ({
+          email: u.email,
+          id: u.id,
+          userType: u.userType,
+        })),
+      );
 
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Check credentials (in real app, this would be an API call)
+      // Normalize email for comparison
+      const normalizedEmail = email.toLowerCase().trim();
+      console.log(`🔄 Normalized email: "${normalizedEmail}"`);
+
+      // Find user with exact email match
       const user = mockUsers.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase(),
+        (u) => u.email.toLowerCase().trim() === normalizedEmail,
       );
 
       console.log(
-        `🔍 User lookup result for ${email}:`,
-        user ? "Found" : "Not found",
+        `🔍 User lookup result for "${normalizedEmail}":`,
+        user
+          ? {
+              found: true,
+              id: user.id,
+              email: user.email,
+              userType: user.userType,
+              name: user.name,
+            }
+          : "Not found",
       );
 
       if (!user) {
-        console.error(`❌ No user found for email: ${email}`);
+        console.error(`❌ No user found for email: "${normalizedEmail}"`);
         console.log(
           "📋 Available demo emails:",
-          mockUsers.map((u) => u.email),
+          mockUsers.map((u) => `"${u.email}"`),
         );
         return {
           success: false,
-          error:
-            "No account found with this email address. Please sign up first.",
+          error: `No account found with email "${email}". Available demo accounts: ${mockUsers.map((u) => u.email).join(", ")}`,
         };
       }
 
-      // Simulate password validation (in real app, password would be hashed and verified)
-      if (password.length < 6) {
+      // For demo accounts, accept any password with length >= 1
+      // For real accounts, require password length >= 6
+      const isDemoAccount = user.email.includes("demo@");
+      const minPasswordLength = isDemoAccount ? 1 : 6;
+
+      if (password.length < minPasswordLength) {
         console.error(
-          `❌ Password too short for ${email}: ${password.length} characters`,
+          `❌ Password too short for ${email}: ${password.length} characters (min: ${minPasswordLength})`,
         );
         return {
           success: false,
-          error: "Invalid email or password. Please try again.",
+          error: `Password must be at least ${minPasswordLength} characters long.`,
         };
       }
 
       // Generate mock token
       const token = `mock_token_${Date.now()}_${user.id}`;
       console.log(
-        `✅ Login successful for ${email}, user type: ${user.userType}`,
+        `✅ Login successful for "${email}", user type: ${user.userType}`,
       );
 
       // Save authentication

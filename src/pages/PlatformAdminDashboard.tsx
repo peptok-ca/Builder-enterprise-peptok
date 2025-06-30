@@ -361,6 +361,27 @@ export default function PlatformAdminDashboard() {
     }
   };
 
+  const handleCSVUpload = (csvUsers: any[]) => {
+    // Convert CSV users to User format
+    const newUsers: User[] = csvUsers.map((csvUser, index) => ({
+      id: `csv-user-${Date.now()}-${index}`,
+      name: `${csvUser.firstName} ${csvUser.lastName}`,
+      firstName: csvUser.firstName,
+      lastName: csvUser.lastName,
+      email: csvUser.email,
+      userType: csvUser.userType,
+      status: "active",
+      company: csvUser.company,
+      joinedAt: new Date().toISOString().split("T")[0],
+      lastActive: new Date().toISOString().split("T")[0],
+      sessionsCount: 0,
+      revenue: 0,
+    }));
+
+    setUsers((prev) => [...prev, ...newUsers]);
+    toast.success(`Successfully imported ${newUsers.length} users from CSV`);
+  };
+
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

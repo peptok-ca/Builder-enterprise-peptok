@@ -43,6 +43,7 @@ import { api } from "@/services/api";
 import { MentorshipRequest, Connection } from "@/types";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { toast } from "sonner";
+import { SessionManagement } from "@/components/sessions/SessionManagement";
 
 const EnterpriseDashboard = () => {
   const { user } = useAuth();

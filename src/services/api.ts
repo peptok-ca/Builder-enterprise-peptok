@@ -84,6 +84,37 @@ class ApiService {
     }
   }
 
+  // Pricing configuration API methods
+  async getPricingConfig(): Promise<any> {
+    try {
+      const response = await this.request<any>("/admin/pricing-config");
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using default pricing config:", error);
+
+      return {
+        companyServiceFee: 0.1, // 10% service charge for companies
+        coachCommission: 0.2, // 20% commission from coaches
+        additionalParticipantFee: 25, // $25 per additional participant
+        currency: "CAD",
+        lastUpdated: new Date().toISOString(),
+      };
+    }
+  }
+
+  async updatePricingConfig(config: any): Promise<any> {
+    try {
+      const response = await this.request<any>("/admin/pricing-config", {
+        method: "PUT",
+        data: config,
+      });
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, cannot update pricing config:", error);
+      throw new Error("Unable to update pricing configuration");
+    }
+  }
+
   // Platform admin API methods
   async getPlatformStats(): Promise<any> {
     try {

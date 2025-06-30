@@ -354,7 +354,8 @@ export default function Pricing() {
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">
                             Additional participants ({sessions} ×{" "}
-                            {participants - 1} × $25)
+                            {participants - 1} × $
+                            {pricingConfig.additionalParticipantFee})
                           </span>
                           <span className="font-medium">
                             ${costs.additionalParticipantsCost.toFixed(2)}
@@ -375,7 +376,8 @@ export default function Pricing() {
 
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">
-                          Platform service fee (15%)
+                          Platform service fee (
+                          {(pricingConfig.companyServiceFee * 100).toFixed(0)}%)
                         </span>
                         <span className="font-medium">
                           ${costs.platformFee.toFixed(2)}
@@ -389,7 +391,7 @@ export default function Pricing() {
                           Total Program Cost
                         </span>
                         <span className="font-bold text-blue-600">
-                          ${costs.totalCost.toFixed(2)} CAD
+                          ${costs.totalCost.toFixed(2)} {pricingConfig.currency}
                         </span>
                       </div>
 

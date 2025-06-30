@@ -192,6 +192,24 @@ export default function MentorshipRequestDetails() {
     );
   };
 
+  const [pricingConfig, setPricingConfig] = useState({
+    companyServiceFee: 0.10,
+    additionalParticipantFee: 25,
+    currency: "CAD",
+  });
+
+  useEffect(() => {
+    const fetchPricingConfig = async () => {
+      try {
+        const config = await api.getPricingConfig();
+        setPricingConfig(config);
+      } catch (error) {
+        console.warn("Using default pricing config:", error);
+      }
+    };
+    fetchPricingConfig();
+  }, []);
+
   const calculateTotalCost = (hourlyRate: number) => {
     if (!request) return 0;
 
@@ -210,7 +228,17 @@ export default function MentorshipRequestDetails() {
           ? 0.5
           : 1;
 
-    return hourlyRate * hoursPerSession * sessionsPerWeek * totalWeeks;
+    const totalSessions = sessionsPerWeek * totalWeeks;
+    const baseSessionCost = hourlyRate * hoursPerSession * totalSessions;
+
+    // Additional participants cost (team members - 1, since first participant is included)
+    const additionalParticipants = Math.max(0, request.teamMembers.length - 1);
+    const additionalParticipantsCost = additionalParticipants * pricingConfig.additionalParticipantFee * totalSessions;
+
+    const subtotal = baseSessionCost + additionalParticipantsCost;
+    const serviceFee = subtotal * pricingConfig.companyServiceFee;
+
+    return subtotal + serviceFee;
   };
 
   const getAvailabilityColor = (availability: string) => {
@@ -469,16 +497,18 @@ export default function MentorshipRequestDetails() {
                             ${coach.hourlyRate}/hr
                           </div>
                           <div className="text-sm font-semibold text-blue-600">
-                            Total: $
-                            {calculateTotalCost(
-                              coach.hourlyRate,
-                            ).toLocaleString()}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            Match: {coach.matchScore}%
-                          </div>
-                          <Badge
-                            className={getAvailabilityColor(coach.availability)}
+                            {user?.userType === "company" ? (
+                              <div className="text-sm space-y-1">
+                                <div>Coach Rate: ${coach.hourlyRate}/hr</div>
+                                <div>Service Fee: {(pricingConfig.companyServiceFee * 100).toFixed(0)}%</div>
+                                {request.teamMembers.length > 1 && (
+                                  <div>Additional Participants: ${pricingConfig.additionalParticipantFee} × {request.teamMembers.length - 1}</div>
+                                )}
+                                <div className="font-semibold">Total: ${calculateTotalCost(coach.hourlyRate).toFixed(2)} {pricingConfig.currency}</div>
+                              </div>
+                            ) : (
+                              <div>Rate: ${coach.hourlyRate}/hr</div>
+                            )}
                           >
                             {coach.availability}
                           </Badge>

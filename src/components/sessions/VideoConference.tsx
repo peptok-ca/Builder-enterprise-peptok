@@ -232,6 +232,12 @@ export default function VideoConference() {
       if (localStream) {
         localStream.getTracks().forEach((track) => track.stop());
       }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
   }, [localStream]);
 

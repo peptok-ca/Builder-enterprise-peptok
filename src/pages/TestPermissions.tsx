@@ -70,14 +70,10 @@ export default function TestPermissions() {
 
                   <div className="relative">
                     <video
+                      ref={videoRef}
                       autoPlay
                       muted
                       playsInline
-                      ref={(video) => {
-                        if (video && currentStream) {
-                          video.srcObject = currentStream;
-                        }
-                      }}
                       className="w-full h-48 bg-gray-900 rounded-lg object-cover"
                     />
                     <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">

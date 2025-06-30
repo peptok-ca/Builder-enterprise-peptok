@@ -79,6 +79,15 @@ export const MediaPermissionModal = ({
 
         setPermissions((prev) => ({ ...prev, camera: "granted" }));
         setCurrentStream(videoStream);
+
+        // Set up video preview
+        if (videoRef.current) {
+          videoRef.current.srcObject = videoStream;
+        }
+
+        // Set up audio level monitoring
+        setupAudioLevelMonitoring(videoStream);
+
         setStep("testing");
       } catch (videoError: any) {
         console.error("Camera access failed:", videoError);

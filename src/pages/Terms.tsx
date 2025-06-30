@@ -199,19 +199,43 @@ DISPUTE RESOLUTION:
     },
     {
       id: "termination",
-      title: "10. Termination",
+      title: "10. Termination & Refunds",
       icon: <Clock className="w-5 h-5" />,
-      content: `Account Termination:
+      content: `SUBSCRIPTION CANCELLATION:
 
-• You may terminate your account at any time through your settings
-• We may terminate accounts for violations of these terms
-• Upon termination, your access to the platform will be removed
-• Some information may be retained for legal and business purposes
-• Refunds for unused services may be provided at our discretion
+• Monthly subscriptions: Cancel anytime, access continues until end of billing cycle
+• Annual subscriptions: Cancel anytime, pro-rated refund for unused months (minus platform fees)
+• Starter Plan: 30-day money-back guarantee for first-time subscribers
+• Growth Plan: 30-day money-back guarantee for first-time subscribers
+• Enterprise Plan: Refund terms specified in custom contract
 
-Effect of Termination:
-• All rights and licenses granted to you will cease
-• You remain liable for all charges incurred before termination`,
+SESSION CANCELLATION POLICY:
+
+• 24+ hours notice: Full refund minus 5% processing fee
+• 2-24 hours notice: 50% refund (coach compensation policy)
+• Less than 2 hours: No refund (coach time reserved)
+• Coach-initiated cancellations: Full refund plus scheduling priority
+
+ACCOUNT TERMINATION:
+
+• Self-termination: Available through account settings anytime
+• Platform termination: For terms violations with 30-day notice when possible
+• Data retention: Essential information kept for legal/business purposes (7 years)
+• Final billing: All outstanding charges due within 30 days
+
+REFUND PROCESSING:
+
+• Subscription refunds: 5-10 business days to original payment method
+• Session refunds: 3-5 business days to original payment method
+• Platform service fees: Non-refundable (15% of session costs)
+• Currency conversion fees: Customer responsibility for international payments
+
+POST-TERMINATION EFFECTS:
+
+• Platform access: Immediate removal upon termination
+• Coach relationships: May continue independently outside platform
+• Data export: Available for 30 days after termination
+• Outstanding payments: Remain due regardless of termination status`,
     },
     {
       id: "changes",

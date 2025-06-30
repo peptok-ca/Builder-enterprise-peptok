@@ -127,7 +127,7 @@ export function TeamManagement({
       setNewMemberRole("participant");
 
       toast.success(
-        `✅ Employee invitation sent to ${newMemberEmail}! They will receive an email to join the program.`,
+        `✅ Team member invitation sent to ${newMemberEmail}! They will receive an email to join the program.`,
         { duration: 5000 },
       );
     } catch (error) {
@@ -154,7 +154,7 @@ export function TeamManagement({
       member.id === memberId ? { ...member, role: newRole } : member,
     );
     onUpdateTeamMembers(updatedMembers);
-    toast.success("Employee role updated successfully");
+    toast.success("Team member role updated successfully");
   };
 
   const resendInvitation = async (memberId: string) => {
@@ -214,16 +214,16 @@ export function TeamManagement({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="w-5 h-5" />
-          Employee Management
+          Team Member Management
           <Badge variant="outline" className="ml-auto">
-            {currentMemberCount}/{userCap === 999999 ? "∞" : userCap} employees
+            {currentMemberCount}/{userCap === 999999 ? "∞" : userCap} members
             {subscriptionTier && (
               <span className="ml-2 text-xs">({subscriptionTier.name})</span>
             )}
           </Badge>
         </CardTitle>
         <CardDescription>
-          Add employees to participate in the mentorship program. Employees will
+          Add team members to participate in the mentorship program. Team members will
           receive invitation emails to join the program.
         </CardDescription>
       </CardHeader>
@@ -233,7 +233,7 @@ export function TeamManagement({
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              You've reached your employee limit ({userCap} employees).
+              You've reached your team member limit ({userCap} members).
               <Button
                 variant="link"
                 className="p-0 h-auto font-semibold text-primary ml-1"
@@ -251,7 +251,7 @@ export function TeamManagement({
           <div className="flex items-center gap-2">
             <UserPlus className="w-4 h-4 text-blue-600" />
             <h3 className="font-semibold text-blue-900">
-              Add Employee to Program
+              Add Team Member to Program
             </h3>
           </div>
 
@@ -263,7 +263,7 @@ export function TeamManagement({
                 type="email"
                 value={newMemberEmail}
                 onChange={(e) => setNewMemberEmail(e.target.value)}
-                placeholder="employee@company.com"
+                placeholder="member@company.com"
                 onKeyPress={(e) => e.key === "Enter" && addTeamMember()}
                 disabled={isAtCapacity}
               />
@@ -313,7 +313,25 @@ export function TeamManagement({
               disabled={isInviting || !newMemberEmail.trim() || isAtCapacity}
               className="shrink-0 bg-blue-600 hover:bg-blue-700"
             >
-              {isInviting ? "Inviting Employee..." : "Add Employee"}
+              {isInviting ? "Inviting Team Member..." : "Add Team Member"}
+            </Button>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-muted-foreground">
+              <strong>Participant:</strong> Can actively participate in
+              mentorship sessions
+              <br />
+              <strong>Observer:</strong> Can view sessions and materials but not
+              participate actively
+            </div>
+
+            <Button
+              onClick={addTeamMember}
+              disabled={isInviting || !newMemberEmail.trim() || isAtCapacity}
+              className="shrink-0"
+            >
+              {isInviting ? "Inviting Team Member..." : "Add Team Member"}
             </Button>
           </div>
         </div>
@@ -322,28 +340,8 @@ export function TeamManagement({
         {teamMembers.length > 0 && (
           <div className="space-y-4">
             <h3 className="font-semibold">
-              Program Employees ({teamMembers.length})
+              Program Team Members ({teamMembers.length})
             </h3>
-
-            <div className="space-y-3">
-              {teamMembers.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={`https://avatar.vercel.sh/${member.email}`}
-                      />
-                      <AvatarFallback>
-                        {member.name
-                          ? member.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .toUpperCase()
-                          : member.email.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
 
@@ -433,8 +431,8 @@ export function TeamManagement({
             <DollarSign className="h-4 w-4" />
             <AlertDescription>
               You're using {Math.round((currentMemberCount / userCap) * 100)}%
-              of your employee allowance. Consider upgrading your plan for more
-              capacity and advanced features.
+              of your team member allowance. Consider upgrading your plan for more
+              more capacity and advanced features.
               <Button
                 variant="link"
                 className="p-0 h-auto font-semibold text-primary ml-1"
@@ -453,7 +451,7 @@ export function TeamManagement({
             <span className="font-medium">Additional Seats</span>
           </div>
           <p>
-            Need more employees? Additional seats are available for
+            Need more team members? Additional seats are available for
             $5/user/month. You can add them during checkout or upgrade your plan
             for better value.
           </p>
@@ -463,13 +461,11 @@ export function TeamManagement({
           <div className="text-center py-8 text-muted-foreground">
             <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p className="font-medium">
-              No employees added to this program yet.
+              No team members added to this program yet.
             </p>
             <p className="text-sm">
-              Add employees by email to include them in the mentorship program.
+              Add team members by email to include them in the mentorship program.
             </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

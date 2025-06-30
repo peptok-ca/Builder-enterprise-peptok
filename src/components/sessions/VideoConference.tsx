@@ -255,8 +255,13 @@ export default function VideoConference() {
     }
   };
 
-  const initializeMedia = async () => {
+  const initializeMedia = async (userInitiated = false) => {
     try {
+      // Check if mediaDevices is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Camera/microphone not supported in this browser");
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
@@ -271,15 +276,32 @@ export default function VideoConference() {
       }
 
       return stream;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to access media devices:", error);
       setCameraError(true);
       setHasStreamAccess(false);
 
-      // Only show toast if this is not the initial preview setup
-      if (hasJoined) {
-        toast.error("Failed to access camera/microphone");
+      // Provide specific error messages based on error type
+      let errorMessage = "Failed to access camera/microphone";
+
+      if (error.name === "NotAllowedError") {
+        errorMessage =
+          "Camera access denied. Please allow camera access in your browser settings.";
+      } else if (error.name === "NotFoundError") {
+        errorMessage =
+          "No camera/microphone found. Please connect a camera and microphone.";
+      } else if (error.name === "NotSupportedError") {
+        errorMessage =
+          "Camera not supported. Please use HTTPS or a supported browser.";
+      } else if (error.name === "NotReadableError") {
+        errorMessage = "Camera is already in use by another application.";
       }
+
+      // Only show toast if this is user-initiated or during session join
+      if (userInitiated || hasJoined) {
+        toast.error(errorMessage);
+      }
+
       throw error;
     }
   };

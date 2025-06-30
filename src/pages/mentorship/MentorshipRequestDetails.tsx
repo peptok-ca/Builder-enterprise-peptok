@@ -186,9 +186,30 @@ export default function MentorshipRequestDetails() {
     setMatchedCoaches((prev) =>
       prev.map((coach) => ({
         ...coach,
-        isSelected: coach.id === coachId,
+        isSelected: coach.id === coachId ? !coach.isSelected : false,
       })),
     );
+  };
+
+  const calculateTotalCost = (hourlyRate: number) => {
+    if (!request) return 0;
+
+    const startDate = new Date(request.timeline.startDate);
+    const endDate = new Date(request.timeline.endDate);
+    const totalWeeks = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 7),
+    );
+
+    // Assume 2 hours per session based on typical coaching sessions
+    const hoursPerSession = 2;
+    const sessionsPerWeek =
+      request.timeline.sessionFrequency === "weekly"
+        ? 1
+        : request.timeline.sessionFrequency === "bi-weekly"
+          ? 0.5
+          : 1;
+
+    return hourlyRate * hoursPerSession * sessionsPerWeek * totalWeeks;
   };
 
   const getAvailabilityColor = (availability: string) => {

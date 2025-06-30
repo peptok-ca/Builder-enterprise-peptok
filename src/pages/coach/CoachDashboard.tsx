@@ -48,6 +48,9 @@ interface CoachStats {
 export const CoachDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  console.log("CoachDashboard component rendering");
+  console.log("Current user:", user);
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [stats, setStats] = useState<CoachStats>({

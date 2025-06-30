@@ -143,11 +143,7 @@ const App: React.FC = () => {
               />
               <Route
                 path="/mentorship/requests/:id"
-                element={
-                  <ProtectedRoute>
-                    <MentorshipRequestDetails />
-                  </ProtectedRoute>
-                }
+                element={<MentorshipRequestDetails />}
               />
               <Route
                 path="/mentorship/matching"

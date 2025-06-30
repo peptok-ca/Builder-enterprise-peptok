@@ -48,6 +48,11 @@ export const MediaPermissionModal = ({
   const [step, setStep] = useState<
     "intro" | "requesting" | "testing" | "complete"
   >("intro");
+  const [audioLevel, setAudioLevel] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationRef = useRef<number>();
 
   const requestPermissions = async () => {
     setStep("requesting");

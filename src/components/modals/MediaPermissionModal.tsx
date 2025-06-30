@@ -332,7 +332,8 @@ export const MediaPermissionModal = ({
               <div className="text-center mb-4">
                 <p className="font-medium">Test Your Setup</p>
                 <p className="text-sm text-gray-600">
-                  Make sure your camera and microphone are working properly
+                  Can you see yourself? Speak to test your microphone - watch
+                  the audio level meter.
                 </p>
               </div>
 

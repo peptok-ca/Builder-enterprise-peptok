@@ -818,23 +818,56 @@ export function MentorshipRequestForm({
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-4">
-              <div className="px-2">
-                <Slider
-                  value={[
-                    formData.budget?.min || 10000,
-                    formData.budget?.max || 25000,
-                  ]}
-                  onValueChange={updateBudget}
-                  max={100000}
-                  min={2500}
-                  step={1000}
-                  className="w-full"
-                />
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="budget-min">Minimum Budget</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
+                    <Input
+                      id="budget-min"
+                      type="number"
+                      min={2500}
+                      max={100000}
+                      step={1000}
+                      value={formData.budget?.min || 10000}
+                      onChange={(e) =>
+                        updateBudget([
+                          parseInt(e.target.value) || 10000,
+                          formData.budget?.max || 25000,
+                        ])
+                      }
+                      className="pl-8"
+                      placeholder="10,000"
+                    />
+                  </div>
+                </div>
 
-              <div className="flex justify-between text-sm">
-                <span>${(formData.budget?.min || 10000).toLocaleString()}</span>
-                <span>${(formData.budget?.max || 25000).toLocaleString()}</span>
+                <div className="space-y-2">
+                  <Label htmlFor="budget-max">Maximum Budget</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
+                    <Input
+                      id="budget-max"
+                      type="number"
+                      min={2500}
+                      max={100000}
+                      step={1000}
+                      value={formData.budget?.max || 25000}
+                      onChange={(e) =>
+                        updateBudget([
+                          formData.budget?.min || 10000,
+                          parseInt(e.target.value) || 25000,
+                        ])
+                      }
+                      className="pl-8"
+                      placeholder="25,000"
+                    />
+                  </div>
+                </div>
               </div>
 
               <p className="text-sm text-muted-foreground">

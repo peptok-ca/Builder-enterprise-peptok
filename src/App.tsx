@@ -124,6 +124,14 @@ const App: React.FC = () => {
                 }
               />
               <Route
+                path="/messages/:conversationId?"
+                element={
+                  <ProtectedRoute>
+                    <Messages />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/mentorship/new"
                 element={
                   <ProtectedRoute

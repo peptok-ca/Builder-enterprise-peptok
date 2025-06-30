@@ -366,7 +366,11 @@ const Login = () => {
                   )}
                 </Button>
               </form>
+            </CardContent>
+          </Card>
 
+          <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-2xl">
+            <CardContent>
               <div className="mt-6">
                 <Separator className="my-4" />
 

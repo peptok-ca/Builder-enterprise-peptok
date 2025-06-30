@@ -128,12 +128,28 @@ export default function CreateMentorshipRequest() {
     }
   };
 
-  const handleSaveDraft = (data: MentorshipRequestFormData) => {
+  const handleSaveDraft = async (data: MentorshipRequestFormData) => {
     try {
+      // Save to localStorage as backup
       localStorage.setItem("mentorship-request-draft", JSON.stringify(data));
-      toast.success("Draft saved successfully!");
+
+      // Also attempt to save draft to backend if available
+      try {
+        const draftData = {
+          ...data,
+          companyId: user?.companyId || "default-company-id",
+          status: "draft" as const,
+        };
+
+        await api.createMentorshipRequest(draftData);
+        toast.success("Draft saved to server successfully!");
+      } catch (backendError) {
+        console.warn("Backend save failed, draft saved locally:", backendError);
+        toast.success("Draft saved locally!");
+      }
     } catch (error) {
-      toast.error("Failed to create mentorship program. Please try again.");
+      console.error("Failed to save draft:", error);
+      toast.error("Failed to save draft. Please try again.");
     }
   };
 

@@ -516,7 +516,7 @@ export default function MentorshipRequestDetails() {
                         >
                           {coach.availability}
                         </Badge>
-                        </div>
+                      </div>
                       </div>
 
                       <p className="text-sm text-gray-600">{coach.bio}</p>

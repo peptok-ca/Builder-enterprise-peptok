@@ -172,7 +172,7 @@ For detailed privacy information, please review our Privacy Policy.`,
       id: "liability",
       title: "9. Limitation of Liability",
       icon: <Scale className="w-5 h-5" />,
-PLATFORM SERVICE ARRANGEMENT:
+      content: `PLATFORM SERVICE ARRANGEMENT:
 
 • We facilitate connections between coaches and clients through our platform
 • For companies: 10% service fee covers technology, support, and administrative costs

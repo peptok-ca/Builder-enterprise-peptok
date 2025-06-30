@@ -332,7 +332,7 @@ export default function VideoConference() {
     setIsJoining(true);
 
     try {
-      await initializeMedia();
+      await initializeMedia(true);
 
       // Start the session
       setSession((prev) => (prev ? { ...prev, status: "live" } : prev));

@@ -14,7 +14,7 @@ import {
   MentorshipRequestForm,
   MentorshipRequestFormData,
 } from "@/components/mentorship/MentorshipRequestForm";
-import { EmployeeManagementCard } from "@/components/mentorship/EmployeeManagementCard";
+import { TeamMemberManagementCard } from "@/components/mentorship/EmployeeManagementCard";
 
 import Header from "@/components/layout/Header";
 import { ArrowLeft, CheckCircle, Clock, AlertTriangle } from "lucide-react";
@@ -63,7 +63,7 @@ export default function CreateMentorshipRequest() {
   const [formData, setFormData] = useState<MentorshipRequestFormData | null>(
     null,
   );
-  const [employees, setEmployees] = useState<TeamMember[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   // Load draft from localStorage on component mount
   useEffect(() => {
@@ -81,23 +81,22 @@ export default function CreateMentorshipRequest() {
     setIsSubmitting(true);
 
     try {
-      // Check if we have employees from either the separate employee state or form data
-      const currentEmployees =
-        employees.length > 0 ? employees : data.teamMembers;
+      // Check if we have team members from either the separate state or form data
+      const currentTeamMembers =
+        teamMembers.length > 0 ? teamMembers : data.teamMembers;
 
-      if (currentEmployees.length === 0) {
-        toast.error("Please add at least one employee to the program");
+      if (currentTeamMembers.length === 0) {
+        toast.error("Please add at least one team member to the program");
         setIsSubmitting(false);
         return;
       }
 
       // Note: With session-based pricing, team size validation is less restrictive
       // Pricing is calculated per session with additional participant fees
-      const teamSize = currentEmployees.length;
+      const teamSize = currentTeamMembers.length;
       console.log(
-        `Creating program for ${teamSize} employees with session-based pricing`,
+        `Creating program for ${teamSize} team members with session-based pricing`,
       );
-
       // Create the request object
       const requestData = {
         companyId: user?.companyId || "default-company-id", // Use actual user company ID
@@ -105,7 +104,7 @@ export default function CreateMentorshipRequest() {
         description: data.description,
         goals: data.goals,
         metricsToTrack: data.metricsToTrack,
-        teamMembers: currentEmployees,
+        teamMembers: currentTeamMembers,
         preferredExpertise: data.preferredExpertise,
         budget: data.budget,
         timeline: data.timeline,
@@ -115,7 +114,7 @@ export default function CreateMentorshipRequest() {
       // Submit to API
       const request = await api.createMentorshipRequest(requestData);
 
-      // Send program details email to all employees
+      // Send program details email to all team members
       try {
         const programDetails = {
           programTitle: data.title,
@@ -129,20 +128,15 @@ export default function CreateMentorshipRequest() {
           metricsToTrack: data.metricsToTrack,
         };
 
-        // Send email to each employee
-        const emailPromises = currentEmployees.map((member) =>
+        // Send email to each team member
+        const emailPromises = currentTeamMembers.map((member) =>
           emailService.sendProgramDetails(member.email, programDetails),
         );
 
         await Promise.all(emailPromises);
         console.log(
-          `📧 Program details sent to ${currentEmployees.length} employees`,
+          `📧 Program details sent to ${currentTeamMembers.length} team members`,
         );
-        console.log(
-          `📧 Program details sent to ${currentEmployees.length} employees`,
-        );
-      } catch (emailError) {
-        console.warn("Failed to send program details emails:", emailError);
         // Don't fail the whole process if emails fail
       }
 
@@ -150,7 +144,7 @@ export default function CreateMentorshipRequest() {
       localStorage.removeItem("mentorship-request-draft");
 
       toast.success(
-        "Mentorship request submitted successfully! Employees have been notified.",
+        "Mentorship request submitted successfully! Team members have been notified.",
       );
 
       // Navigate to appropriate dashboard based on user type
@@ -332,10 +326,10 @@ export default function CreateMentorshipRequest() {
                   onFormDataChange={handleFormDataChange}
                 />
 
-                {/* Dedicated Employee Management Card */}
-                <EmployeeManagementCard
-                  employees={employees}
-                  onUpdateEmployees={setEmployees}
+                {/* Dedicated Team Member Management Card */}
+                <TeamMemberManagementCard
+                  teamMembers={teamMembers}
+                  onUpdateTeamMembers={setTeamMembers}
                   programTitle={formData?.title || "New Mentorship Program"}
                 />
 
@@ -344,23 +338,19 @@ export default function CreateMentorshipRequest() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() =>
-                      handleSaveDraft(
-                        formData || {
-                          title: "",
-                          description: "",
-                          goals: [],
-                          metricsToTrack: [],
-                          teamMembers: employees,
-                          preferredExpertise: [],
-                          timeline: {
-                            startDate: "",
-                            endDate: "",
-                            sessionFrequency: "bi-weekly",
-                          },
-                        },
-                      )
-                    }
+                    onClick={() => handleSaveDraft(formData || {
+                      title: "",
+                      description: "",
+                      goals: [],
+                      metricsToTrack: [],
+                      teamMembers: teamMembers,
+                      preferredExpertise: [],
+                      timeline: {
+                        startDate: "",
+                        endDate: "",
+                        sessionFrequency: "bi-weekly",
+                      },
+                    })}
                     disabled={isSubmitting}
                   >
                     Save as Draft
@@ -370,10 +360,7 @@ export default function CreateMentorshipRequest() {
                       if (formData) {
                         handleSubmitRequest({
                           ...formData,
-                          teamMembers:
-                            employees.length > 0
-                              ? employees
-                              : formData.teamMembers,
+                          teamMembers: teamMembers.length > 0 ? teamMembers : formData.teamMembers
                         });
                       } else {
                         toast.error("Please fill in the program details first");

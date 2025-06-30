@@ -137,7 +137,9 @@ export default function CreateMentorshipRequest() {
         console.log(
           `📧 Program details sent to ${currentTeamMembers.length} team members`,
         );
+      } catch (emailError) {
         // Don't fail the whole process if emails fail
+        console.error("Failed to send program details emails:", emailError);
       }
 
       // Clear saved draft
@@ -338,19 +340,23 @@ export default function CreateMentorshipRequest() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => handleSaveDraft(formData || {
-                      title: "",
-                      description: "",
-                      goals: [],
-                      metricsToTrack: [],
-                      teamMembers: teamMembers,
-                      preferredExpertise: [],
-                      timeline: {
-                        startDate: "",
-                        endDate: "",
-                        sessionFrequency: "bi-weekly",
-                      },
-                    })}
+                    onClick={() =>
+                      handleSaveDraft(
+                        formData || {
+                          title: "",
+                          description: "",
+                          goals: [],
+                          metricsToTrack: [],
+                          teamMembers: teamMembers,
+                          preferredExpertise: [],
+                          timeline: {
+                            startDate: "",
+                            endDate: "",
+                            sessionFrequency: "bi-weekly",
+                          },
+                        },
+                      )
+                    }
                     disabled={isSubmitting}
                   >
                     Save as Draft
@@ -360,7 +366,10 @@ export default function CreateMentorshipRequest() {
                       if (formData) {
                         handleSubmitRequest({
                           ...formData,
-                          teamMembers: teamMembers.length > 0 ? teamMembers : formData.teamMembers
+                          teamMembers:
+                            teamMembers.length > 0
+                              ? teamMembers
+                              : formData.teamMembers,
                         });
                       } else {
                         toast.error("Please fill in the program details first");

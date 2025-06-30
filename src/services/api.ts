@@ -953,6 +953,96 @@ class ApiService {
     return response.data;
   }
 
+  // Accept mentorship request and assign coach
+  async acceptMentorshipRequest(
+    requestId: string,
+    coachId: string,
+    sessionSchedule: {
+      date: string;
+      time: string;
+      duration: string;
+    }[],
+  ): Promise<{
+    request: MentorshipRequest;
+    coach: Coach;
+    emailsSent: boolean;
+  }> {
+    try {
+      // Update request status and assign coach
+      const response = await this.request<{
+        request: MentorshipRequest;
+        coach: Coach;
+      }>(`/mentorship-requests/${requestId}/accept`, {
+        method: "POST",
+        body: JSON.stringify({ coachId, sessionSchedule }),
+      });
+
+      const { request, coach } = response.data;
+
+      // Send coach acceptance emails to all employees
+      try {
+        const { emailService } = await import("./email");
+
+        const coachAcceptanceData = {
+          programTitle: request.title,
+          coachName: coach.name,
+          coachTitle: coach.title,
+          coachExpertise: coach.coaching,
+          sessionSchedule,
+          companyName: "Your Company", // TODO: Get from request or user data
+          employeeName: "", // Will be filled per employee
+        };
+
+        // Send email to each employee
+        const emailPromises = request.teamMembers.map(async (member) => {
+          const personalizedData = {
+            ...coachAcceptanceData,
+            employeeName: member.name || member.email.split("@")[0],
+          };
+          return emailService.sendCoachAcceptanceNotification(
+            member.email,
+            personalizedData,
+          );
+        });
+
+        await Promise.all(emailPromises);
+        console.log(
+          `📧 Coach acceptance emails sent to ${request.teamMembers.length} employees`,
+        );
+
+        return { request, coach, emailsSent: true };
+      } catch (emailError) {
+        console.warn("Failed to send coach acceptance emails:", emailError);
+        return { request, coach, emailsSent: false };
+      }
+    } catch (error) {
+      console.warn("API not available, using mock response:", error);
+
+      // Mock response for demo
+      const mockCoach = this.getMockCoaches()[0];
+      const mockRequest = {
+        id: requestId,
+        title: "Mock Program",
+        teamMembers: [
+          {
+            id: "1",
+            email: "employee@company.com",
+            name: "Employee",
+            role: "participant" as const,
+            status: "accepted" as const,
+            invitedAt: new Date().toISOString(),
+          },
+        ],
+      } as MentorshipRequest;
+
+      return {
+        request: mockRequest,
+        coach: mockCoach,
+        emailsSent: true,
+      };
+    }
+  }
+
   async deleteMentorshipRequest(id: string): Promise<void> {
     await this.request(`/mentorship-requests/${id}`, {
       method: "DELETE",

@@ -467,6 +467,12 @@ export default function MentorshipRequestDetails() {
                           <div className="text-lg font-bold">
                             ${coach.hourlyRate}/hr
                           </div>
+                          <div className="text-sm font-semibold text-blue-600">
+                            Total: $
+                            {calculateTotalCost(
+                              coach.hourlyRate,
+                            ).toLocaleString()}
+                          </div>
                           <div className="text-sm text-gray-600">
                             Match: {coach.matchScore}%
                           </div>

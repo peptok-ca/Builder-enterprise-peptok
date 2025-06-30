@@ -242,11 +242,20 @@ const Signup = () => {
             </div>
           </div>
 
-          {/* Enhanced Signup Form */}
-          <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-2xl">
-            <CardHeader className="space-y-1 text-center">
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
-                Sign up
+          {/* Show 2FA Setup or Signup Form */}
+          {showTwoFactor ? (
+            <TwoFactorSetup
+              userEmail={tempUserEmail}
+              onComplete={handleTwoFactorComplete}
+              onSkip={handleTwoFactorSkip}
+              isOptional={true}
+            />
+          ) : (
+            /* Enhanced Signup Form */
+            <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-2xl">
+              <CardHeader className="space-y-1 text-center">
+                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                  Sign up
               </CardTitle>
               <CardDescription className="text-base">
                 Create your account to get started with Peptok

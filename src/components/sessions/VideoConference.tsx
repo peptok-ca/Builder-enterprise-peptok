@@ -297,8 +297,8 @@ export default function VideoConference() {
     setIsJoining(true);
 
     try {
-      // Initialize media
-      await initializeMedia();
+      // Initialize media with user interaction
+      await initializeMedia(true);
 
       // In real app, this would connect to video service (WebRTC, Zoom SDK, etc.)
       await new Promise((resolve) => setTimeout(resolve, 2000));

@@ -160,6 +160,36 @@ class AuthService {
     return this.currentUser;
   }
 
+  // Debug utility to check available demo accounts
+  getAvailableDemoAccounts(): Array<{ email: string; userType: string }> {
+    return mockUsers.map((user) => ({
+      email: user.email,
+      userType: user.userType,
+    }));
+  }
+
+  // Test specific demo account
+  async testDemoLogin(email: string = "demo@platform.com"): Promise<void> {
+    console.log("🧪 Testing demo login...");
+    console.log("📋 Available accounts:", this.getAvailableDemoAccounts());
+
+    const user = mockUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase(),
+    );
+    console.log(`🔍 Account lookup for ${email}:`, user);
+
+    if (user) {
+      console.log("✅ Demo account found:", {
+        id: user.id,
+        email: user.email,
+        userType: user.userType,
+        name: user.name,
+      });
+    } else {
+      console.error(`❌ Demo account ${email} not found!`);
+    }
+  }
+
   // Check if user is authenticated
   isAuthenticated(): boolean {
     return (

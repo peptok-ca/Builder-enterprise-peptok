@@ -26,9 +26,17 @@ export default function Terms() {
       id: "acceptance",
       title: "1. Acceptance of Terms",
       icon: <FileText className="w-5 h-5" />,
-      content: `By accessing and using this mentorship platform ("Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+      content: `By accessing and using this mentorship platform ("Service"), you accept and agree to be bound by the terms and provision of this agreement, including all pricing, payment, and refund policies outlined herein. If you do not agree to abide by the above, please do not use this service.
 
-These Terms of Service govern your use of our platform and form a legally binding agreement between you and our company. Please read them carefully before using our services.
+These Terms of Service govern your use of our platform and form a legally binding agreement between you and our company. By subscribing to any paid plan or booking coaching sessions, you acknowledge understanding of our pricing structure, platform service fees, and cancellation policies.
+
+PRICING ACKNOWLEDGMENT:
+• All prices listed are in Canadian Dollars (CAD)
+• Subscription pricing subject to change with 30-day notice
+• Platform service fees (15%) apply to all session-based bookings
+• Additional participant fees ($25 CAD) apply beyond first participant
+
+Please read these terms carefully before using our services, especially the payment and refund sections.
 
 Last updated: ${new Date().toLocaleDateString()}`,
     },

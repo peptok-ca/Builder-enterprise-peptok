@@ -296,6 +296,7 @@ export default function CreateMentorshipRequest() {
                   onUpgradePrompt={handleUpgradePrompt}
                   initialData={savedDraft || undefined}
                   isLoading={isSubmitting}
+                  onFormDataChange={handleFormDataChange}
                 />
 
                 {/* Coach Search Section */}

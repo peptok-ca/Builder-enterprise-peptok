@@ -218,12 +218,37 @@ const Login = () => {
                   </strong>{" "}
                   demo@company.com
                   <br />
-                  <strong>Coach (cannot create sessions):</strong>{" "}
-                  demo@coach.com
+                  <strong>Coach (provides mentoring):</strong> demo@coach.com
+                  <br />
+                  <strong>Team Member (receives mentoring):</strong>{" "}
+                  demo@team.com
                 </AlertDescription>
               </Alert>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Debug Section - Only in development */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm font-medium text-yellow-800 mb-3">Debug Tools:</p>
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={debugDemoAccount}
+                    >
+                      Debug Demo Account
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={quickDemoLogin}
+                    >
+                      Quick Demo Login
+                    </Button>
+                  </div>
+                </div>
+              )}
                 {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm font-medium">

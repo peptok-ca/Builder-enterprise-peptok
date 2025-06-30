@@ -59,6 +59,9 @@ export default function CreateMentorshipRequest() {
   const [savedDraft, setSavedDraft] =
     useState<MentorshipRequestFormData | null>(null);
   const [selectedCoaches, setSelectedCoaches] = useState<Coach[]>([]);
+  const [formData, setFormData] = useState<MentorshipRequestFormData | null>(
+    null,
+  );
 
   // Load draft from localStorage on component mount
   useEffect(() => {
@@ -186,6 +189,10 @@ export default function CreateMentorshipRequest() {
     });
   };
 
+  const handleFormDataChange = (data: MentorshipRequestFormData) => {
+    setFormData(data);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-blue-100/30">
       <Header />
@@ -293,8 +300,12 @@ export default function CreateMentorshipRequest() {
 
                 {/* Coach Search Section */}
                 <CoachSearch
-                  selectedExpertise={savedDraft?.preferredExpertise || []}
-                  budgetRange={savedDraft?.budget}
+                  selectedExpertise={
+                    formData?.preferredExpertise ||
+                    savedDraft?.preferredExpertise ||
+                    []
+                  }
+                  budgetRange={formData?.budget || savedDraft?.budget}
                   onCoachSelect={handleCoachSelect}
                   selectedCoaches={selectedCoaches}
                 />

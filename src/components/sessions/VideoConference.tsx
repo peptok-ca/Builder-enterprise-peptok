@@ -413,10 +413,16 @@ export default function VideoConference() {
   const startSession = async () => {
     if (!session || !canManageSession) return;
 
+    // Show permission modal if we don't have stream access
+    if (!hasStreamAccess) {
+      setShowPermissionModal(true);
+      return;
+    }
+
     setIsJoining(true);
 
     try {
-      await initializeMedia(true);
+      // Media already initialized through permission modal
 
       // Start the session
       setSession((prev) => (prev ? { ...prev, status: "live" } : prev));

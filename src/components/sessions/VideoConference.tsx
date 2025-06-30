@@ -597,6 +597,23 @@ export default function VideoConference() {
                       </div>
                     )}
 
+                    {/* Audio Level Meter */}
+                    {hasStreamAccess && audioEnabled && (
+                      <div className="absolute top-4 right-4 bg-black bg-opacity-50 rounded-lg p-2">
+                        <div className="flex items-center gap-2">
+                          <Mic className="w-3 h-3 text-white" />
+                          <div className="w-12 h-2 bg-gray-600 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-green-500 transition-all duration-100"
+                              style={{
+                                width: `${Math.min(audioLevel * 2, 100)}%`,
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Camera Controls */}
                     {hasStreamAccess && (
                       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">

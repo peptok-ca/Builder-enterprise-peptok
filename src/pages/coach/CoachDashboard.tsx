@@ -75,53 +75,20 @@ export const CoachDashboard: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // Mock data for demonstration
-      const mockRequests: PendingRequest[] = [
-        {
-          id: "req-1",
-          title: "React Development Coaching",
-          company: "TechStart Inc.",
-          description:
-            "Looking for guidance on React best practices and modern development workflows for our engineering team.",
-          goals: [
-            "Learn React hooks and state management",
-            "Implement testing strategies",
-            "Code review processes",
-          ],
-          teamSize: 5,
-          urgency: "medium",
-          budget: 2500,
-          preferredSchedule: "Weekdays 2-4 PM PST",
-          submittedAt: new Date("2024-01-15"),
-        },
-        {
-          id: "req-2",
-          title: "Leadership Development Program",
-          company: "Growth Corp",
-          description:
-            "Need coaching advice on migrating to cloud infrastructure.",
-          goals: [
-            "Team leadership skills",
-            "Communication strategies",
-            "Performance management",
-          ],
-          teamSize: 8,
-          urgency: "high",
-          budget: 4000,
-          preferredSchedule: "Flexible",
-          submittedAt: new Date("2024-01-12"),
-        },
-      ];
+      if (!user?.id) {
+        toast.error("User not found. Please log in again.");
+        return;
+      }
 
-      const mockStats: CoachStats = {
-        totalSessions: 156,
-        completedSessions: 142,
-        averageRating: 4.8,
-        totalEarnings: 45600,
-        upcomingSessions: 8,
-        responseTime: 2.4,
-        successRate: 94,
-      };
+      console.log("Loading coach dashboard data for user:", user.id);
+
+      // Fetch pending requests from backend
+      const pendingRequestsData = await api.getCoachPendingRequests(user.id);
+      console.log("Fetched pending requests:", pendingRequestsData);
+
+      // Fetch coach stats from backend
+      const statsData = await api.getCoachStats(user.id);
+      console.log("Fetched coach stats:", statsData);
 
       const mockSessions = [
         {

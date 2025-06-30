@@ -294,6 +294,31 @@ export default function VideoConference() {
     }
   };
 
+  const remindParticipants = async () => {
+    if (!session) return;
+
+    try {
+      const offlineParticipants = session.participants.filter(
+        (p) => !p.isOnline && p.userType !== "coach",
+      );
+
+      if (offlineParticipants.length === 0) {
+        toast.info("All participants are already online!");
+        return;
+      }
+
+      // In real app, this would send email/SMS reminders
+      toast.success(
+        `Reminder sent to ${offlineParticipants.length} participant(s)`,
+      );
+
+      // Mock API call for sending reminders
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } catch (error) {
+      toast.error("Failed to send reminders");
+    }
+  };
+
   const endSession = async () => {
     if (!session || !canManageSession) return;
 

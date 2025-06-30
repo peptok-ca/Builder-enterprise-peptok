@@ -612,8 +612,9 @@ export default function MentorshipRequestDetails() {
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold">
-                  ${request.budget.min.toLocaleString()} - $
-                  {request.budget.max.toLocaleString()}
+                  {request.budget
+                    ? `$${request.budget.min.toLocaleString()} - $${request.budget.max.toLocaleString()}`
+                    : "Budget not specified"}
                 </p>
               </CardContent>
             </Card>

@@ -23,6 +23,7 @@ import {
   Share,
   Clock,
   CheckCircle,
+  Bell,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";

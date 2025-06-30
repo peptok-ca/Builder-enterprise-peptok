@@ -28,12 +28,12 @@ export default function Terms() {
       icon: <FileText className="w-5 h-5" />,
       content: `By accessing and using this mentorship platform ("Service"), you accept and agree to be bound by the terms and provision of this agreement, including all pricing, payment, and refund policies outlined herein. If you do not agree to abide by the above, please do not use this service.
 
-These Terms of Service govern your use of our platform and form a legally binding agreement between you and our company. By subscribing to any paid plan or booking coaching sessions, you acknowledge understanding of our pricing structure, platform service fees, and cancellation policies.
+These Terms of Service govern your use of our platform and form a legally binding agreement between you and our company. By booking coaching sessions, you acknowledge understanding of our session-based pricing structure, platform service fees, and cancellation policies.
 
 PRICING ACKNOWLEDGMENT:
 • All prices listed are in Canadian Dollars (CAD)
-• Subscription pricing subject to change with 30-day notice
-• Platform service fees (15%) apply to all session-based bookings
+• Session pricing subject to change with 30-day notice
+• Platform service fees (15%) apply to all session bookings
 • Additional participant fees ($25 CAD) apply beyond first participant
 
 Please read these terms carefully before using our services, especially the payment and refund sections.
@@ -86,43 +86,34 @@ We strive to maintain service availability but do not guarantee uninterrupted ac
       id: "payments",
       title: "5. Payment Terms",
       icon: <CreditCard className="w-5 h-5" />,
-      content: `SUBSCRIPTION TIERS (CAD):
-
-Starter Plan - $99/month ($1,069.20 annually):
-• 200 minutes of mentor time per month
-• Minimum 2 users, up to 20 seats available
-• Additional seats: $119/user/month
-• Monthly progress reports and email support
-
-Growth Plan - $199/month ($2,148.40 annually):
-• 1,200 minutes of mentor time per month
-• Minimum 5 users, up to 100 seats available
-• Additional seats: $219/user/month
-• Advanced analytics and priority support
-
-Enterprise Plan - Custom Pricing:
-• Unlimited user seats and mentor time
-• Dedicated Customer Success Manager
-• White-labeling and API access
-• SLA guarantees and custom integrations
-
-SESSION-BASED PRICING:
+      content: `SESSION-BASED PRICING:
 
 Standard Sessions - $150 CAD base rate:
 • 1-hour coaching sessions (professional rate varies by coach)
 • Additional participants: $25 CAD per person beyond first participant
-• Platform service charge: 15% of total session cost
+�� Platform service charge: 15% of total session cost
 • Includes session recordings and progress tracking
+
+Extended Sessions:
+• 90-minute sessions: $225 CAD base rate + additional participant fees
+• 2-hour sessions: $300 CAD base rate + additional participant fees
+• Group sessions (3+ participants): Base rate + $25 CAD per additional participant
+
+Enterprise Custom Packages:
+• Bulk session packages available for companies
+• Volume discounts for 10+ sessions booked in advance
+• Custom coaching programs with dedicated support
+• Contact us for enterprise pricing
 
 PAYMENT PROCESSING:
 
 • All payments processed securely through certified payment partners
 • Coach payments: Processed within 7 business days after session completion
 • Platform fees: Automatically deducted from total session cost
-• Client billing: Charged immediately upon session booking/subscription
+• Client billing: Charged immediately upon session booking
 • Currency: All prices in Canadian Dollars (CAD) unless specified
-• Refunds: Available within 30 days of initial subscription
-• Price changes: 30 days advance notice for subscription modifications`,
+• Refunds: Available according to cancellation policy outlined below
+• Price changes: 30 days advance notice for session rate modifications`,
     },
     {
       id: "content",
@@ -184,15 +175,14 @@ For detailed privacy information, please review our Privacy Policy.`,
 
 FINANCIAL RESPONSIBILITY:
 
-• Subscription fees are non-refundable except within initial 30-day period
 • Session fees are final once session is completed
 • Platform service charges are non-refundable processing fees
-• Unused subscription minutes do not roll over to following billing periods
-• Enterprise custom pricing subject to separate contract terms
+• Enterprise custom packages subject to separate contract terms
+• No recurring billing or automatic charges beyond booked sessions
 
 LIABILITY LIMITATIONS:
 
-• Our liability is limited to the amount paid for platform services in the last 12 months
+• Our liability is limited to the amount paid for sessions in the last 12 months
 • Maximum liability per incident: $10,000 CAD
 • We are not liable for indirect, incidental, or consequential damages
 • Not responsible for coach-client relationship outcomes or disputes
@@ -209,41 +199,41 @@ DISPUTE RESOLUTION:
       id: "termination",
       title: "10. Termination & Refunds",
       icon: <Clock className="w-5 h-5" />,
-      content: `SUBSCRIPTION CANCELLATION:
-
-• Monthly subscriptions: Cancel anytime, access continues until end of billing cycle
-• Annual subscriptions: Cancel anytime, pro-rated refund for unused months (minus platform fees)
-• Starter Plan: 30-day money-back guarantee for first-time subscribers
-• Growth Plan: 30-day money-back guarantee for first-time subscribers
-• Enterprise Plan: Refund terms specified in custom contract
-
-SESSION CANCELLATION POLICY:
+      content: `SESSION CANCELLATION POLICY:
 
 • 24+ hours notice: Full refund minus 5% processing fee
 • 2-24 hours notice: 50% refund (coach compensation policy)
 • Less than 2 hours: No refund (coach time reserved)
 • Coach-initiated cancellations: Full refund plus scheduling priority
+• Rescheduling: Free rescheduling available with 24+ hours notice
+
+BULK SESSION PACKAGES:
+
+• Enterprise packages: Refund policies specified in custom contract
+• Prepaid sessions: Unused sessions refundable within 90 days of purchase
+• Volume discounts: Non-refundable discount amounts, base session fees refundable
 
 ACCOUNT TERMINATION:
 
 • Self-termination: Available through account settings anytime
 • Platform termination: For terms violations with 30-day notice when possible
 • Data retention: Essential information kept for legal/business purposes (7 years)
-• Final billing: All outstanding charges due within 30 days
+• Outstanding session fees: All charges due within 30 days
 
 REFUND PROCESSING:
 
-• Subscription refunds: 5-10 business days to original payment method
 • Session refunds: 3-5 business days to original payment method
 • Platform service fees: Non-refundable (15% of session costs)
 • Currency conversion fees: Customer responsibility for international payments
+• Processing fees: 5% processing fee applies to all refunds
 
 POST-TERMINATION EFFECTS:
 
 • Platform access: Immediate removal upon termination
 • Coach relationships: May continue independently outside platform
 • Data export: Available for 30 days after termination
-• Outstanding payments: Remain due regardless of termination status`,
+• Outstanding payments: Remain due regardless of termination status
+• Booked sessions: May be completed or cancelled according to cancellation policy`,
     },
     {
       id: "changes",

@@ -188,17 +188,12 @@ const Index = () => {
 
         {/* Animated Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
           <div
-            className="absolute top-1/4 left-0 w-64 h-64 bg-blue-600/8 rounded-full blur-2xl animate-bounce"
+            className="absolute top-0 right-0 w-96 h-96 bg-blue-500/8 rounded-full blur-3xl animate-pulse"
             style={{ animationDuration: "6s" }}
           ></div>
           <div
-            className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-400/6 rounded-full blur-3xl animate-pulse"
-            style={{ animationDelay: "2s" }}
-          ></div>
-          <div
-            className="absolute bottom-0 left-0 w-72 h-72 bg-blue-700/7 rounded-full blur-3xl animate-bounce"
+            className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/6 rounded-full blur-3xl animate-bounce"
             style={{ animationDuration: "8s", animationDelay: "1s" }}
           ></div>
         </div>

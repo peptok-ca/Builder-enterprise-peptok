@@ -38,7 +38,7 @@ import { useAuth } from "@/contexts/AuthContext";
 interface TeamManagementProps {
   teamMembers: TeamMember[];
   onUpdateTeamMembers: (members: TeamMember[]) => void;
-  subscriptionTier: SubscriptionTier;
+  subscriptionTier: SubscriptionTier | null;
   onUpgradePrompt: () => void;
   maxMembers?: number;
 }
@@ -57,10 +57,10 @@ export function TeamManagement({
   >("participant");
   const [isInviting, setIsInviting] = useState(false);
 
-  const userCap = maxMembers || subscriptionTier.userCap;
+  const userCap = maxMembers || subscriptionTier?.userCap || 999999;
   const currentMemberCount = teamMembers.length;
-  const isAtCapacity = currentMemberCount >= userCap;
-  const canAddMore = currentMemberCount < userCap;
+  const isAtCapacity = currentMemberCount >= userCap && userCap !== 999999;
+  const canAddMore = currentMemberCount < userCap || userCap === 999999;
 
   const addTeamMember = async () => {
     if (!newMemberEmail.trim()) {
@@ -217,6 +217,9 @@ export function TeamManagement({
           Team Management
           <Badge variant="outline" className="ml-auto">
             {currentMemberCount}/{userCap === 999999 ? "∞" : userCap} members
+            {subscriptionTier && (
+              <span className="ml-2 text-xs">({subscriptionTier.name})</span>
+            )}
           </Badge>
         </CardTitle>
         <CardDescription>

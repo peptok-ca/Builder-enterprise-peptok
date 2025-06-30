@@ -59,8 +59,9 @@ export const CoachDashboard: React.FC = () => {
     responseTime: 0,
     successRate: 0,
   });
+  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [sessions, setSessions] = useState<any[]>([]);
 
   useEffect(() => {
     loadDashboardData();

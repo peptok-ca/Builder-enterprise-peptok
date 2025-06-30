@@ -214,17 +214,17 @@ export function TeamManagement({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="w-5 h-5" />
-          Team Management
+          Employee Management
           <Badge variant="outline" className="ml-auto">
-            {currentMemberCount}/{userCap === 999999 ? "∞" : userCap} members
+            {currentMemberCount}/{userCap === 999999 ? "∞" : userCap} employees
             {subscriptionTier && (
               <span className="ml-2 text-xs">({subscriptionTier.name})</span>
             )}
           </Badge>
         </CardTitle>
         <CardDescription>
-          Add team members to participate in mentorship sessions. Members will
-          receive invitations via email.
+          Add employees to participate in the mentorship program. Employees will
+          receive invitation emails to join the program.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -247,10 +247,12 @@ export function TeamManagement({
         )}
 
         {/* Add New Member */}
-        <div className="space-y-4 p-4 border rounded-lg">
+        <div className="space-y-4 p-4 border rounded-lg bg-blue-50/50 border-blue-200">
           <div className="flex items-center gap-2">
-            <UserPlus className="w-4 h-4" />
-            <h3 className="font-semibold">Invite Team Member</h3>
+            <UserPlus className="w-4 h-4 text-blue-600" />
+            <h3 className="font-semibold text-blue-900">
+              Add Employee to Program
+            </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -261,7 +263,7 @@ export function TeamManagement({
                 type="email"
                 value={newMemberEmail}
                 onChange={(e) => setNewMemberEmail(e.target.value)}
-                placeholder="colleague@company.com"
+                placeholder="employee@company.com"
                 onKeyPress={(e) => e.key === "Enter" && addTeamMember()}
                 disabled={isAtCapacity}
               />
@@ -309,9 +311,9 @@ export function TeamManagement({
             <Button
               onClick={addTeamMember}
               disabled={isInviting || !newMemberEmail.trim() || isAtCapacity}
-              className="shrink-0"
+              className="shrink-0 bg-blue-600 hover:bg-blue-700"
             >
-              {isInviting ? "Sending..." : "Send Invitation"}
+              {isInviting ? "Inviting Employee..." : "Add Employee"}
             </Button>
           </div>
         </div>
@@ -319,7 +321,9 @@ export function TeamManagement({
         {/* Current Team Members */}
         {teamMembers.length > 0 && (
           <div className="space-y-4">
-            <h3 className="font-semibold">Current Team Members</h3>
+            <h3 className="font-semibold">
+              Program Employees ({teamMembers.length})
+            </h3>
 
             <div className="space-y-3">
               {teamMembers.map((member) => (
@@ -458,9 +462,11 @@ export function TeamManagement({
         {teamMembers.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>No team members added yet.</p>
+            <p className="font-medium">
+              No employees added to this program yet.
+            </p>
             <p className="text-sm">
-              Invite colleagues to start collaborating on mentorship goals.
+              Add employees by email to include them in the mentorship program.
             </p>
           </div>
         )}

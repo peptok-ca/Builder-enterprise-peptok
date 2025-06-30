@@ -369,8 +369,8 @@ export const MediaPermissionModal = ({
               <Alert>
                 <CheckCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Can you see yourself and hear your voice? If yes, you're ready
-                  to join the session!
+                  Can you see yourself in the video? Does the audio meter move
+                  when you speak? If yes, you're ready to join the session!
                 </AlertDescription>
               </Alert>
 

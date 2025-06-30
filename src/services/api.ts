@@ -535,7 +535,6 @@ class ApiService {
 
       if (response.ok) {
         const tiers = await response.json();
-        console.log("✅ Loaded session pricing tiers from backend");
         return tiers.map((tier: any) => ({
           ...tier,
           currency: tier.currency || "CAD",

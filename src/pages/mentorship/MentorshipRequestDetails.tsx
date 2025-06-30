@@ -49,68 +49,85 @@ export default function MentorshipRequestDetails() {
       if (!id) return;
 
       try {
-        // For now, create mock data since the API endpoint doesn't exist yet
-        const mockRequest: MentorshipRequest = {
-          id,
-          companyId: user?.companyId || "company-1",
-          title: "Leadership Development Program",
-          description:
-            "A comprehensive leadership development program focused on building strategic thinking and team management skills.",
-          goals: [
-            {
-              title: "Develop strategic thinking skills",
-              description:
-                "Learn to think long-term and make strategic decisions",
-            },
-            {
-              title: "Improve team management",
-              description: "Build effective team leadership capabilities",
-            },
-            {
-              title: "Enhance communication skills",
-              description: "Develop clear and persuasive communication",
-            },
-          ],
-          metricsToTrack: [
-            "Team engagement scores",
-            "Leadership assessment results",
-            "360-degree feedback",
-          ],
-          teamMembers: [
-            {
-              id: "member-1",
-              email: "john.doe@company.com",
-              name: "John Doe",
-              role: "participant" as const,
-              status: "active" as const,
-              invitedAt: new Date().toISOString(),
-            },
-            {
-              id: "member-2",
-              email: "jane.smith@company.com",
-              name: "Jane Smith",
-              role: "observer" as const,
-              status: "active" as const,
-              invitedAt: new Date().toISOString(),
-            },
-          ],
-          preferredExpertise: [
-            "Leadership",
-            "Strategic Planning",
-            "Team Management",
-          ],
-          budget: { min: 5000, max: 10000 },
-          timeline: {
-            startDate: "2024-02-01",
-            endDate: "2024-05-01",
-            sessionFrequency: "weekly" as const,
-          },
-          status: "active" as const,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+        // First try to fetch from API
+        const allRequests = await api.getMentorshipRequests();
+        const foundRequest = allRequests.find((req) => req.id === id);
 
-        setRequest(mockRequest);
+        if (foundRequest) {
+          setRequest(foundRequest);
+        } else {
+          // Fallback to mock data if specific request not found
+          const mockRequest: MentorshipRequest = {
+            id,
+            companyId: user?.companyId || "company-1",
+            title: "Leadership Development Program",
+            description:
+              "A comprehensive leadership development program focused on building strategic thinking and team management skills.",
+            goals: [
+              {
+                id: "goal_1",
+                title: "Develop strategic thinking skills",
+                description:
+                  "Learn to think long-term and make strategic decisions",
+                category: "strategic",
+                priority: "high",
+              },
+              {
+                id: "goal_2",
+                title: "Improve team management",
+                description: "Build effective team leadership capabilities",
+                category: "leadership",
+                priority: "high",
+              },
+              {
+                id: "goal_3",
+                title: "Enhance communication skills",
+                description: "Develop clear and persuasive communication",
+                category: "communication",
+                priority: "medium",
+              },
+            ],
+            metricsToTrack: [
+              "Team engagement scores",
+              "Leadership assessment results",
+              "360-degree feedback",
+            ],
+            teamMembers: [
+              {
+                id: "member-1",
+                email: "john.doe@company.com",
+                name: "John Doe",
+                role: "participant" as const,
+                status: "accepted" as const,
+                invitedAt: new Date().toISOString(),
+              },
+              {
+                id: "member-2",
+                email: "jane.smith@company.com",
+                name: "Jane Smith",
+                role: "observer" as const,
+                status: "accepted" as const,
+                invitedAt: new Date().toISOString(),
+              },
+            ],
+            preferredExpertise: [
+              "Leadership",
+              "Strategic Planning",
+              "Team Management",
+            ],
+            budget: { min: 5000, max: 10000 },
+            timeline: {
+              startDate: "2024-02-01",
+              endDate: "2024-05-01",
+              sessionFrequency: "weekly" as const,
+            },
+            status: "active" as const,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+
+          setRequest(mockRequest);
+        }
 
         // Mock matched coaches data
         const mockMatchedCoaches: MatchedCoach[] = [

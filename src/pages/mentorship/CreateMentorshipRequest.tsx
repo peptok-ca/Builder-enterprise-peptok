@@ -14,6 +14,7 @@ import {
   MentorshipRequestForm,
   MentorshipRequestFormData,
 } from "@/components/mentorship/MentorshipRequestForm";
+import { EmployeeManagementCard } from "@/components/mentorship/EmployeeManagementCard";
 
 import Header from "@/components/layout/Header";
 import { ArrowLeft, CheckCircle, Clock, AlertTriangle } from "lucide-react";
@@ -21,6 +22,7 @@ import {
   SubscriptionTier,
   MentorshipRequest,
   SessionPricingTier,
+  TeamMember,
 } from "@/types";
 import { toast } from "sonner";
 import { api } from "@/services/api";
@@ -61,6 +63,7 @@ export default function CreateMentorshipRequest() {
   const [formData, setFormData] = useState<MentorshipRequestFormData | null>(
     null,
   );
+  const [employees, setEmployees] = useState<TeamMember[]>([]);
 
   // Load draft from localStorage on component mount
   useEffect(() => {
@@ -92,7 +95,7 @@ export default function CreateMentorshipRequest() {
         description: data.description,
         goals: data.goals,
         metricsToTrack: data.metricsToTrack,
-        teamMembers: data.teamMembers,
+        teamMembers: employees.length > 0 ? employees : data.teamMembers,
         preferredExpertise: data.preferredExpertise,
         budget: data.budget,
         timeline: data.timeline,
@@ -117,13 +120,15 @@ export default function CreateMentorshipRequest() {
         };
 
         // Send email to each employee
-        const emailPromises = data.teamMembers.map((member) =>
+        const currentEmployees =
+          employees.length > 0 ? employees : data.teamMembers;
+        const emailPromises = currentEmployees.map((member) =>
           emailService.sendProgramDetails(member.email, programDetails),
         );
 
         await Promise.all(emailPromises);
         console.log(
-          `📧 Program details sent to ${data.teamMembers.length} employees`,
+          `📧 Program details sent to ${currentEmployees.length} employees`,
         );
       } catch (emailError) {
         console.warn("Failed to send program details emails:", emailError);
@@ -306,15 +311,24 @@ export default function CreateMentorshipRequest() {
                 </CardContent>
               </Card>
             ) : (
-              <MentorshipRequestForm
-                onSubmit={handleSubmitRequest}
-                onSaveDraft={handleSaveDraft}
-                sessionPricingTier={sessionPricingTier}
-                onUpgradePrompt={handleUpgradePrompt}
-                initialData={savedDraft || undefined}
-                isLoading={isSubmitting}
-                onFormDataChange={handleFormDataChange}
-              />
+              <div className="space-y-8">
+                <MentorshipRequestForm
+                  onSubmit={handleSubmitRequest}
+                  onSaveDraft={handleSaveDraft}
+                  sessionPricingTier={sessionPricingTier}
+                  onUpgradePrompt={handleUpgradePrompt}
+                  initialData={savedDraft || undefined}
+                  isLoading={isSubmitting}
+                  onFormDataChange={handleFormDataChange}
+                />
+
+                {/* Dedicated Employee Management Card */}
+                <EmployeeManagementCard
+                  employees={employees}
+                  onUpdateEmployees={setEmployees}
+                  programTitle={formData?.title || "New Mentorship Program"}
+                />
+              </div>
             )}
           </div>
         </div>

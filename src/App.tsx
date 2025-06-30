@@ -99,6 +99,14 @@ const App: React.FC = () => {
                 }
               />
               <Route
+                path="/team-member/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={["team_member"]}>
+                    <TeamMemberDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/mentorship/new"
                 element={
                   <ProtectedRoute

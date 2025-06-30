@@ -410,11 +410,12 @@ const TeamMemberDashboard = () => {
                             {session.status === "live" ? (
                               <Button
                                 size="sm"
-                                onClick={() =>
+                                onClick={() => {
+                                  toast.success("Joining live session...");
                                   navigate(
-                                    `/session/video?sessionId=${session.id}`,
-                                  )
-                                }
+                                    `/session/video?sessionId=${session.id}&programId=${session.programTitle}`,
+                                  );
+                                }}
                                 className="bg-red-600 hover:bg-red-700"
                               >
                                 <Video className="w-4 h-4 mr-1" />
@@ -423,11 +424,12 @@ const TeamMemberDashboard = () => {
                             ) : session.meetingLink ? (
                               <Button
                                 size="sm"
-                                onClick={() =>
+                                onClick={() => {
+                                  toast.success("Accessing session...");
                                   navigate(
-                                    `/session/video?sessionId=${session.id}`,
-                                  )
-                                }
+                                    `/session/video?sessionId=${session.id}&programId=${session.programTitle}`,
+                                  );
+                                }}
                                 variant="outline"
                               >
                                 <Video className="w-4 h-4 mr-1" />

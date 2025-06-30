@@ -38,6 +38,7 @@ interface CoachAcceptanceData {
   companyName: string;
   employeeName: string;
 }
+
 export class EmailService {
   private async sendEmail(template: EmailTemplate): Promise<boolean> {
     // In development/demo mode, we'll log the email and show a success message
@@ -101,121 +102,309 @@ export class EmailService {
   }
 
   async sendTeamInvitation(
-    email: string,
-    invitationData: TeamInvitationData,
+    recipientEmail: string,
+    data: TeamInvitationData,
   ): Promise<boolean> {
-    const invitationLink = `${window.location.origin}/invitation/accept?token=${btoa(email + ":" + Date.now())}`;
+    try {
+      const emailContent = this.generateTeamInvitationEmail(data);
 
-    const template: EmailTemplate = {
-      to: email,
-      subject: `You're invited to join ${invitationData.companyName} on Peptok`,
-      htmlContent: this.generateInvitationHTML(email, {
-        ...invitationData,
-        invitationLink,
-      }),
-      textContent: this.generateInvitationText(email, {
-        ...invitationData,
-        invitationLink,
-      }),
-    };
+      // Log the email content for development/demo purposes
+      console.log(`
+📧 EMPLOYEE INVITATION EMAIL SENT TO: ${recipientEmail}
+📧 SUBJECT: ${emailContent.subject}
+📧 CONTENT:
+${emailContent.htmlContent}
+      `);
 
-    return await this.sendEmail(template);
+      // Simulate email sending delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      return true;
+    } catch (error) {
+      console.error("Failed to send employee invitation email:", error);
+      return false;
+    }
   }
 
-  private generateInvitationHTML(
-    email: string,
-    data: TeamInvitationData,
-  ): string {
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Invitation - Peptok</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 28px;">You're Invited!</h1>
-        <p style="color: #f0f0f0; margin: 10px 0 0 0; font-size: 16px;">Join your team on Peptok</p>
-    </div>
+  async sendProgramDetails(
+    recipientEmail: string,
+    data: ProgramDetailsData,
+  ): Promise<boolean> {
+    try {
+      const emailContent = this.generateProgramDetailsEmail(data);
 
-    <div style="background: white; padding: 30px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px;">
-        <p style="font-size: 16px; margin-bottom: 20px;">Hi there!</p>
+      // Log the email content for development/demo purposes
+      console.log(`
+📧 PROGRAM DETAILS EMAIL SENT TO: ${recipientEmail}
+📧 SUBJECT: ${emailContent.subject}
+📧 CONTENT:
+${emailContent.htmlContent}
+      `);
 
-        <p style="font-size: 16px; margin-bottom: 20px;">
-            <strong>${data.inviterName}</strong> has invited you to join <strong>${data.companyName}</strong>'s mentorship program on Peptok.
-        </p>
+      // Simulate email sending delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin: 0 0 10px 0; color: #495057;">Your Role:</h3>
-            <p style="margin: 0; font-size: 16px; color: #6c757d;">
-                ${
-                  data.role === "participant"
-                    ? "🎯 <strong>Participant</strong> - Actively participate in mentorship sessions and track your progress"
-                    : "👁️ <strong>Observer</strong> - Monitor progress and attend sessions as an observer"
-                }
+      return true;
+    } catch (error) {
+      console.error("Failed to send program details email:", error);
+      return false;
+    }
+  }
+
+  async sendCoachAcceptanceNotification(
+    recipientEmail: string,
+    data: CoachAcceptanceData,
+  ): Promise<boolean> {
+    try {
+      const emailContent = this.generateCoachAcceptanceEmail(data);
+
+      // Log the email content for development/demo purposes
+      console.log(`
+📧 COACH ACCEPTANCE EMAIL SENT TO: ${recipientEmail}
+📧 SUBJECT: ${emailContent.subject}
+📧 CONTENT:
+${emailContent.htmlContent}
+      `);
+
+      // Simulate email sending delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      return true;
+    } catch (error) {
+      console.error("Failed to send coach acceptance email:", error);
+      return false;
+    }
+  }
+
+  private generateTeamInvitationEmail(data: TeamInvitationData): {
+    subject: string;
+    htmlContent: string;
+  } {
+    const subject = `You're invited to join ${data.companyName}'s mentorship program`;
+
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
+        <div style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #1e40af; margin: 0; font-size: 28px;">🎯 Mentorship Invitation</h1>
+          </div>
+          
+          <div style="margin-bottom: 25px;">
+            <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
+              Hi there! 👋
             </p>
-        </div>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
+              <strong>${data.inviterName}</strong> has invited you to join <strong>${data.companyName}</strong>'s mentorship program as a <strong>${data.role}</strong>.
+            </p>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
+              This is an exciting opportunity to develop your skills, connect with experienced mentors, and accelerate your professional growth.
+            </p>
+          </div>
 
-        <div style="text-align: center; margin: 30px 0;">
-            <a href="${data.invitationLink}"
-               style="background: #007bff; color: white; text-decoration: none; padding: 15px 30px; border-radius: 6px; font-size: 16px; font-weight: bold; display: inline-block;">
-                Accept Invitation
+          <div style="margin: 30px 0; padding: 20px; background-color: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 4px;">
+            <h3 style="color: #1e40af; margin: 0 0 10px 0; font-size: 18px;">🚀 What's Next?</h3>
+            <p style="margin: 0; color: #1e40af; font-size: 14px; line-height: 1.5;">
+              • Click the button below to accept your invitation<br>
+              • Complete your profile and set your goals<br>
+              • Get matched with an expert mentor<br>
+              • Start your mentorship journey!
+            </p>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${data.invitationLink}" 
+               style="display: inline-block; background-color: #3b82f6; color: white; padding: 12px 30px; 
+                      text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
+              Accept Invitation
             </a>
-        </div>
+          </div>
 
-        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 6px; margin: 20px 0;">
-            <p style="margin: 0; font-size: 14px; color: #856404;">
-                ⏰ This invitation expires on ${data.expiresAt.toLocaleDateString()} at ${data.expiresAt.toLocaleTimeString()}
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <p style="font-size: 14px; color: #6b7280; margin: 0 0 10px 0;">
+              ⏰ This invitation expires on ${data.expiresAt.toLocaleDateString()}
             </p>
-        </div>
-
-        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-
-        <p style="font-size: 14px; color: #6c757d; margin-bottom: 20px;">
-            If you can't click the button above, copy and paste this link into your browser:
-        </p>
-        <p style="font-size: 12px; color: #adb5bd; word-break: break-all; background: #f8f9fa; padding: 10px; border-radius: 4px;">
-            ${data.invitationLink}
-        </p>
-
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="font-size: 14px; color: #6c757d; margin: 0;">
-                Questions? Contact your team admin or reply to this email.
+            <p style="font-size: 14px; color: #6b7280; margin: 0;">
+              If you have any questions, please contact your program administrator.
             </p>
-            <p style="font-size: 12px; color: #adb5bd; margin: 10px 0 0 0;">
-                This email was sent by Peptok on behalf of ${data.companyName}
-            </p>
+          </div>
         </div>
-    </div>
-</body>
-</html>
+      </div>
     `;
+
+    return { subject, htmlContent };
   }
 
-  private generateInvitationText(
-    email: string,
-    data: TeamInvitationData,
-  ): string {
-    return `
-You're invited to join ${data.companyName} on Peptok!
+  private generateProgramDetailsEmail(data: ProgramDetailsData): {
+    subject: string;
+    htmlContent: string;
+  } {
+    const subject = `New Mentorship Program Created: ${data.programTitle}`;
 
-Hi there!
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
+        <div style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #059669; margin: 0; font-size: 28px;">🎯 Program Created Successfully!</h1>
+          </div>
+          
+          <div style="margin-bottom: 25px;">
+            <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
+              Hi there! 👋
+            </p>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
+              Great news! <strong>${data.adminName}</strong> has created a new mentorship program: 
+              <strong>"${data.programTitle}"</strong> at <strong>${data.companyName}</strong>.
+            </p>
+          </div>
 
-${data.inviterName} has invited you to join ${data.companyName}'s mentorship program on Peptok.
+          <div style="margin: 30px 0; padding: 20px; background-color: #ecfdf5; border-left: 4px solid #059669; border-radius: 4px;">
+            <h3 style="color: #059669; margin: 0 0 15px 0; font-size: 18px;">📋 Program Details</h3>
+            <p style="margin: 0 0 10px 0; color: #065f46; font-size: 14px; line-height: 1.5;">
+              <strong>Description:</strong> ${data.programDescription}
+            </p>
+            <p style="margin: 0 0 10px 0; color: #065f46; font-size: 14px; line-height: 1.5;">
+              <strong>Duration:</strong> ${new Date(data.startDate).toLocaleDateString()} - ${new Date(data.endDate).toLocaleDateString()}
+            </p>
+            <p style="margin: 0 0 10px 0; color: #065f46; font-size: 14px; line-height: 1.5;">
+              <strong>Session Frequency:</strong> ${data.sessionFrequency}
+            </p>
+          </div>
 
-Your Role: ${data.role === "participant" ? "Participant - Actively participate in mentorship sessions and track your progress" : "Observer - Monitor progress and attend sessions as an observer"}
+          ${
+            data.goals.length > 0
+              ? `
+          <div style="margin: 30px 0; padding: 20px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
+            <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">🎯 Program Goals</h3>
+            <ul style="margin: 0; padding-left: 20px; color: #92400e; font-size: 14px; line-height: 1.5;">
+              ${data.goals.map((goal) => `<li style="margin-bottom: 5px;">${goal}</li>`).join("")}
+            </ul>
+          </div>
+          `
+              : ""
+          }
 
-To accept this invitation, visit: ${data.invitationLink}
+          ${
+            data.metricsToTrack.length > 0
+              ? `
+          <div style="margin: 30px 0; padding: 20px; background-color: #e0e7ff; border-left: 4px solid #6366f1; border-radius: 4px;">
+            <h3 style="color: #3730a3; margin: 0 0 15px 0; font-size: 18px;">📊 Success Metrics</h3>
+            <ul style="margin: 0; padding-left: 20px; color: #3730a3; font-size: 14px; line-height: 1.5;">
+              ${data.metricsToTrack.map((metric) => `<li style="margin-bottom: 5px;">${metric}</li>`).join("")}
+            </ul>
+          </div>
+          `
+              : ""
+          }
 
-This invitation expires on ${data.expiresAt.toLocaleDateString()} at ${data.expiresAt.toLocaleTimeString()}
+          <div style="margin: 30px 0; padding: 20px; background-color: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 4px;">
+            <h3 style="color: #1e40af; margin: 0 0 10px 0; font-size: 18px;">🚀 What's Next?</h3>
+            <p style="margin: 0; color: #1e40af; font-size: 14px; line-height: 1.5;">
+              • We're currently matching you with qualified coaches<br>
+              • You'll receive another email once a coach is assigned<br>
+              • Your mentorship journey will begin soon!
+            </p>
+          </div>
 
-If you have any questions, contact your team admin.
-
---
-Peptok Team
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <p style="font-size: 14px; color: #6b7280; margin: 0;">
+              If you have any questions about this program, please contact ${data.adminName} or your program administrator.
+            </p>
+          </div>
+        </div>
+      </div>
     `;
+
+    return { subject, htmlContent };
+  }
+
+  private generateCoachAcceptanceEmail(data: CoachAcceptanceData): {
+    subject: string;
+    htmlContent: string;
+  } {
+    const subject = `Your Coach is Ready! ${data.programTitle} - ${data.coachName}`;
+
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
+        <div style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #7c3aed; margin: 0; font-size: 28px;">🎉 Your Coach is Ready!</h1>
+          </div>
+          
+          <div style="margin-bottom: 25px;">
+            <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
+              Hi ${data.employeeName}! 👋
+            </p>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
+              Exciting news! Your coach for the <strong>"${data.programTitle}"</strong> program at 
+              <strong>${data.companyName}</strong> has been confirmed and is ready to start working with you.
+            </p>
+          </div>
+
+          <div style="margin: 30px 0; padding: 20px; background-color: #f3e8ff; border-left: 4px solid #7c3aed; border-radius: 4px;">
+            <h3 style="color: #6b21a8; margin: 0 0 15px 0; font-size: 18px;">👨‍🏫 Meet Your Coach</h3>
+            <p style="margin: 0 0 10px 0; color: #6b21a8; font-size: 16px; line-height: 1.5;">
+              <strong>${data.coachName}</strong><br>
+              <span style="font-size: 14px;">${data.coachTitle}</span>
+            </p>
+            <p style="margin: 0 0 10px 0; color: #6b21a8; font-size: 14px; line-height: 1.5;">
+              <strong>Expertise:</strong> ${data.coachExpertise.join(", ")}
+            </p>
+          </div>
+
+          ${
+            data.sessionSchedule.length > 0
+              ? `
+          <div style="margin: 30px 0; padding: 20px; background-color: #ecfdf5; border-left: 4px solid #059669; border-radius: 4px;">
+            <h3 style="color: #065f46; margin: 0 0 15px 0; font-size: 18px;">📅 Upcoming Sessions</h3>
+            ${data.sessionSchedule
+              .map(
+                (session) => `
+              <div style="margin-bottom: 10px; padding: 10px; background-color: white; border-radius: 4px;">
+                <p style="margin: 0; color: #065f46; font-size: 14px; line-height: 1.5;">
+                  <strong>${session.date}</strong> at <strong>${session.time}</strong><br>
+                  <span style="font-size: 12px;">Duration: ${session.duration}</span>
+                </p>
+              </div>
+            `,
+              )
+              .join("")}
+          </div>
+          `
+              : ""
+          }
+
+          <div style="margin: 30px 0; padding: 20px; background-color: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 4px;">
+            <h3 style="color: #1e40af; margin: 0 0 10px 0; font-size: 18px;">🚀 Ready to Start?</h3>
+            <p style="margin: 0; color: #1e40af; font-size: 14px; line-height: 1.5;">
+              • Your coach will contact you shortly to introduce themselves<br>
+              • Prepare any questions or goals you'd like to discuss<br>
+              • Check your calendar for the scheduled sessions<br>
+              • Get ready for an amazing mentorship experience!
+            </p>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="#" 
+               style="display: inline-block; background-color: #7c3aed; color: white; padding: 12px 30px; 
+                      text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
+              View Program Dashboard
+            </a>
+          </div>
+
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <p style="font-size: 14px; color: #6b7280; margin: 0;">
+              If you have any questions about your sessions or need to reschedule, please contact your program administrator.
+            </p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    return { subject, htmlContent };
   }
 
   async sendWelcomeEmail(email: string, companyName: string): Promise<boolean> {

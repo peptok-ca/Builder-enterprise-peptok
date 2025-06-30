@@ -78,18 +78,43 @@ We strive to maintain service availability but do not guarantee uninterrupted ac
       id: "payments",
       title: "5. Payment Terms",
       icon: <CreditCard className="w-5 h-5" />,
-      content: `Payment and Billing:
+      content: `SUBSCRIPTION TIERS (CAD):
 
-• Subscription fees are billed monthly or annually as selected
-• All payments are processed securely through our payment partners
-• Refunds are available within 30 days of initial subscription
-• Late payments may result in service suspension
-• Prices are subject to change with 30 days notice
+Starter Plan - $99/month ($1,069.20 annually):
+• 200 minutes of mentor time per month
+• Minimum 2 users, up to 20 seats available
+• Additional seats: $119/user/month
+• Monthly progress reports and email support
 
-Session Payments:
-• Coach payments are processed within 7 business days after session completion
-• Platform fees are automatically deducted from coach earnings
-• Clients are charged immediately upon session booking`,
+Growth Plan - $199/month ($2,148.40 annually):
+• 1,200 minutes of mentor time per month
+• Minimum 5 users, up to 100 seats available
+• Additional seats: $219/user/month
+• Advanced analytics and priority support
+
+Enterprise Plan - Custom Pricing:
+• Unlimited user seats and mentor time
+• Dedicated Customer Success Manager
+• White-labeling and API access
+• SLA guarantees and custom integrations
+
+SESSION-BASED PRICING:
+
+Standard Sessions - $150 CAD base rate:
+• 1-hour coaching sessions (professional rate varies by coach)
+• Additional participants: $25 CAD per person beyond first participant
+• Platform service charge: 15% of total session cost
+• Includes session recordings and progress tracking
+
+PAYMENT PROCESSING:
+
+• All payments processed securely through certified payment partners
+• Coach payments: Processed within 7 business days after session completion
+• Platform fees: Automatically deducted from total session cost
+• Client billing: Charged immediately upon session booking/subscription
+• Currency: All prices in Canadian Dollars (CAD) unless specified
+• Refunds: Available within 30 days of initial subscription
+• Price changes: 30 days advance notice for subscription modifications`,
     },
     {
       id: "content",

@@ -338,18 +338,30 @@ export const MediaPermissionModal = ({
 
               <div className="relative">
                 <video
+                  ref={videoRef}
                   autoPlay
                   muted
                   playsInline
-                  ref={(video) => {
-                    if (video && currentStream) {
-                      video.srcObject = currentStream;
-                    }
-                  }}
                   className="w-full h-48 bg-gray-900 rounded-lg object-cover"
                 />
                 <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
                   You
+                </div>
+
+                {/* Audio Level Indicator */}
+                <div className="absolute top-2 right-2 bg-black bg-opacity-50 rounded-lg p-2">
+                  <div className="flex items-center gap-2">
+                    <Mic className="w-3 h-3 text-white" />
+                    <div className="w-12 h-2 bg-gray-600 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-green-500 transition-all duration-100"
+                        style={{ width: `${Math.min(audioLevel * 2, 100)}%` }}
+                      ></div>
+                    </div>
+                    {audioLevel > 10 && (
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    )}
+                  </div>
                 </div>
               </div>
 

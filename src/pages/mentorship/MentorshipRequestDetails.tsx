@@ -19,6 +19,23 @@ import { useEffect, useState } from "react";
 import { api } from "@/services/api";
 import { MentorshipRequest } from "@/types";
 
+interface MatchedCoach {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  title: string;
+  company: string;
+  location: string;
+  rating: number;
+  expertise: string[];
+  hourlyRate: number;
+  availability: "available" | "limited" | "busy";
+  matchScore: number;
+  bio: string;
+  isSelected?: boolean;
+}
+
 export default function MentorshipRequestDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

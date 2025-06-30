@@ -351,14 +351,19 @@ class ApiService {
   // Payment-related methods
   async getSubscriptionTiers(): Promise<SubscriptionTier[]> {
     try {
+      // Skip backend requests in deployed environments without explicit API URL
+      if (Environment.isProduction() && !import.meta.env.VITE_API_URL) {
+        throw new Error("Backend not configured for deployed environment");
+      }
+
       // Only try backend if environment supports it
       if (!Environment.shouldTryBackend()) {
-        throw new Error("Backend not configured for deployed environment");
+        throw new Error("Backend not configured for this environment");
       }
 
       // Try to fetch from backend first
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // Reduced timeout
 
       const response = await fetch(`${API_BASE_URL}/subscriptions/tiers`, {
         method: "GET",
@@ -504,14 +509,19 @@ class ApiService {
   // Session Pricing Methods
   async getSessionPricingTiers(): Promise<SessionPricingTier[]> {
     try {
+      // Skip backend requests in deployed environments without explicit API URL
+      if (Environment.isProduction() && !import.meta.env.VITE_API_URL) {
+        throw new Error("Backend not configured for deployed environment");
+      }
+
       // Only try backend if environment supports it
       if (!Environment.shouldTryBackend()) {
-        throw new Error("Backend not configured for deployed environment");
+        throw new Error("Backend not configured for this environment");
       }
 
       // Try to fetch from backend first
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // Reduced timeout
 
       const response = await fetch(`${API_BASE_URL}/sessions/pricing-tiers`, {
         method: "GET",

@@ -235,6 +235,33 @@ export default function VideoConference() {
     };
   }, [localStream]);
 
+  const setupAudioLevelMonitoring = (stream: MediaStream) => {
+    try {
+      audioContextRef.current = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      analyserRef.current = audioContextRef.current.createAnalyser();
+
+      analyserRef.current.fftSize = 256;
+      source.connect(analyserRef.current);
+
+      const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+
+      const checkAudioLevel = () => {
+        if (analyserRef.current) {
+          analyserRef.current.getByteFrequencyData(dataArray);
+          const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+          setAudioLevel(average);
+          animationRef.current = requestAnimationFrame(checkAudioLevel);
+        }
+      };
+
+      checkAudioLevel();
+    } catch (error) {
+      console.warn("Audio level monitoring failed:", error);
+    }
+  };
+
   const requestCameraAccess = async () => {
     try {
       await initializeMedia(true); // Mark as user-initiated

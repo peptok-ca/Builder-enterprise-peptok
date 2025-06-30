@@ -121,6 +121,28 @@ const Signup = () => {
     }
   };
 
+  const handleTwoFactorComplete = (secret: string, backupCodes: string[]) => {
+    toast.success("Account created successfully with 2FA enabled!");
+
+    // Determine onboarding path based on user type
+    if (formData.userType === "coach") {
+      navigate("/coach/onboarding");
+    } else {
+      navigate("/onboarding");
+    }
+  };
+
+  const handleTwoFactorSkip = () => {
+    toast.success("Account created successfully!");
+
+    // Determine onboarding path based on user type
+    if (formData.userType === "coach") {
+      navigate("/coach/onboarding");
+    } else {
+      navigate("/onboarding");
+    }
+  };
+
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
 

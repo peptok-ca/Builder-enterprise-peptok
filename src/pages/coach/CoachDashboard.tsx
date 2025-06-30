@@ -494,6 +494,21 @@ export const CoachDashboard: React.FC = () => {
                 )}
               </div>
             </div>
+
+            {/* Session Management */}
+            <SessionManagement
+              sessions={sessions}
+              onSessionUpdate={(sessionId, updates) => {
+                setSessions((prev) =>
+                  prev.map((session) =>
+                    session.id === sessionId
+                      ? { ...session, ...updates }
+                      : session,
+                  ),
+                );
+              }}
+              userType="coach"
+            />
           </div>
 
           {/* Sidebar */}

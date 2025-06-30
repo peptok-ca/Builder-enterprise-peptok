@@ -45,27 +45,6 @@ export default function MentorshipRequestDetails() {
   const [matchedCoaches, setMatchedCoaches] = useState<MatchedCoach[]>([]);
   const [loading, setLoading] = useState(true);
 
-  console.log("MentorshipRequestDetails component rendering");
-  console.log("ID from params:", id);
-  console.log("User:", user);
-
-  // Early debug return to test if component is reached
-  if (!id) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">
-            Debug: No ID Parameter
-          </h1>
-          <p className="text-gray-600">URL parameter 'id' is missing</p>
-          <Button onClick={() => navigate(-1)} className="mt-4">
-            Go Back
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     const fetchRequest = async () => {
       if (!id) {

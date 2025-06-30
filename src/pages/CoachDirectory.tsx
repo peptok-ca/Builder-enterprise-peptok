@@ -149,7 +149,7 @@ const CoachDirectory = () => {
     setFilteredCoaches(mockCoaches);
   };
 
-  const featuredCoaches = mockCoaches
+  const featuredCoaches = allCoaches
     .filter((coach) => coach.rating >= 4.8)
     .slice(0, 4);
 

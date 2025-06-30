@@ -14,12 +14,14 @@ import {
   MentorshipRequestForm,
   MentorshipRequestFormData,
 } from "@/components/mentorship/MentorshipRequestForm";
+import { CoachSearch } from "@/components/mentorship/CoachSearch";
 import Header from "@/components/layout/Header";
 import { ArrowLeft, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 import {
   SubscriptionTier,
   MentorshipRequest,
   SessionPricingTier,
+  Coach,
 } from "@/types";
 import { toast } from "sonner";
 import { api } from "@/services/api";
@@ -56,6 +58,7 @@ export default function CreateMentorshipRequest() {
   }, []);
   const [savedDraft, setSavedDraft] =
     useState<MentorshipRequestFormData | null>(null);
+  const [selectedCoaches, setSelectedCoaches] = useState<Coach[]>([]);
 
   // Load draft from localStorage on component mount
   useEffect(() => {
@@ -170,6 +173,17 @@ export default function CreateMentorshipRequest() {
     localStorage.removeItem("mentorship-request-draft");
     setSavedDraft(null);
     toast.success("Draft cleared");
+  };
+
+  const handleCoachSelect = (coach: Coach) => {
+    setSelectedCoaches((prev) => {
+      const isAlreadySelected = prev.some((c) => c.id === coach.id);
+      if (isAlreadySelected) {
+        return prev.filter((c) => c.id !== coach.id);
+      } else {
+        return [...prev, coach];
+      }
+    });
   };
 
   return (

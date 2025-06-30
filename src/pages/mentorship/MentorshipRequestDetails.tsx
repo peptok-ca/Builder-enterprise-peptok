@@ -56,73 +56,47 @@ export default function MentorshipRequestDetails() {
         if (foundRequest) {
           setRequest(foundRequest);
         } else {
-          // Fallback to mock data if specific request not found
+          // Fallback: match the data from the sample request in localStorage
           const mockRequest: MentorshipRequest = {
             id,
-            companyId: user?.companyId || "company-1",
-            title: "Leadership Development Program",
+            companyId: user?.companyId || "default-company-id",
+            title: "React Development Training",
             description:
-              "A comprehensive leadership development program focused on building strategic thinking and team management skills.",
+              "Help our team improve their React skills and best practices.",
             goals: [
               {
                 id: "goal_1",
-                title: "Develop strategic thinking skills",
+                title: "Master React Hooks",
                 description:
-                  "Learn to think long-term and make strategic decisions",
-                category: "strategic",
+                  "Learn advanced React hooks and custom hook patterns",
+                category: "technical",
                 priority: "high",
               },
-              {
-                id: "goal_2",
-                title: "Improve team management",
-                description: "Build effective team leadership capabilities",
-                category: "leadership",
-                priority: "high",
-              },
-              {
-                id: "goal_3",
-                title: "Enhance communication skills",
-                description: "Develop clear and persuasive communication",
-                category: "communication",
-                priority: "medium",
-              },
             ],
-            metricsToTrack: [
-              "Team engagement scores",
-              "Leadership assessment results",
-              "360-degree feedback",
-            ],
+            metricsToTrack: ["Code quality scores", "Development velocity"],
             teamMembers: [
               {
-                id: "member-1",
+                id: "member_1",
                 email: "john.doe@company.com",
                 name: "John Doe",
                 role: "participant" as const,
                 status: "accepted" as const,
                 invitedAt: new Date().toISOString(),
               },
-              {
-                id: "member-2",
-                email: "jane.smith@company.com",
-                name: "Jane Smith",
-                role: "observer" as const,
-                status: "accepted" as const,
-                invitedAt: new Date().toISOString(),
-              },
             ],
-            preferredExpertise: [
-              "Leadership",
-              "Strategic Planning",
-              "Team Management",
-            ],
-            budget: { min: 5000, max: 10000 },
+            preferredExpertise: ["React", "JavaScript", "Frontend Development"],
+            budget: { min: 100, max: 200 },
             timeline: {
-              startDate: "2024-02-01",
-              endDate: "2024-05-01",
+              startDate: new Date().toISOString(),
+              endDate: new Date(
+                Date.now() + 90 * 24 * 60 * 60 * 1000,
+              ).toISOString(),
               sessionFrequency: "weekly" as const,
             },
             status: "active" as const,
-            createdAt: new Date().toISOString(),
+            createdAt: new Date(
+              Date.now() - 7 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
             updatedAt: new Date().toISOString(),
           };
 

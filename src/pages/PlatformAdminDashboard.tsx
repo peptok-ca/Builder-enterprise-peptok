@@ -569,7 +569,7 @@ export default function PlatformAdminDashboard() {
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
-                      <DialogHeader>
+                        <DialogHeader>
                         <DialogTitle>Create New User</DialogTitle>
                         <DialogDescription>
                           Add a new user to the platform

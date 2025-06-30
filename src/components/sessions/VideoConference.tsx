@@ -74,6 +74,8 @@ export default function VideoConference() {
   const [hasJoined, setHasJoined] = useState(false);
   const [sessionTimer, setSessionTimer] = useState(0);
   const [canManageSession, setCanManageSession] = useState(false);
+  const [cameraError, setCameraError] = useState(false);
+  const [hasStreamAccess, setHasStreamAccess] = useState(false);
 
   useEffect(() => {
     if (!sessionId) {

@@ -38,6 +38,30 @@ export function MentorshipRequestProgress({
   showCreateButton = false,
   viewMode = "employee",
 }: MentorshipRequestProgressProps) {
+  const navigate = useNavigate();
+
+  const handleJoinSession = async (requestId: string) => {
+    try {
+      // Check if there's an active session for this program
+      const activeSession = await api.getUpcomingSessions("current-user", 1);
+      if (activeSession.length > 0) {
+        navigate(
+          `/session/video?sessionId=${activeSession[0].id}&programId=${requestId}`,
+        );
+      } else {
+        toast.info(
+          "No active session available. Next session will be scheduled soon.",
+        );
+      }
+    } catch (error) {
+      console.error("Failed to join session:", error);
+      toast.error("Failed to join session. Please try again.");
+    }
+  };
+
+  const handleSendMessage = (requestId: string) => {
+    navigate(`/messages?programId=${requestId}`);
+  };
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":

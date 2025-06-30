@@ -261,13 +261,14 @@ We encourage regular review of these terms to stay informed of any updates.`,
       icon: <Users className="w-5 h-5" />,
       content: `For questions about these Terms of Service:
 
-Email: legal@mentorshipplatform.com
+Email: legal@peptok.ca (Legal Department - Terms of Service)
 Phone: +1 (555) 123-4567
 Address: 123 Business Street, Suite 100, City, State 12345
 
 Support Hours: Monday-Friday, 9 AM - 6 PM EST
 
-For technical support, please use the in-platform support system or contact support@mentorshipplatform.com.`,
+For technical support, please use the in-platform support system or contact support@peptok.ca (Technical Support Department).
+For general inquiries: info@peptok.ca (General Information Department)`,
     },
   ];
 

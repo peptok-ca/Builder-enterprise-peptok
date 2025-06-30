@@ -26,6 +26,7 @@ import {
   Bell,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/services/api";
 import { toast } from "sonner";
 
 interface SessionParticipant {

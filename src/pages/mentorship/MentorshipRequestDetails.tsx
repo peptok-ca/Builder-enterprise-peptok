@@ -64,7 +64,6 @@ export default function MentorshipRequestDetails() {
           setRequest(foundRequest);
         } else {
           // Always create a fallback request for any ID to ensure page works
-          console.log("Creating fallback request for ID:", id);
           toast.info("Loading sample program data for demonstration");
 
           const mockRequest: MentorshipRequest = {

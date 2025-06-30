@@ -786,6 +786,7 @@ class ApiService {
     request: Omit<MentorshipRequest, "id" | "createdAt" | "updatedAt">,
   ): Promise<MentorshipRequest> {
     try {
+      // Try backend first
       const response = await this.request<MentorshipRequest>(
         "/mentorship-requests",
         {
@@ -793,12 +794,110 @@ class ApiService {
           body: JSON.stringify(request),
         },
       );
+      console.log("✅ Mentorship request saved to backend");
       return response.data;
     } catch (error) {
       // Fallback to localStorage if API is not available
-      console.warn("API not available, using localStorage fallback:", error);
+      console.warn("⚠️ Backend not available, saving locally:", error);
       return this.createMentorshipRequestInStorage(request);
     }
+  }
+
+  // Add coach search functionality
+  async searchCoachesForMentorship(
+    filters: {
+      expertise?: string[];
+      hourlyRateMin?: number;
+      hourlyRateMax?: number;
+      availability?: boolean;
+      location?: string;
+    } = {},
+  ): Promise<Coach[]> {
+    try {
+      const searchParams = new URLSearchParams();
+      if (filters.expertise?.length) {
+        searchParams.append("expertise", filters.expertise.join(","));
+      }
+      if (filters.hourlyRateMin) {
+        searchParams.append("hourlyRateMin", filters.hourlyRateMin.toString());
+      }
+      if (filters.hourlyRateMax) {
+        searchParams.append("hourlyRateMax", filters.hourlyRateMax.toString());
+      }
+      if (filters.availability !== undefined) {
+        searchParams.append("availability", filters.availability.toString());
+      }
+      if (filters.location) {
+        searchParams.append("location", filters.location);
+      }
+
+      const response = await this.request<Coach[]>(
+        `/coaches/search?${searchParams}`,
+      );
+      console.log("✅ Found coaches from backend:", response.data.length);
+      return response.data;
+    } catch (error) {
+      console.warn("⚠️ Backend search not available, using mock data:", error);
+      // Return mock coaches for demo
+      return this.getMockCoaches(filters);
+    }
+  }
+
+  // Mock coaches for fallback
+  private getMockCoaches(filters: any = {}): Coach[] {
+    const mockCoaches: Coach[] = [
+      {
+        id: "coach1",
+        name: "Sarah Johnson",
+        title: "Senior Technical Coach",
+        company: "Tech Innovations",
+        coaching: ["React", "TypeScript", "Team Leadership", "Agile"],
+        rating: 4.9,
+        experience: 8,
+        totalSessions: 127,
+        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
+        availableSlots: ["Monday 9-5", "Wednesday 9-5", "Friday 9-5"],
+      },
+      {
+        id: "coach2",
+        name: "Michael Chen",
+        title: "Product Strategy Expert",
+        company: "Innovation Labs",
+        coaching: ["Product Management", "Strategy", "Business Development"],
+        rating: 4.8,
+        experience: 12,
+        totalSessions: 203,
+        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=michael",
+        availableSlots: ["Tuesday 10-6", "Thursday 10-6"],
+      },
+      {
+        id: "coach3",
+        name: "Emily Rodriguez",
+        title: "Leadership Development Coach",
+        company: "Executive Coaching Pro",
+        coaching: ["Leadership", "Executive Coaching", "Team Building"],
+        rating: 4.9,
+        experience: 15,
+        totalSessions: 312,
+        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=emily",
+        availableSlots: ["Monday 1-7", "Wednesday 1-7", "Friday 1-7"],
+      },
+    ];
+
+    // Apply basic filtering
+    let filteredCoaches = mockCoaches;
+
+    if (filters.expertise?.length) {
+      filteredCoaches = filteredCoaches.filter((coach) =>
+        coach.coaching.some((skill) =>
+          filters.expertise.some((exp: string) =>
+            skill.toLowerCase().includes(exp.toLowerCase()),
+          ),
+        ),
+      );
+    }
+
+    return filteredCoaches;
   }
 
   // localStorage fallback methods

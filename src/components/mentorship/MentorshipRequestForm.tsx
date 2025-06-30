@@ -51,7 +51,7 @@ import {
 
 interface MentorshipRequestFormProps {
   onSubmit: (data: MentorshipRequestFormData) => void;
-  onSaveDraft: (data: MentorshipRequestFormData) => void;
+  onSaveDraft?: (data: MentorshipRequestFormData) => void;
   sessionPricingTier?: SessionPricingTier | null;
   subscriptionTier?: SubscriptionTier | null; // Keep for backward compatibility
   onUpgradePrompt: () => void;

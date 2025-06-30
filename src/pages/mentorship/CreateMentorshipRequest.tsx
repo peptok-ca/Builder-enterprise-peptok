@@ -325,7 +325,6 @@ export default function CreateMentorshipRequest() {
               <div className="space-y-8">
                 <MentorshipRequestForm
                   onSubmit={handleSubmitRequest}
-                  onSaveDraft={handleSaveDraft}
                   sessionPricingTier={sessionPricingTier}
                   onUpgradePrompt={handleUpgradePrompt}
                   initialData={savedDraft || undefined}

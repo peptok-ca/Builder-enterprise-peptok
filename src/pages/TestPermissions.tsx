@@ -8,11 +8,19 @@ import Header from "@/components/layout/Header";
 export default function TestPermissions() {
   const [showModal, setShowModal] = useState(false);
   const [currentStream, setCurrentStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const handlePermissionsGranted = (stream: MediaStream) => {
     setCurrentStream(stream);
     console.log("Permissions granted, stream:", stream);
   };
+
+  // Update video element when stream changes
+  useEffect(() => {
+    if (videoRef.current && currentStream) {
+      videoRef.current.srcObject = currentStream;
+    }
+  }, [currentStream]);
 
   const stopStream = () => {
     if (currentStream) {

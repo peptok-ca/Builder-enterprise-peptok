@@ -99,6 +99,14 @@ const App: React.FC = () => {
                 }
               />
               <Route
+                path="/mentorship/requests/:id"
+                element={
+                  <ProtectedRoute>
+                    <MentorshipRequestDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/mentorship/matching"
                 element={
                   <ProtectedRoute

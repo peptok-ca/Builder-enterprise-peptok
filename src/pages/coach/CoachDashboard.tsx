@@ -119,6 +119,97 @@ export const CoachDashboard: React.FC = () => {
         successRate: 94,
       };
 
+      const mockSessions = [
+        {
+          id: "session-1",
+          title: "Leadership Fundamentals",
+          description: "Introduction to leadership principles and goal setting",
+          date: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
+          duration: 60,
+          status: "upcoming",
+          type: "video",
+          coach: {
+            id: user?.id || "coach-1",
+            name: user?.name || "Sarah Johnson",
+            avatar:
+              user?.picture || "https://avatar.vercel.sh/sarah@example.com",
+          },
+          participants: [
+            {
+              id: "participant-1",
+              name: "John Doe",
+              email: "john@example.com",
+              role: "participant",
+              status: "confirmed",
+            },
+            {
+              id: "participant-2",
+              name: "Jane Smith",
+              email: "jane@example.com",
+              role: "observer",
+              status: "confirmed",
+            },
+          ],
+          programTitle: "Leadership Development Program",
+          canManage: true,
+          meetingLink: "/session/video?sessionId=session-1",
+        },
+        {
+          id: "session-2",
+          title: "Team Communication Skills",
+          description: "Effective communication strategies for team leaders",
+          date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+          duration: 60,
+          status: "upcoming",
+          type: "video",
+          coach: {
+            id: user?.id || "coach-1",
+            name: user?.name || "Sarah Johnson",
+            avatar:
+              user?.picture || "https://avatar.vercel.sh/sarah@example.com",
+          },
+          participants: [
+            {
+              id: "participant-3",
+              name: "Mike Wilson",
+              email: "mike@example.com",
+              role: "participant",
+              status: "confirmed",
+            },
+          ],
+          programTitle: "Leadership Development Program",
+          canManage: true,
+          meetingLink: "/session/video?sessionId=session-2",
+        },
+        {
+          id: "session-3",
+          title: "Performance Management",
+          description:
+            "Building high-performing teams through effective management",
+          date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+          duration: 60,
+          status: "completed",
+          type: "video",
+          coach: {
+            id: user?.id || "coach-1",
+            name: user?.name || "Sarah Johnson",
+            avatar:
+              user?.picture || "https://avatar.vercel.sh/sarah@example.com",
+          },
+          participants: [
+            {
+              id: "participant-1",
+              name: "John Doe",
+              email: "john@example.com",
+              role: "participant",
+              status: "confirmed",
+            },
+          ],
+          programTitle: "Leadership Development Program",
+          canManage: true,
+        },
+      ];
+
       const mockActivity = [
         {
           id: "1",

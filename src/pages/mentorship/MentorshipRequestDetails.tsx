@@ -165,6 +165,11 @@ export default function MentorshipRequestDetails() {
         setMatchedCoaches(mockMatchedCoaches);
       } catch (error) {
         console.error("Failed to fetch mentorship request:", error);
+        console.error("Request ID:", id);
+        console.error("User:", user);
+
+        // Set request to null to show the "not found" message
+        setRequest(null);
       } finally {
         setLoading(false);
       }

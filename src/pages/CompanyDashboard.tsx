@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import MetricsOverview from "@/components/metrics/MetricsOverview";
 import { MentorshipRequestProgress } from "@/components/mentorship/MentorshipRequestProgress";
 import { SessionManagement } from "@/components/admin/SessionManagement";
+import { ButtonValidationTest } from "@/components/testing/ButtonValidationTest";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Card,

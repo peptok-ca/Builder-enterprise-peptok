@@ -174,6 +174,11 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
                           <Badge variant="outline" className="text-xs">
                             Coach
                           </Badge>
+                        ) : userType === "team_member" ? (
+                          <Badge variant="outline" className="text-xs">
+                            <User className="w-3 h-3 mr-1" />
+                            Team Member
+                          </Badge>
                         ) : (
                           <Badge variant="outline" className="text-xs">
                             Enterprise

@@ -373,11 +373,16 @@ export default function VideoConference() {
   const joinSession = async () => {
     if (!session || !user) return;
 
+    // Show permission modal if we don't have stream access
+    if (!hasStreamAccess) {
+      setShowPermissionModal(true);
+      return;
+    }
+
     setIsJoining(true);
 
     try {
-      // Initialize media with user interaction
-      await initializeMedia(true);
+      // Media already initialized through permission modal
 
       // In real app, this would connect to video service (WebRTC, Zoom SDK, etc.)
       await new Promise((resolve) => setTimeout(resolve, 2000));

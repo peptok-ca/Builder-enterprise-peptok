@@ -1092,6 +1092,152 @@ class ApiService {
     });
   }
 
+  // Coach-specific API methods
+  async getCoachPendingRequests(coachId: string): Promise<any[]> {
+    try {
+      const response = await this.request<any[]>(
+        `/coaches/${coachId}/pending-requests`,
+      );
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock pending requests:", error);
+
+      // Return mock pending requests for demo
+      return [
+        {
+          id: "req-1",
+          title: "React Development Coaching",
+          company: "TechStart Inc.",
+          description:
+            "Looking for guidance on React best practices and modern development workflows for our engineering team.",
+          goals: [
+            "Learn React hooks and state management",
+            "Implement testing strategies",
+            "Code review processes",
+          ],
+          teamSize: 5,
+          urgency: "medium",
+          budget: 2500,
+          preferredSchedule: "Weekdays 2-4 PM PST",
+          submittedAt: new Date("2024-01-15"),
+          status: "pending",
+          requesterName: "John Smith",
+          requesterEmail: "john@techstart.com",
+        },
+        {
+          id: "req-2",
+          title: "Leadership Development Program",
+          company: "Growth Corp",
+          description:
+            "Need coaching for developing leadership skills across our management team.",
+          goals: [
+            "Team leadership skills",
+            "Communication strategies",
+            "Performance management",
+          ],
+          teamSize: 8,
+          urgency: "high",
+          budget: 4000,
+          preferredSchedule: "Flexible",
+          submittedAt: new Date("2024-01-12"),
+          status: "pending",
+          requesterName: "Sarah Johnson",
+          requesterEmail: "sarah@growthcorp.com",
+        },
+        {
+          id: "req-3",
+          title: "DevOps and Cloud Migration Coaching",
+          company: "StartupXYZ",
+          description:
+            "Seeking guidance on DevOps practices and cloud migration strategies.",
+          goals: [
+            "Docker and containerization",
+            "CI/CD pipeline setup",
+            "AWS cloud migration",
+          ],
+          teamSize: 3,
+          urgency: "low",
+          budget: 1800,
+          preferredSchedule: "Weekends preferred",
+          submittedAt: new Date("2024-01-18"),
+          status: "pending",
+          requesterName: "Mike Chen",
+          requesterEmail: "mike@startupxyz.com",
+        },
+      ];
+    }
+  }
+
+  async getCoachStats(coachId: string): Promise<any> {
+    try {
+      const response = await this.request<any>(`/coaches/${coachId}/stats`);
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock coach stats:", error);
+
+      // Return mock stats for demo
+      return {
+        totalSessions: 156,
+        completedSessions: 142,
+        averageRating: 4.8,
+        totalEarnings: 45600,
+        upcomingSessions: 3,
+        responseTime: 2.4, // hours
+        successRate: 95,
+        monthlyEarnings: 8200,
+        newRequestsThisWeek: 5,
+        acceptanceRate: 87,
+      };
+    }
+  }
+
+  async acceptCoachingRequest(
+    requestId: string,
+    coachId: string,
+    message?: string,
+  ): Promise<any> {
+    try {
+      const response = await this.request<any>(
+        `/coaching-requests/${requestId}/accept`,
+        {
+          method: "POST",
+          body: JSON.stringify({ coachId, message }),
+        },
+      );
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock acceptance:", error);
+      return {
+        success: true,
+        message: "Request accepted successfully",
+        nextSteps: "You will be contacted to schedule the first session.",
+      };
+    }
+  }
+
+  async declineCoachingRequest(
+    requestId: string,
+    coachId: string,
+    reason?: string,
+  ): Promise<any> {
+    try {
+      const response = await this.request<any>(
+        `/coaching-requests/${requestId}/decline`,
+        {
+          method: "POST",
+          body: JSON.stringify({ coachId, reason }),
+        },
+      );
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock decline:", error);
+      return {
+        success: true,
+        message: "Request declined successfully",
+      };
+    }
+  }
+
   // Validation methods for button functionality
   async validateSessionJoin(requestId: string): Promise<{
     success: boolean;

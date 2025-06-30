@@ -43,6 +43,8 @@ const Signup = () => {
     "google" | "microsoft" | null
   >(null);
   const [error, setError] = useState("");
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
+  const [tempUserEmail, setTempUserEmail] = useState("");
 
   const [formData, setFormData] = useState({
     firstName: "",

@@ -230,6 +230,7 @@ export const CoachDashboard: React.FC = () => {
       setPendingRequests(mockRequests);
       setStats(mockStats);
       setRecentActivity(mockActivity);
+      setSessions(mockSessions);
     } catch (error) {
       console.error("Error loading dashboard data:", error);
       toast.error("Failed to load dashboard data");

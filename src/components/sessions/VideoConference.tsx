@@ -252,6 +252,8 @@ export default function VideoConference() {
       });
 
       setLocalStream(stream);
+      setHasStreamAccess(true);
+      setCameraError(false);
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -260,7 +262,13 @@ export default function VideoConference() {
       return stream;
     } catch (error) {
       console.error("Failed to access media devices:", error);
-      toast.error("Failed to access camera/microphone");
+      setCameraError(true);
+      setHasStreamAccess(false);
+
+      // Only show toast if this is not the initial preview setup
+      if (hasJoined) {
+        toast.error("Failed to access camera/microphone");
+      }
       throw error;
     }
   };

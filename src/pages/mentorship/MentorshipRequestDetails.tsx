@@ -51,7 +51,14 @@ export default function MentorshipRequestDetails() {
 
   useEffect(() => {
     const fetchRequest = async () => {
-      if (!id) return;
+      if (!id) {
+        console.error("No ID provided in params");
+        setRequest(null);
+        setLoading(false);
+        return;
+      }
+
+      console.log("Starting to fetch request for ID:", id);
 
       try {
         // First try to fetch from API

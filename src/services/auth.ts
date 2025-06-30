@@ -108,14 +108,26 @@ class AuthService {
   // Load user from localStorage
   private loadUserFromStorage() {
     try {
+      console.log("🔄 Loading user from localStorage...");
       const userData = localStorage.getItem("peptok_user");
       const token = localStorage.getItem("peptok_token");
 
+      console.log("📦 Storage data found:", {
+        hasUserData: !!userData,
+        hasToken: !!token,
+        userDataLength: userData?.length || 0,
+      });
+
       if (userData && token) {
         this.currentUser = JSON.parse(userData);
+        console.log(
+          `✅ User loaded from storage: ${this.currentUser.email} (${this.currentUser.userType})`,
+        );
+      } else {
+        console.log("ℹ️ No valid auth data found in localStorage");
       }
     } catch (error) {
-      console.error("Failed to load user from storage:", error);
+      console.error("❌ Failed to load user from storage:", error);
       this.clearAuth();
     }
   }
@@ -123,11 +135,16 @@ class AuthService {
   // Save user to localStorage
   private saveUserToStorage(user: User, token: string) {
     try {
+      console.log(
+        `💾 Saving user to storage: ${user.email} (${user.userType})`,
+      );
       localStorage.setItem("peptok_user", JSON.stringify(user));
       localStorage.setItem("peptok_token", token);
       this.currentUser = user;
+      console.log(`✅ User saved successfully to localStorage`);
     } catch (error) {
-      console.error("Failed to save user to storage:", error);
+      console.error("❌ Failed to save user to storage:", error);
+      throw error;
     }
   }
 
@@ -153,6 +170,8 @@ class AuthService {
   // Email/Password Login
   async loginWithEmail(email: string, password: string): Promise<AuthResponse> {
     try {
+      console.log(`🔐 Login attempt for email: ${email}`);
+
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -161,7 +180,17 @@ class AuthService {
         (u) => u.email.toLowerCase() === email.toLowerCase(),
       );
 
+      console.log(
+        `🔍 User lookup result for ${email}:`,
+        user ? "Found" : "Not found",
+      );
+
       if (!user) {
+        console.error(`❌ No user found for email: ${email}`);
+        console.log(
+          "📋 Available demo emails:",
+          mockUsers.map((u) => u.email),
+        );
         return {
           success: false,
           error:
@@ -171,6 +200,9 @@ class AuthService {
 
       // Simulate password validation (in real app, password would be hashed and verified)
       if (password.length < 6) {
+        console.error(
+          `❌ Password too short for ${email}: ${password.length} characters`,
+        );
         return {
           success: false,
           error: "Invalid email or password. Please try again.",
@@ -179,6 +211,9 @@ class AuthService {
 
       // Generate mock token
       const token = `mock_token_${Date.now()}_${user.id}`;
+      console.log(
+        `✅ Login successful for ${email}, user type: ${user.userType}`,
+      );
 
       // Save authentication
       this.saveUserToStorage(user, token);
@@ -189,6 +224,7 @@ class AuthService {
         token,
       };
     } catch (error) {
+      console.error(`💥 Login error for ${email}:`, error);
       return {
         success: false,
         error: "Login failed. Please try again.",

@@ -312,6 +312,11 @@ export const CoachDashboard: React.FC = () => {
           <p className="text-gray-600">
             Manage your coaching requests and sessions
           </p>
+          {/* Debug info to show data source */}
+          <div className="mt-2 text-xs text-blue-600">
+            ✅ Data loaded from backend API • {pendingRequests.length} pending
+            requests • Stats updated
+          </div>
         </div>
 
         {/* Quick Stats */}

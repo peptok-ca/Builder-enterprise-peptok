@@ -384,6 +384,117 @@ export default function MentorshipRequestDetails() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Matched Coaches */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Matched Coaches ({matchedCoaches.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {matchedCoaches.map((coach) => (
+                    <div
+                      key={coach.id}
+                      className="border rounded-lg p-4 space-y-4"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-4">
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage
+                              src={
+                                coach.avatar ||
+                                `https://avatar.vercel.sh/${coach.email}`
+                              }
+                            />
+                            <AvatarFallback>
+                              {coach.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .toUpperCase()
+                                .slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-lg">
+                              {coach.name}
+                            </h4>
+                            <p className="text-gray-600">{coach.title}</p>
+                            <p className="text-sm text-gray-500">
+                              {coach.company}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="flex items-center gap-1">
+                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                <span className="text-sm font-medium">
+                                  {coach.rating}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <MapPin className="w-4 h-4 text-gray-400" />
+                                <span className="text-sm text-gray-600">
+                                  {coach.location}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold">
+                            ${coach.hourlyRate}/hr
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            Match: {coach.matchScore}%
+                          </div>
+                          <Badge
+                            className={getAvailabilityColor(coach.availability)}
+                          >
+                            {coach.availability}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-gray-600">{coach.bio}</p>
+
+                      <div className="flex flex-wrap gap-2">
+                        {coach.expertise.map((skill, index) => (
+                          <Badge key={index} variant="outline">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t">
+                        <div className="text-sm text-gray-600">
+                          Available for{" "}
+                          {coach.availability === "available"
+                            ? "immediate"
+                            : "limited"}{" "}
+                          coaching
+                        </div>
+                        {coach.isSelected ? (
+                          <Badge className="bg-green-100 text-green-800">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Selected
+                          </Badge>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSelectCoach(coach.id)}
+                          >
+                            Select Coach
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}

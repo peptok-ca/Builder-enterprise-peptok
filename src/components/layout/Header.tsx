@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { websocketService, Notification } from "@/services/websocket";
 
 interface HeaderProps {
   userType?: "platform_admin" | "company_admin" | "coach";

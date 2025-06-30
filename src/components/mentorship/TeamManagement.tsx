@@ -233,7 +233,7 @@ export function TeamManagement({
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              You've reached your team member limit ({userCap} members).
+              You've reached your employee limit ({userCap} employees).
               <Button
                 variant="link"
                 className="p-0 h-auto font-semibold text-primary ml-1"
@@ -433,8 +433,8 @@ export function TeamManagement({
             <DollarSign className="h-4 w-4" />
             <AlertDescription>
               You're using {Math.round((currentMemberCount / userCap) * 100)}%
-              of your team member allowance. Consider upgrading your plan for
-              more capacity and advanced features.
+              of your employee allowance. Consider upgrading your plan for more
+              capacity and advanced features.
               <Button
                 variant="link"
                 className="p-0 h-auto font-semibold text-primary ml-1"
@@ -453,7 +453,7 @@ export function TeamManagement({
             <span className="font-medium">Additional Seats</span>
           </div>
           <p>
-            Need more team members? Additional seats are available for
+            Need more employees? Additional seats are available for
             $5/user/month. You can add them during checkout or upgrade your plan
             for better value.
           </p>

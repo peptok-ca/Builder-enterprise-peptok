@@ -235,7 +235,7 @@ export function MentorshipRequestForm({
     if (formData.metricsToTrack.length === 0)
       newErrors.metrics = "At least one metric must be selected";
     if (formData.teamMembers.length === 0)
-      newErrors.team = "At least one team member is required";
+      newErrors.team = "At least one employee is required";
     if (!formData.timeline.startDate)
       newErrors.startDate = "Start date is required";
     if (!formData.timeline.endDate) newErrors.endDate = "End date is required";
@@ -273,7 +273,7 @@ export function MentorshipRequestForm({
     }
 
     if (formData.teamMembers.length === 0) {
-      toast.error("Please add at least one team member");
+      toast.error("Please add at least one employee");
       return;
     }
 
@@ -638,7 +638,7 @@ export function MentorshipRequestForm({
         </CardContent>
       </Card>
 
-      {/* Team Management */}
+      {/* Employee Management */}
       {(subscriptionTier || sessionPricingTier) && (
         <TeamManagement
           teamMembers={formData.teamMembers}

@@ -568,7 +568,7 @@ export default function PlatformAdminDashboard() {
                           Create User
                         </Button>
                       </DialogTrigger>
-                    <DialogContent>
+                      <DialogContent>
                       <DialogHeader>
                         <DialogTitle>Create New User</DialogTitle>
                         <DialogDescription>

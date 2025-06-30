@@ -14,14 +14,13 @@ import {
   MentorshipRequestForm,
   MentorshipRequestFormData,
 } from "@/components/mentorship/MentorshipRequestForm";
-import { CoachSearch } from "@/components/mentorship/CoachSearch";
+
 import Header from "@/components/layout/Header";
 import { ArrowLeft, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 import {
   SubscriptionTier,
   MentorshipRequest,
   SessionPricingTier,
-  Coach,
 } from "@/types";
 import { toast } from "sonner";
 import { api } from "@/services/api";
@@ -58,7 +57,6 @@ export default function CreateMentorshipRequest() {
   }, []);
   const [savedDraft, setSavedDraft] =
     useState<MentorshipRequestFormData | null>(null);
-  const [selectedCoaches, setSelectedCoaches] = useState<Coach[]>([]);
   const [formData, setFormData] = useState<MentorshipRequestFormData | null>(
     null,
   );
@@ -178,17 +176,6 @@ export default function CreateMentorshipRequest() {
     toast.success("Draft cleared");
   };
 
-  const handleCoachSelect = (coach: Coach) => {
-    setSelectedCoaches((prev) => {
-      const isAlreadySelected = prev.some((c) => c.id === coach.id);
-      if (isAlreadySelected) {
-        return prev.filter((c) => c.id !== coach.id);
-      } else {
-        return [...prev, coach];
-      }
-    });
-  };
-
   const handleFormDataChange = (data: MentorshipRequestFormData) => {
     setFormData(data);
   };
@@ -288,29 +275,15 @@ export default function CreateMentorshipRequest() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-8">
-                <MentorshipRequestForm
-                  onSubmit={handleSubmitRequest}
-                  onSaveDraft={handleSaveDraft}
-                  sessionPricingTier={sessionPricingTier}
-                  onUpgradePrompt={handleUpgradePrompt}
-                  initialData={savedDraft || undefined}
-                  isLoading={isSubmitting}
-                  onFormDataChange={handleFormDataChange}
-                />
-
-                {/* Coach Search Section */}
-                <CoachSearch
-                  selectedExpertise={
-                    formData?.preferredExpertise ||
-                    savedDraft?.preferredExpertise ||
-                    []
-                  }
-                  budgetRange={formData?.budget || savedDraft?.budget}
-                  onCoachSelect={handleCoachSelect}
-                  selectedCoaches={selectedCoaches}
-                />
-              </div>
+              <MentorshipRequestForm
+                onSubmit={handleSubmitRequest}
+                onSaveDraft={handleSaveDraft}
+                sessionPricingTier={sessionPricingTier}
+                onUpgradePrompt={handleUpgradePrompt}
+                initialData={savedDraft || undefined}
+                isLoading={isSubmitting}
+                onFormDataChange={handleFormDataChange}
+              />
             )}
           </div>
         </div>

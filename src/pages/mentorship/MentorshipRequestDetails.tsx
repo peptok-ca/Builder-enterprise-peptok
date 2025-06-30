@@ -41,6 +41,7 @@ export default function MentorshipRequestDetails() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [request, setRequest] = useState<MentorshipRequest | null>(null);
+  const [matchedCoaches, setMatchedCoaches] = useState<MatchedCoach[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

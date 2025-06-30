@@ -193,7 +193,7 @@ export default function MentorshipRequestDetails() {
   };
 
   const [pricingConfig, setPricingConfig] = useState({
-    companyServiceFee: 0.10,
+    companyServiceFee: 0.1,
     additionalParticipantFee: 25,
     currency: "CAD",
   });
@@ -233,7 +233,10 @@ export default function MentorshipRequestDetails() {
 
     // Additional participants cost (team members - 1, since first participant is included)
     const additionalParticipants = Math.max(0, request.teamMembers.length - 1);
-    const additionalParticipantsCost = additionalParticipants * pricingConfig.additionalParticipantFee * totalSessions;
+    const additionalParticipantsCost =
+      additionalParticipants *
+      pricingConfig.additionalParticipantFee *
+      totalSessions;
 
     const subtotal = baseSessionCost + additionalParticipantsCost;
     const serviceFee = subtotal * pricingConfig.companyServiceFee;
@@ -500,11 +503,27 @@ export default function MentorshipRequestDetails() {
                             {user?.userType === "company" ? (
                               <div className="text-sm space-y-1">
                                 <div>Coach Rate: ${coach.hourlyRate}/hr</div>
-                                <div>Service Fee: {(pricingConfig.companyServiceFee * 100).toFixed(0)}%</div>
+                                <div>
+                                  Service Fee:{" "}
+                                  {(
+                                    pricingConfig.companyServiceFee * 100
+                                  ).toFixed(0)}
+                                  %
+                                </div>
                                 {request.teamMembers.length > 1 && (
-                                  <div>Additional Participants: ${pricingConfig.additionalParticipantFee} × {request.teamMembers.length - 1}</div>
+                                  <div>
+                                    Additional Participants: $
+                                    {pricingConfig.additionalParticipantFee} ×{" "}
+                                    {request.teamMembers.length - 1}
+                                  </div>
                                 )}
-                                <div className="font-semibold">Total: ${calculateTotalCost(coach.hourlyRate).toFixed(2)} {pricingConfig.currency}</div>
+                                <div className="font-semibold">
+                                  Total: $
+                                  {calculateTotalCost(coach.hourlyRate).toFixed(
+                                    2,
+                                  )}{" "}
+                                  {pricingConfig.currency}
+                                </div>
                               </div>
                             ) : (
                               <div>Rate: ${coach.hourlyRate}/hr</div>
@@ -516,7 +535,6 @@ export default function MentorshipRequestDetails() {
                         >
                           {coach.availability}
                         </Badge>
-                      </div>
                       </div>
 
                       <p className="text-sm text-gray-600">{coach.bio}</p>

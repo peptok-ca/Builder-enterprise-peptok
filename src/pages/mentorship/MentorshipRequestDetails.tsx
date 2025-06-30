@@ -65,6 +65,8 @@ export default function MentorshipRequestDetails() {
         } else {
           // Always create a fallback request for any ID to ensure page works
           console.log("Creating fallback request for ID:", id);
+          toast.info("Loading sample program data for demonstration");
+
           const mockRequest: MentorshipRequest = {
             id,
             companyId: user?.companyId || "default-company-id",

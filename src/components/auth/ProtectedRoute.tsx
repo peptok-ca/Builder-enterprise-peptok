@@ -39,7 +39,11 @@ export function ProtectedRoute({
         const userDashboard =
           user?.userType === "platform_admin"
             ? "/platform-admin"
-            : "/dashboard";
+            : user?.userType === "coach"
+              ? "/coach/dashboard"
+              : user?.userType === "team_member"
+                ? "/team-member/dashboard"
+                : "/dashboard";
         navigate(userDashboard);
         return;
       }

@@ -246,15 +246,13 @@ export default function VideoConference() {
 
   const requestCameraAccess = async () => {
     try {
-      await initializeMedia();
+      await initializeMedia(true); // Mark as user-initiated
       toast.success("Camera access granted!");
-    } catch (error) {
-      toast.error(
-        "Unable to access camera. Please check your browser permissions.",
-      );
+    } catch (error: any) {
+      // Error message is already handled in initializeMedia
+      console.error("Camera access request failed:", error);
     }
   };
-
   const initializeMedia = async (userInitiated = false) => {
     try {
       // Check if mediaDevices is supported

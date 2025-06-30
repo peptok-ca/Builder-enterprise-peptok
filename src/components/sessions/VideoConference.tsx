@@ -297,14 +297,24 @@ export default function VideoConference() {
     }
   };
 
-  const requestCameraAccess = async () => {
-    try {
-      await initializeMedia(true); // Mark as user-initiated
-      toast.success("Camera access granted!");
-    } catch (error: any) {
-      // Error message is already handled in initializeMedia
-      console.error("Camera access request failed:", error);
+  const requestCameraAccess = () => {
+    setShowPermissionModal(true);
+  };
+
+  const handlePermissionsGranted = (stream: MediaStream) => {
+    setLocalStream(stream);
+    setHasStreamAccess(true);
+    setCameraError(false);
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
     }
+
+    // Set up audio level monitoring
+    setupAudioLevelMonitoring(stream);
+
+    setShowPermissionModal(false);
+    toast.success("Camera and microphone access granted!");
   };
   const initializeMedia = async (userInitiated = false) => {
     try {

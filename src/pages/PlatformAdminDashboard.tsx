@@ -45,6 +45,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/layout/Header";
 import { CSVUserUpload } from "@/components/admin/CSVUserUpload";
 import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/services/api";
 import { toast } from "sonner";
 import {
   Users,

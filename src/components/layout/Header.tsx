@@ -38,6 +38,30 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
   // Use auth context user type if available, otherwise fall back to prop
   const userType = user?.userType || propUserType || "company_admin";
 
+  // WebSocket connection and notifications
+  useEffect(() => {
+    if (user && isAuthenticated) {
+      // Connect to WebSocket for real-time notifications
+      websocketService.simulateConnection(user.id);
+
+      // Subscribe to connection status
+      const unsubscribeConnection =
+        websocketService.onConnectionChange(setIsConnected);
+
+      // Subscribe to notifications
+      const unsubscribeNotifications = websocketService.onNotification(
+        (notification) => {
+          setNotifications((prev) => [notification, ...prev.slice(0, 9)]); // Keep last 10 notifications
+        },
+      );
+
+      return () => {
+        unsubscribeConnection();
+        unsubscribeNotifications();
+      };
+    }
+  }, [user, isAuthenticated]);
+
   const isActive = (path: string) => location.pathname === path;
 
   const getDashboardPath = (userType: string) => {

@@ -88,6 +88,11 @@ class ApiService {
     endpoint: string,
     options: RequestInit = {},
   ): Promise<{ data: T; success: boolean; message?: string }> {
+    // Skip fetch requests in deployed environments without explicit API configuration
+    if (Environment.isProduction() && !import.meta.env.VITE_API_URL) {
+      throw new Error("API not configured for deployed environment");
+    }
+
     const token = localStorage.getItem("auth_token");
 
     const config: RequestInit = {
@@ -96,21 +101,30 @@ class ApiService {
         ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
+      // Add timeout
+      signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined,
       ...options,
     };
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
-    if (!response.ok) {
-      const errorData = await response
-        .json()
-        .catch(() => ({ message: "Network error" }));
-      throw new Error(
-        errorData.message || `HTTP error! status: ${response.status}`,
-      );
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Network error" }));
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`,
+        );
+      }
+
+      return await response.json();
+    } catch (error) {
+      if (Environment.isProduction()) {
+        console.log("API request failed in deployed environment (expected)");
+      }
+      throw error;
     }
-
-    return await response.json();
   }
 
   // Coach-related methods

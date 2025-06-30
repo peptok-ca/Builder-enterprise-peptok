@@ -205,14 +205,14 @@ export function TeamMemberManagementCard({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="w-5 h-5 text-blue-600" />
-          Program Employees
+          Program Team Members
           <Badge variant="outline" className="ml-auto">
-            {employees.length} employees
+            {teamMembers.length} members
           </Badge>
         </CardTitle>
         <CardDescription>
-          Add employees to participate in "{programTitle}". Each employee will
-          receive an invitation email with program details.
+          Add team members to participate in "{programTitle}". Each team member
+          will receive an invitation email with program details.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -221,41 +221,41 @@ export function TeamMemberManagementCard({
           <div className="flex items-center gap-2">
             <UserPlus className="w-4 h-4 text-blue-600" />
             <h3 className="font-semibold text-blue-900">
-              Add Employee to Program
+              Add Team Member to Program
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="employeeEmail">Email Address *</Label>
+              <Label htmlFor="memberEmail">Email Address *</Label>
               <Input
-                id="employeeEmail"
+                id="memberEmail"
                 type="email"
-                value={newEmployeeEmail}
-                onChange={(e) => setNewEmployeeEmail(e.target.value)}
-                placeholder="employee@company.com"
-                onKeyPress={(e) => e.key === "Enter" && addEmployee()}
+                value={newMemberEmail}
+                onChange={(e) => setNewMemberEmail(e.target.value)}
+                placeholder="member@company.com"
+                onKeyPress={(e) => e.key === "Enter" && addTeamMember()}
                 disabled={isInviting}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="employeeName">Full Name (Optional)</Label>
+              <Label htmlFor="memberName">Full Name (Optional)</Label>
               <Input
-                id="employeeName"
-                value={newEmployeeName}
-                onChange={(e) => setNewEmployeeName(e.target.value)}
+                id="memberName"
+                value={newMemberName}
+                onChange={(e) => setNewMemberName(e.target.value)}
                 placeholder="John Doe"
                 disabled={isInviting}
               />
             </div>
 
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="employeeRole">Role in Program</Label>
+              <Label htmlFor="memberRole">Role in Program</Label>
               <Select
-                value={newEmployeeRole}
+                value={newMemberRole}
                 onValueChange={(value: "participant" | "observer") =>
-                  setNewEmployeeRole(value)
+                  setNewMemberRole(value)
                 }
                 disabled={isInviting}
               >
@@ -292,75 +292,81 @@ export function TeamMemberManagementCard({
 
           <div className="flex justify-end">
             <Button
-              onClick={addEmployee}
-              disabled={isInviting || !newEmployeeEmail.trim()}
+              onClick={addTeamMember}
+              disabled={isInviting || !newMemberEmail.trim()}
               className="bg-blue-600 hover:bg-blue-700"
             >
               {isInviting ? (
                 <>
                   <Clock className="w-4 h-4 mr-2 animate-spin" />
-                  Inviting Employee...
+                  Inviting Team Member...
                 </>
               ) : (
                 <>
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Employee
+                  Add Team Member
                 </>
               )}
             </Button>
           </div>
         </div>
 
-        {/* Current Employees */}
-        {employees.length > 0 ? (
+        {/* Current Team Members */}
+        {teamMembers.length > 0 ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">
-                Program Employees ({employees.length})
+                Program Team Members ({teamMembers.length})
               </h3>
               <div className="text-sm text-muted-foreground">
-                {employees.filter((emp) => emp.status === "accepted").length}{" "}
+                {
+                  teamMembers.filter((member) => member.status === "accepted")
+                    .length
+                }{" "}
                 accepted,{" "}
-                {employees.filter((emp) => emp.status === "invited").length}{" "}
+                {
+                  teamMembers.filter((member) => member.status === "invited")
+                    .length
+                }{" "}
                 pending
               </div>
             </div>
 
             <div className="space-y-3">
-              {employees.map((employee) => (
+              {teamMembers.map((member) => (
                 <div
-                  key={employee.id}
+                  key={member.id}
                   className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <Avatar className="h-8 w-8">
                       <AvatarImage
-                        src={`https://avatar.vercel.sh/${employee.email}`}
+                        src={`https://avatar.vercel.sh/${member.email}`}
                       />
                       <AvatarFallback>
-                        {employee.name
-                          ? employee.name
+                        {member.name
+                          ? member.name
                               .split(" ")
                               .map((n) => n[0])
                               .join("")
                               .toUpperCase()
-                          : employee.email.substring(0, 2).toUpperCase()}
+                          : member.email.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
 
                     <div>
                       <div className="font-medium">
-                        {employee.name || employee.email}
+                        {member.name || member.email}
                       </div>
-                      {employee.name && (
+                      {member.name && (
                         <div className="text-sm text-muted-foreground">
-                          {employee.email}
+                          {member.email}
                         </div>
                       )}
-                      {employee.status === "invited" && (
+                      {member.status === "invited" && (
                         <div className="text-xs text-muted-foreground">
                           Invited{" "}
-                          {new Date(employee.invitedAt).toLocaleDateString()}
+                          {new Date(member.invitedAt).toLocaleDateString()}
                         </div>
                       )}
                     </div>
@@ -369,27 +375,25 @@ export function TeamMemberManagementCard({
                   <div className="flex items-center gap-2">
                     <Badge
                       variant={
-                        employee.role === "participant"
-                          ? "default"
-                          : "secondary"
+                        member.role === "participant" ? "default" : "secondary"
                       }
                     >
-                      {employee.role}
+                      {member.role}
                     </Badge>
 
-                    <Badge variant={getStatusBadgeVariant(employee.status)}>
+                    <Badge variant={getStatusBadgeVariant(member.status)}>
                       <div className="flex items-center gap-1">
-                        {getStatusIcon(employee.status)}
-                        {employee.status}
+                        {getStatusIcon(member.status)}
+                        {member.status}
                       </div>
                     </Badge>
 
                     <div className="flex items-center gap-1">
-                      {employee.status === "invited" && (
+                      {member.status === "invited" && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => resendInvitation(employee.id)}
+                          onClick={() => resendInvitation(member.id)}
                           title="Resend invitation"
                         >
                           <Mail className="w-4 h-4" />
@@ -397,9 +401,9 @@ export function TeamMemberManagementCard({
                       )}
 
                       <Select
-                        value={employee.role}
+                        value={member.role}
                         onValueChange={(value: "participant" | "observer") =>
-                          updateEmployeeRole(employee.id, value)
+                          updateMemberRole(member.id, value)
                         }
                       >
                         <SelectTrigger className="w-auto h-8 px-2 text-xs">
@@ -416,9 +420,9 @@ export function TeamMemberManagementCard({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => removeEmployee(employee.id)}
+                        onClick={() => removeTeamMember(member.id)}
                         className="text-destructive hover:text-destructive"
-                        title="Remove employee"
+                        title="Remove team member"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -432,10 +436,11 @@ export function TeamMemberManagementCard({
           <div className="text-center py-8 text-muted-foreground">
             <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p className="font-medium">
-              No employees added to this program yet.
+              No team members added to this program yet.
             </p>
             <p className="text-sm">
-              Add employees by email to include them in the mentorship program.
+              Add team members by email to include them in the mentorship
+              program.
             </p>
           </div>
         )}
@@ -447,9 +452,9 @@ export function TeamMemberManagementCard({
             <div>
               <p className="font-medium mb-1">Email Notifications</p>
               <p>
-                Employees will receive two emails: one when added to the program
-                with details, and another when a coach is assigned with session
-                schedules.
+                Team members will receive two emails: one when added to the
+                program with details, and another when a coach is assigned with
+                session schedules.
               </p>
             </div>
           </div>

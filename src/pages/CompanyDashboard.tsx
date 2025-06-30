@@ -474,6 +474,13 @@ const CompanyDashboard = () => {
                   <TrendingUp className="w-4 h-4" />
                   Analytics
                 </TabsTrigger>
+                <TabsTrigger
+                  value="testing"
+                  className="flex items-center gap-2"
+                >
+                  <Shield className="w-4 h-4" />
+                  Testing
+                </TabsTrigger>
               </TabsList>
 
               {/* Overview Tab */}

@@ -579,29 +579,7 @@ class ApiService {
           analytics: "basic",
           currency: "CAD",
         },
-        {
-          id: "premium",
-          name: "Premium Sessions",
-          slug: "premium",
-          description: "Enhanced sessions with advanced features",
-          baseSessionPrice: 200, // CAD per session
-          participantFee: 30, // CAD per additional participant
-          maxParticipantsIncluded: 2, // Two participants included
-          platformServiceCharge: 12, // 12% platform fee (discount)
-          features: [
-            "All Standard features",
-            "Extended 90-minute sessions available",
-            "Priority mentor selection",
-            "Advanced analytics & insights",
-            "Custom session objectives",
-            "Priority support",
-          ],
-          supportLevel: "premium",
-          customizations: true,
-          analytics: "advanced",
-          badge: "Most Popular",
-          currency: "CAD",
-        },
+
         {
           id: "enterprise",
           name: "Enterprise Sessions",

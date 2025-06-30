@@ -34,59 +34,59 @@ import { toast } from "sonner";
 import { emailService } from "@/services/email";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface EmployeeManagementCardProps {
-  employees: TeamMember[];
-  onUpdateEmployees: (employees: TeamMember[]) => void;
+interface TeamMemberManagementCardProps {
+  teamMembers: TeamMember[];
+  onUpdateTeamMembers: (teamMembers: TeamMember[]) => void;
   programTitle?: string;
   className?: string;
 }
 
-export function EmployeeManagementCard({
-  employees,
-  onUpdateEmployees,
+export function TeamMemberManagementCard({
+  teamMembers,
+  onUpdateTeamMembers,
   programTitle = "Mentorship Program",
   className,
-}: EmployeeManagementCardProps) {
+}: TeamMemberManagementCardProps) {
   const { user } = useAuth();
-  const [newEmployeeEmail, setNewEmployeeEmail] = useState("");
-  const [newEmployeeName, setNewEmployeeName] = useState("");
-  const [newEmployeeRole, setNewEmployeeRole] = useState<
+  const [newMemberEmail, setNewMemberEmail] = useState("");
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberRole, setNewMemberRole] = useState<
     "participant" | "observer"
   >("participant");
   const [isInviting, setIsInviting] = useState(false);
 
-  const addEmployee = async () => {
-    if (!newEmployeeEmail.trim()) {
+  const addTeamMember = async () => {
+    if (!newMemberEmail.trim()) {
       toast.error("Please enter an email address");
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newEmployeeEmail)) {
+    if (!emailRegex.test(newMemberEmail)) {
       toast.error("Please enter a valid email address");
       return;
     }
 
     // Check for duplicates
     if (
-      employees.some(
-        (emp) => emp.email.toLowerCase() === newEmployeeEmail.toLowerCase(),
+      teamMembers.some(
+        (member) => member.email.toLowerCase() === newMemberEmail.toLowerCase(),
       )
     ) {
-      toast.error("This employee is already added to the program");
+      toast.error("This team member is already added to the program");
       return;
     }
 
     setIsInviting(true);
 
     try {
-      // Create new employee entry
-      const newEmployee: TeamMember = {
-        id: `employee-${Date.now()}`,
-        email: newEmployeeEmail.toLowerCase(),
-        name: newEmployeeName.trim() || undefined,
-        role: newEmployeeRole,
+      // Create new team member entry
+      const newTeamMember: TeamMember = {
+        id: `member-${Date.now()}`,
+        email: newMemberEmail.toLowerCase(),
+        name: newMemberName.trim() || undefined,
+        role: newMemberRole,
         status: "invited",
         invitedAt: new Date().toISOString(),
       };
@@ -97,13 +97,13 @@ export function EmployeeManagementCard({
           ? `${user.firstName} ${user.lastName}`
           : "Your program administrator",
         companyName: user?.businessDetails?.companyName || "Your Company",
-        role: newEmployeeRole,
-        invitationLink: `${window.location.origin}/invitation/accept?token=${btoa(newEmployeeEmail + ":" + Date.now())}`,
+        role: newMemberRole,
+        invitationLink: `${window.location.origin}/invitation/accept?token=${btoa(newMemberEmail + ":" + Date.now())}`,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       };
 
       const emailSent = await emailService.sendTeamInvitation(
-        newEmployeeEmail.toLowerCase(),
+        newMemberEmail.toLowerCase(),
         invitationData,
       );
 
@@ -111,48 +111,50 @@ export function EmployeeManagementCard({
         throw new Error("Failed to send invitation email");
       }
 
-      // Add to employees list
-      onUpdateEmployees([...employees, newEmployee]);
+      // Add to team members list
+      onUpdateTeamMembers([...teamMembers, newTeamMember]);
 
       // Reset form
-      setNewEmployeeEmail("");
-      setNewEmployeeName("");
-      setNewEmployeeRole("participant");
+      setNewMemberEmail("");
+      setNewMemberName("");
+      setNewMemberRole("participant");
 
       toast.success(
-        `✅ Employee invitation sent to ${newEmployeeEmail}! They will receive an email to join the program.`,
+        `✅ Team member invitation sent to ${newMemberEmail}! They will receive an email to join the program.`,
         { duration: 5000 },
       );
     } catch (error) {
-      console.error("Failed to add employee:", error);
+      console.error("Failed to add team member:", error);
       toast.error("Failed to send invitation email. Please try again.");
     } finally {
       setIsInviting(false);
     }
   };
 
-  const removeEmployee = (employeeId: string) => {
-    const employee = employees.find((emp) => emp.id === employeeId);
-    if (employee) {
-      onUpdateEmployees(employees.filter((emp) => emp.id !== employeeId));
-      toast.success(`Removed ${employee.email} from the program`);
+  const removeTeamMember = (memberId: string) => {
+    const member = teamMembers.find((member) => member.id === memberId);
+    if (member) {
+      onUpdateTeamMembers(
+        teamMembers.filter((member) => member.id !== memberId),
+      );
+      toast.success(`Removed ${member.email} from the program`);
     }
   };
 
-  const updateEmployeeRole = (
-    employeeId: string,
+  const updateMemberRole = (
+    memberId: string,
     newRole: "participant" | "observer",
   ) => {
-    const updatedEmployees = employees.map((employee) =>
-      employee.id === employeeId ? { ...employee, role: newRole } : employee,
+    const updatedMembers = teamMembers.map((member) =>
+      member.id === memberId ? { ...member, role: newRole } : member,
     );
-    onUpdateEmployees(updatedEmployees);
-    toast.success("Employee role updated successfully");
+    onUpdateTeamMembers(updatedMembers);
+    toast.success("Team member role updated successfully");
   };
 
-  const resendInvitation = async (employeeId: string) => {
-    const employee = employees.find((emp) => emp.id === employeeId);
-    if (!employee) return;
+  const resendInvitation = async (memberId: string) => {
+    const member = teamMembers.find((member) => member.id === memberId);
+    if (!member) return;
 
     try {
       const invitationData = {
@@ -160,13 +162,13 @@ export function EmployeeManagementCard({
           ? `${user.firstName} ${user.lastName}`
           : "Your program administrator",
         companyName: user?.businessDetails?.companyName || "Your Company",
-        role: employee.role,
-        invitationLink: `${window.location.origin}/invitation/accept?token=${btoa(employee.email + ":" + Date.now())}`,
+        role: member.role,
+        invitationLink: `${window.location.origin}/invitation/accept?token=${btoa(member.email + ":" + Date.now())}`,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       };
 
-      await emailService.sendTeamInvitation(employee.email, invitationData);
-      toast.success(`Invitation resent to ${employee.email}`);
+      await emailService.sendTeamInvitation(member.email, invitationData);
+      toast.success(`Invitation resent to ${member.email}`);
     } catch (error) {
       toast.error("Failed to resend invitation");
     }

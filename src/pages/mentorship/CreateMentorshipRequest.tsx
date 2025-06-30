@@ -15,13 +15,7 @@ import {
   MentorshipRequestFormData,
 } from "@/components/mentorship/MentorshipRequestForm";
 import Header from "@/components/layout/Header";
-import {
-  ArrowLeft,
-  CheckCircle,
-  Clock,
-  AlertTriangle,
-  CreditCard,
-} from "lucide-react";
+import { ArrowLeft, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 import {
   SubscriptionTier,
   MentorshipRequest,
@@ -60,7 +54,6 @@ export default function CreateMentorshipRequest() {
 
     loadSessionPricingTier();
   }, []);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [savedDraft, setSavedDraft] =
     useState<MentorshipRequestFormData | null>(null);
 
@@ -145,7 +138,8 @@ export default function CreateMentorshipRequest() {
   };
 
   const handleUpgradePrompt = () => {
-    setShowUpgradeModal(true);
+    // With session-based pricing, direct users to pricing page for more information
+    navigate("/pricing");
   };
 
   const loadDraft = () => {
@@ -204,27 +198,22 @@ export default function CreateMentorshipRequest() {
             {!loadingTier && sessionPricingTier && (
               <Card>
                 <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Badge variant="default">{sessionPricingTier.name}</Badge>
-                      <span className="text-sm text-muted-foreground">
-                        ${sessionPricingTier.baseSessionPrice} per session
-                        {sessionPricingTier.participantFee > 0 && (
-                          <>
-                            , +${sessionPricingTier.participantFee} per
-                            additional participant
-                          </>
-                        )}
-                      </span>
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowUpgradeModal(true)}
-                    >
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      View Pricing Options
-                    </Button>
+                  <div className="flex items-center gap-3">
+                    <Badge variant="default">{sessionPricingTier.name}</Badge>
+                    <span className="text-sm text-muted-foreground">
+                      ${sessionPricingTier.baseSessionPrice} per session
+                      {sessionPricingTier.participantFee > 0 && (
+                        <>
+                          , +${sessionPricingTier.participantFee} per additional
+                          participant
+                        </>
+                      )}
+                    </span>
                   </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Pay-per-session pricing with{" "}
+                    {sessionPricingTier.platformServiceCharge}% platform fee
+                  </p>
                 </CardContent>
               </Card>
             )}
@@ -274,82 +263,6 @@ export default function CreateMentorshipRequest() {
           </div>
         </div>
       </div>
-
-      {/* Upgrade Modal */}
-      {showUpgradeModal && (
-        <UpgradeModal onClose={() => setShowUpgradeModal(false)} />
-      )}
-    </div>
-  );
-}
-
-interface UpgradeModalProps {
-  onClose: () => void;
-}
-
-function UpgradeModal({ onClose }: UpgradeModalProps) {
-  const navigate = useNavigate();
-
-  const handleUpgrade = (tier: string) => {
-    // Navigate to subscription management or upgrade page
-    navigate("/admin", {
-      state: { upgradeModalOpen: true, selectedTier: tier },
-    });
-    onClose();
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-orange-500" />
-            Upgrade Required
-          </CardTitle>
-          <CardDescription>
-            You've reached the limits of your current plan. Upgrade to continue.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <div className="p-3 border rounded-lg">
-              <h4 className="font-medium">Growth Plan - $99/month</h4>
-              <p className="text-sm text-muted-foreground">
-                Up to 50 team members
-              </p>
-              <Button
-                className="w-full mt-2"
-                onClick={() => handleUpgrade("growth")}
-              >
-                Upgrade to Growth
-              </Button>
-            </div>
-
-            <div className="p-3 border rounded-lg">
-              <h4 className="font-medium">Enterprise Plan - Custom</h4>
-              <p className="text-sm text-muted-foreground">
-                Unlimited team members
-              </p>
-              <Button
-                variant="outline"
-                className="w-full mt-2"
-                onClick={() => handleUpgrade("enterprise")}
-              >
-                Contact Sales
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
-            <Button onClick={onClose} className="flex-1">
-              Continue with Current Plan
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

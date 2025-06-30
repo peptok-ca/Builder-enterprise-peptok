@@ -1068,6 +1068,15 @@ export default function VideoConference() {
           </div>
         </div>
       </div>
+
+      {/* Media Permission Modal */}
+      <MediaPermissionModal
+        isOpen={showPermissionModal}
+        onClose={() => setShowPermissionModal(false)}
+        onPermissionsGranted={handlePermissionsGranted}
+        title="Join Video Session"
+        description="To participate in this video session, we need access to your camera and microphone."
+      />
     </div>
   );
 }

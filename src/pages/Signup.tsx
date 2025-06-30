@@ -32,6 +32,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { authService } from "@/services/auth";
+import { TwoFactorSetup } from "@/components/auth/TwoFactorSetup";
 import { toast } from "sonner";
 
 const Signup = () => {

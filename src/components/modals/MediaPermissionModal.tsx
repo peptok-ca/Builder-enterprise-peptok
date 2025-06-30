@@ -162,7 +162,30 @@ export const MediaPermissionModal = ({
       currentStream.getTracks().forEach((track) => track.stop());
       setCurrentStream(null);
     }
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+    setAudioLevel(0);
   };
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (currentStream) {
+        currentStream.getTracks().forEach((track) => track.stop());
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [currentStream]);
 
   const getPermissionIcon = (status: string) => {
     switch (status) {

@@ -220,6 +220,28 @@ export default function VideoConference() {
     };
   }, [hasJoined, session?.status]);
 
+  // Initialize camera preview when component mounts
+  useEffect(() => {
+    const setupPreview = async () => {
+      try {
+        await initializeMedia();
+        console.log("Camera preview initialized");
+      } catch (error) {
+        console.warn("Camera preview failed:", error);
+        // Don't show error toast here as users might need to grant permissions
+      }
+    };
+
+    setupPreview();
+
+    // Cleanup function to stop media stream when component unmounts
+    return () => {
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
   const initializeMedia = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({

@@ -1113,6 +1113,13 @@ export default function PlatformAdminDashboard() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* CSV Upload Modal */}
+      <CSVUserUpload
+        isOpen={isCSVUploadOpen}
+        onClose={() => setIsCSVUploadOpen(false)}
+        onUsersAdded={handleCSVUpload}
+      />
     </div>
   );
 }

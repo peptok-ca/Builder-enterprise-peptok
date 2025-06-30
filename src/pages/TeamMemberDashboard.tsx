@@ -83,64 +83,101 @@ const TeamMemberDashboard = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        // Mock data - in real app, this would come from API filtered by user's access
-        const mockSessions: TeamMemberSession[] = [
-          {
-            id: "session-1",
-            title: "Leadership Fundamentals",
+        console.log("Loading team member dashboard data from API...");
+
+        // Fetch user's sessions from backend
+        const sessionsData = await api.getUserSessions(
+          user?.id || "current-user",
+          undefined,
+        );
+        console.log("Fetched sessions:", sessionsData);
+
+        // Transform API data to match TeamMemberSession interface
+        const transformedSessions: TeamMemberSession[] = sessionsData.map(
+          (session) => ({
+            id: session.id,
+            title: session.title,
             coach: {
-              name: "Sarah Johnson",
-              title: "Senior Leadership Coach",
-              avatar: "https://avatar.vercel.sh/sarah@example.com",
+              name: session.coach?.name || "Coach",
+              avatar: session.coach?.avatar,
+              title: session.coach?.title || "Professional Coach",
             },
-            date: "2024-02-15T14:00:00Z",
-            duration: 60,
-            status: "upcoming",
-            type: "video",
-            description:
-              "Introduction to leadership principles and goal setting",
-            programTitle: "Leadership Development Program",
-            role: (user?.role as "participant" | "observer") || "participant",
+            date: session.startTime,
+            duration: session.duration || 60,
+            status: session.status as "upcoming" | "completed" | "cancelled",
+            type: session.type as "video" | "phone" | "in-person",
+            description: session.description || "",
+            programTitle: session.programId || "Coaching Program",
+            role: "participant" as const,
             hasRated: false,
-            meetingLink: "https://meet.google.com/abc-defg-hij",
-          },
-          {
-            id: "session-2",
-            title: "Communication Skills",
-            coach: {
-              name: "Sarah Johnson",
-              title: "Senior Leadership Coach",
-              avatar: "https://avatar.vercel.sh/sarah@example.com",
-            },
-            date: "2024-02-08T14:00:00Z",
-            duration: 60,
-            status: "completed",
-            type: "video",
-            description: "Effective communication strategies for leaders",
-            programTitle: "Leadership Development Program",
-            role: (user?.role as "participant" | "observer") || "participant",
-            hasRated: false,
-          },
-          {
-            id: "session-3",
-            title: "Team Management",
-            coach: {
-              name: "Sarah Johnson",
-              title: "Senior Leadership Coach",
-              avatar: "https://avatar.vercel.sh/sarah@example.com",
-            },
-            date: "2024-02-01T14:00:00Z",
-            duration: 60,
-            status: "completed",
-            type: "video",
-            description: "Building and managing high-performing teams",
-            programTitle: "Leadership Development Program",
-            role: (user?.role as "participant" | "observer") || "participant",
-            rating: 5,
-            feedback: "Excellent session with practical insights!",
-            hasRated: true,
-          },
-        ];
+            meetingLink: session.meetingLink,
+          }),
+        );
+
+        // If no API sessions, fallback to sample data for demo
+        const mockSessions: TeamMemberSession[] =
+          transformedSessions.length > 0
+            ? transformedSessions
+            : [
+                {
+                  id: "session-1",
+                  title: "Leadership Fundamentals",
+                  coach: {
+                    name: "Sarah Johnson",
+                    title: "Senior Leadership Coach",
+                    avatar: "https://avatar.vercel.sh/sarah@example.com",
+                  },
+                  date: "2024-02-15T14:00:00Z",
+                  duration: 60,
+                  status: "upcoming",
+                  type: "video",
+                  description:
+                    "Introduction to leadership principles and goal setting",
+                  programTitle: "Leadership Development Program",
+                  role:
+                    (user?.role as "participant" | "observer") || "participant",
+                  hasRated: false,
+                  meetingLink: "https://meet.google.com/abc-defg-hij",
+                },
+                {
+                  id: "session-2",
+                  title: "Communication Skills",
+                  coach: {
+                    name: "Sarah Johnson",
+                    title: "Senior Leadership Coach",
+                    avatar: "https://avatar.vercel.sh/sarah@example.com",
+                  },
+                  date: "2024-02-08T14:00:00Z",
+                  duration: 60,
+                  status: "completed",
+                  type: "video",
+                  description: "Effective communication strategies for leaders",
+                  programTitle: "Leadership Development Program",
+                  role:
+                    (user?.role as "participant" | "observer") || "participant",
+                  hasRated: false,
+                },
+                {
+                  id: "session-3",
+                  title: "Team Management",
+                  coach: {
+                    name: "Sarah Johnson",
+                    title: "Senior Leadership Coach",
+                    avatar: "https://avatar.vercel.sh/sarah@example.com",
+                  },
+                  date: "2024-02-01T14:00:00Z",
+                  duration: 60,
+                  status: "completed",
+                  type: "video",
+                  description: "Building and managing high-performing teams",
+                  programTitle: "Leadership Development Program",
+                  role:
+                    (user?.role as "participant" | "observer") || "participant",
+                  rating: 5,
+                  feedback: "Excellent session with practical insights!",
+                  hasRated: true,
+                },
+              ];
 
         const mockPrograms: TeamMemberProgram[] = [
           {

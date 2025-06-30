@@ -333,7 +333,11 @@ export function MentorshipRequestProgress({
 
                 <div className="flex items-center gap-2">
                   {request.status === "active" && (
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSendMessage(request.id)}
+                    >
                       <MessageSquare className="w-4 h-4 mr-1" />
                       Message
                     </Button>
@@ -347,7 +351,10 @@ export function MentorshipRequestProgress({
                   </Button>
 
                   {request.status === "active" && (
-                    <Button size="sm">
+                    <Button
+                      size="sm"
+                      onClick={() => handleJoinSession(request.id)}
+                    >
                       <Play className="w-4 h-4 mr-1" />
                       Join Session
                     </Button>

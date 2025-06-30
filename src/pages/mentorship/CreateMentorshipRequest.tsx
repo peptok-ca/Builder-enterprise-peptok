@@ -24,6 +24,7 @@ import {
 } from "@/types";
 import { toast } from "sonner";
 import { api } from "@/services/api";
+import { emailService } from "@/services/email";
 import { useAuth } from "@/contexts/AuthContext";
 import { BackendStatus } from "@/components/ui/BackendStatus";
 
@@ -101,10 +102,40 @@ export default function CreateMentorshipRequest() {
       // Submit to API
       const request = await api.createMentorshipRequest(requestData);
 
+      // Send program details email to all employees
+      try {
+        const programDetails = {
+          programTitle: data.title,
+          programDescription: data.description,
+          startDate: data.timeline.startDate,
+          endDate: data.timeline.endDate,
+          sessionFrequency: data.timeline.sessionFrequency,
+          companyName: user?.businessDetails?.companyName || "Your Company",
+          adminName: user?.name || "Program Administrator",
+          goals: data.goals.map((g) => g.title),
+          metricsToTrack: data.metricsToTrack,
+        };
+
+        // Send email to each employee
+        const emailPromises = data.teamMembers.map((member) =>
+          emailService.sendProgramDetails(member.email, programDetails),
+        );
+
+        await Promise.all(emailPromises);
+        console.log(
+          `📧 Program details sent to ${data.teamMembers.length} employees`,
+        );
+      } catch (emailError) {
+        console.warn("Failed to send program details emails:", emailError);
+        // Don't fail the whole process if emails fail
+      }
+
       // Clear saved draft
       localStorage.removeItem("mentorship-request-draft");
 
-      toast.success("Mentorship request submitted successfully!");
+      toast.success(
+        "Mentorship request submitted successfully! Employees have been notified.",
+      );
 
       // Navigate to appropriate dashboard based on user type
       const dashboardPath =

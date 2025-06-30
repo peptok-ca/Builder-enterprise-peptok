@@ -67,11 +67,11 @@ export default function MentorshipRequestDetails() {
               {
                 id: "goal_1",
                 title: "Master React Hooks",
-                description:
-                  "Learn advanced React hooks and custom hook patterns",
-                category: "technical",
-                priority: "high",
+                description: "Learn advanced React hooks and custom hook patterns",
+                category: "technical" as const,
+                priority: "high" as const,
               },
+            ],
             ],
             metricsToTrack: ["Code quality scores", "Development velocity"],
             teamMembers: [

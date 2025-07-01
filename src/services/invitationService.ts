@@ -366,7 +366,7 @@ class InvitationService {
   }
 
   /**
-   * Get all invitations for a program or company
+   * Get all invitations for a program or company - Backend Database Only
    */
   async getInvitations(filters?: {
     programId?: string;
@@ -374,16 +374,36 @@ class InvitationService {
     status?: TeamInvitation["status"];
   }): Promise<TeamInvitation[]> {
     try {
-      // Use backend API for getting invitations
+      console.log("🗃️ Loading invitations from backend database", filters);
+
+      // Use backend API for getting invitations - NO localStorage fallback
       const invitations = await apiEnhanced.getTeamInvitations(filters);
 
-      return invitations.sort(
+      // Verify we got database data
+      const validInvitations = invitations.filter(
+        (inv) => inv.id && !inv.id.includes("temp_"),
+      );
+
+      if (validInvitations.length !== invitations.length) {
+        console.warn("⚠️ Some invitations appear to be temporary/mock data");
+      }
+
+      console.log(
+        `✅ Loaded ${validInvitations.length} invitations from backend database`,
+      );
+
+      return validInvitations.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     } catch (error) {
-      console.error("Failed to get invitations:", error);
-      return [];
+      console.error(
+        "❌ Failed to get invitations from backend database:",
+        error,
+      );
+      throw new Error(
+        `Failed to load invitations from backend database: ${error.message}`,
+      );
     }
   }
 

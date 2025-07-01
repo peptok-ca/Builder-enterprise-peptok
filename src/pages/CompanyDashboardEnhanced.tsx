@@ -283,7 +283,8 @@ export default function CompanyDashboardEnhanced() {
     }
   };
 
-  if (loading) {
+  // Show loading state
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
@@ -291,7 +292,32 @@ export default function CompanyDashboardEnhanced() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading dashboard...</p>
+              <p className="text-muted-foreground">
+                {!user ? "Authenticating..." : "Loading dashboard..."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state for unauthorized users
+  if (user.userType !== "company_admin" || !user.companyId) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
+              <p className="text-muted-foreground mb-4">
+                Company admin access required to view this dashboard.
+              </p>
+              <Button onClick={() => navigate("/")} variant="outline">
+                Return Home
+              </Button>
             </div>
           </div>
         </div>

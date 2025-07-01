@@ -18,7 +18,7 @@ Write-Host "🔍 Checking for processes using ports 8080, 3001, 5433..." -Foregr
 # Function to kill process on port
 function Kill-ProcessOnPort {
     param($Port)
-    
+
     $process = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue
     if ($process) {
         $processId = (Get-Process -Id $process.OwningProcess -ErrorAction SilentlyContinue).Id
@@ -36,8 +36,9 @@ Kill-ProcessOnPort 5433
 
 Write-Host "🚀 Starting containers..." -ForegroundColor Green
 
-# Start the containers
-docker compose up --build
+# Start the containers with clean build (no cache)
+docker compose build --no-cache
+docker compose up
 
 Write-Host "✅ Docker environment should be running!" -ForegroundColor Green
 Write-Host "🌐 Frontend: http://localhost:8080" -ForegroundColor Cyan

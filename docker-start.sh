@@ -32,8 +32,9 @@ fi
 
 echo "🚀 Starting containers..."
 
-# Start the containers
-docker compose up --build
+# Start the containers with clean build (no cache)
+docker compose build --no-cache
+docker compose up
 
 echo "✅ Docker environment should be running!"
 echo "🌐 Frontend: http://localhost:8080"

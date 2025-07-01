@@ -172,11 +172,14 @@ export default function SecuritySettings() {
   const [showSecurityEvents, setShowSecurityEvents] = useState(false);
 
   // Cross-browser sync
-  const { data: syncedData, isLoading: syncLoading } = useCrossBrowserSync(
-    "SECURITY_SETTINGS",
-    settings,
-    { enableAutoRefresh: true, refreshInterval: 30000 },
-  );
+  const { data: syncedData, isLoading: syncLoading } = useCrossBrowserSync({
+    syncConfig: {
+      storageKey: "peptok_security_settings",
+      cookieKey: "peptok_security",
+      broadcastChannel: "peptok_security_sync",
+      syncInterval: 5000,
+    },
+  });
 
   useEffect(() => {
     loadSettings();

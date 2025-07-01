@@ -225,11 +225,14 @@ export default function AnalyticsSettings() {
   });
 
   // Cross-browser sync
-  const { data: syncedData, isLoading: syncLoading } = useCrossBrowserSync(
-    "ANALYTICS_SETTINGS",
-    settings,
-    { enableAutoRefresh: true, refreshInterval: 30000 },
-  );
+  const { data: syncedData, isLoading: syncLoading } = useCrossBrowserSync({
+    syncConfig: {
+      storageKey: "peptok_analytics_settings",
+      cookieKey: "peptok_analytics",
+      broadcastChannel: "peptok_analytics_sync",
+      syncInterval: 6000,
+    },
+  });
 
   const availableMetrics = [
     "user_registrations",

@@ -692,14 +692,13 @@ export default function MentorshipRequestDetails() {
             </Card>
 
             {/* Team Member Management */}
-            {user?.userType === "company_admin" && (
-              <TeamMemberManagementCard
-                teamMembers={teamMembers}
-                onUpdateTeamMembers={handleUpdateTeamMembers}
-                programTitle={request.title}
-                programId={request.id}
-              />
-            )}
+            <TeamMemberManagementCard
+              teamMembers={teamMembers}
+              onUpdateTeamMembers={handleUpdateTeamMembers}
+              programTitle={request.title}
+              programId={request.id}
+              readOnly={user?.userType !== "company_admin"}
+            />
           </div>
 
           {/* Sidebar */}

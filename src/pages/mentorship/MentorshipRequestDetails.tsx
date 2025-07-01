@@ -144,6 +144,7 @@ export default function MentorshipRequestDetails() {
           };
 
           setRequest(mockRequest);
+          setTeamMembers(mockRequest.teamMembers || []);
         }
 
         // Mock matched coaches data

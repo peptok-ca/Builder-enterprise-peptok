@@ -26,6 +26,7 @@ import CreateMentorshipRequest from "./pages/mentorship/CreateMentorshipRequest"
 import MentorshipRequestDetails from "./pages/mentorship/MentorshipRequestDetails";
 import { CoachMatching } from "./pages/coach/CoachMatching";
 import { CoachDashboard } from "./pages/coach/CoachDashboard";
+import CoachSettings from "./pages/coach/CoachSettings";
 import InvitationAccept from "./pages/InvitationAccept";
 import TestPermissions from "./pages/TestPermissions";
 import Terms from "./pages/Terms";
@@ -177,6 +178,14 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute allowedRoles={["coach"]}>
                     <CoachDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/coach/settings"
+                element={
+                  <ProtectedRoute allowedRoles={["coach"]}>
+                    <CoachSettings />
                   </ProtectedRoute>
                 }
               />

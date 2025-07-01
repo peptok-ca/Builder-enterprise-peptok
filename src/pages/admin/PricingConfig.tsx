@@ -93,6 +93,7 @@ export default function PricingConfig() {
       companyServiceFee: 0.1,
       coachCommission: 0.2,
       additionalParticipantFee: 25,
+      maxParticipantsIncluded: 1,
       currency: "CAD",
       lastUpdated: new Date().toISOString(),
     });

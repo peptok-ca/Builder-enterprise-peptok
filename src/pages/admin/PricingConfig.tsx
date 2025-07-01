@@ -397,14 +397,54 @@ export default function PricingConfig() {
 
               <Separator className="my-6" />
 
-              <div className="text-center text-sm text-gray-600">
-                <p>
-                  Last updated: {new Date(config.lastUpdated).toLocaleString()}
-                </p>
-                <p className="mt-1">
-                  Changes will be reflected across all pricing displays and
-                  calculations immediately after saving.
-                </p>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <h4 className="font-semibold text-gray-900 mb-2">
+                    Platform-Wide Implementation
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                      <div className="font-semibold text-green-900">
+                        Active Components
+                      </div>
+                      <div className="text-green-700">
+                        • Pricing Calculator
+                        <br />
+                        • Mentorship Request Costs
+                        <br />
+                        • Session Management
+                        <br />• Coach Earnings Display
+                      </div>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <div className="font-semibold text-blue-900">
+                        Usage Impact
+                      </div>
+                      <div className="text-blue-700">
+                        • All company cost estimates
+                        <br />
+                        • Coach commission calculations
+                        <br />
+                        • Session pricing displays
+                        <br />• Revenue tracking
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center text-sm text-gray-600">
+                  <p>
+                    Last updated:{" "}
+                    {new Date(config.lastUpdated).toLocaleString()}
+                  </p>
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Note:</strong> Changes will be reflected across
+                      all pricing displays and calculations immediately after
+                      saving.
+                    </p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

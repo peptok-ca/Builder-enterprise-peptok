@@ -64,7 +64,10 @@ export default function Pricing() {
     const platformFee =
       user?.userType === "company"
         ? subtotal * pricingConfig.companyServiceFee
-        : baseSessionsCost * pricingConfig.coachCommission;
+        : Math.max(
+            baseSessionsCost * pricingConfig.coachCommission,
+            (pricingConfig.minCoachCommissionAmount || 0) * sessions,
+          );
 
     const totalCost = subtotal + platformFee;
 

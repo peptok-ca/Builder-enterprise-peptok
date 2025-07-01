@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { websocketService, Notification } from "@/services/websocket";
+import { useSyncStatus } from "@/hooks/useCrossBrowserSync";
 
 interface HeaderProps {
   userType?: "platform_admin" | "company_admin" | "coach";

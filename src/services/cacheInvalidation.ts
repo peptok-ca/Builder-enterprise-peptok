@@ -314,7 +314,10 @@ class CacheInvalidationService {
     return (
       key.includes("platform") ||
       key.includes("admin") ||
-      key.includes("global")
+      key.includes("global") ||
+      key.includes("security") ||
+      key.includes("analytics") ||
+      key.includes("audit")
     );
   }
 

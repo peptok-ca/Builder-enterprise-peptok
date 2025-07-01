@@ -41,6 +41,31 @@ export interface AcceptInvitationData {
 }
 
 class InvitationService {
+  constructor() {
+    // Ensure database connection on service initialization
+    this.verifyDatabaseConnection();
+  }
+
+  /**
+   * Verify database connection before operations
+   */
+  private async verifyDatabaseConnection(): Promise<void> {
+    if (!databaseConfig.isDatabaseReady()) {
+      console.log("🗃️ Database not ready, testing connection...");
+      await databaseConfig.refreshDatabaseConnection();
+
+      if (!databaseConfig.isDatabaseReady()) {
+        toast.error("❌ Backend database unavailable", {
+          description: "All invitation operations require database connection",
+          duration: 8000,
+        });
+        throw new Error(
+          "Backend database connection required for invitation operations",
+        );
+      }
+    }
+  }
+
   /**
    * Create a new team member invitation - Backend Database Only
    */

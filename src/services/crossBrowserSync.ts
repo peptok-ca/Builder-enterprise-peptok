@@ -299,6 +299,18 @@ export const SYNC_CONFIGS = {
     broadcastChannel: "peptok_settings_sync",
     syncInterval: 6000,
   },
+  SECURITY_SETTINGS: {
+    storageKey: "peptok_security_settings",
+    cookieKey: "peptok_security",
+    broadcastChannel: "peptok_security_sync",
+    syncInterval: 5000,
+  },
+  ANALYTICS_SETTINGS: {
+    storageKey: "peptok_analytics_settings",
+    cookieKey: "peptok_analytics",
+    broadcastChannel: "peptok_analytics_sync",
+    syncInterval: 6000,
+  },
   AUDIT_LOG: {
     storageKey: "peptok_platform_audit_log",
     cookieKey: "peptok_audit",

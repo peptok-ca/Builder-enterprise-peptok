@@ -452,18 +452,35 @@ export default function PricingConfig() {
                   <div className="text-sm text-green-800 space-y-1">
                     <div>Session Revenue: $150/hour</div>
                     <div>
-                      Platform Commission (
+                      Percentage Commission (
                       {(config.coachCommission * 100).toFixed(1)}%): $
                       {(150 * config.coachCommission).toFixed(2)}
                     </div>
+                    <div>
+                      Minimum Commission: ${config.minCoachCommissionAmount}
+                    </div>
+                    <div>
+                      Actual Commission: $
+                      {Math.max(
+                        150 * config.coachCommission,
+                        config.minCoachCommissionAmount,
+                      ).toFixed(2)}
+                    </div>
                     <div className="font-semibold border-t border-green-300 pt-1 mt-2">
                       Coach Earnings: $
-                      {(150 * (1 - config.coachCommission)).toFixed(2)}{" "}
+                      {(
+                        150 -
+                        Math.max(
+                          150 * config.coachCommission,
+                          config.minCoachCommissionAmount,
+                        )
+                      ).toFixed(2)}{" "}
                       {config.currency}
                     </div>
                     <div className="text-xs text-green-600 mt-2 pt-1 border-t border-green-300">
                       Note: Coach earnings are per session, regardless of
-                      participant count.
+                      participant count. Commission is the higher of percentage
+                      or minimum amount.
                     </div>
                   </div>
                 </div>

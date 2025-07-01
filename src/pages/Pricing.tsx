@@ -53,8 +53,9 @@ export default function Pricing() {
   const calculateCosts = () => {
     const sessionCost = (coachRate * sessionDuration) / 60;
     const baseSessionsCost = sessions * sessionCost;
+    const maxIncluded = pricingConfig.maxParticipantsIncluded || 1;
     const additionalParticipantsCost =
-      Math.max(0, participants - 1) *
+      Math.max(0, participants - maxIncluded) *
       pricingConfig.additionalParticipantFee *
       sessions;
     const subtotal = baseSessionsCost + additionalParticipantsCost;

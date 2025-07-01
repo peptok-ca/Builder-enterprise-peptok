@@ -644,10 +644,27 @@ export default function PricingConfig() {
                 </div>
 
                 <div className="text-center text-sm text-gray-600">
-                  <p>
-                    Last updated:{" "}
-                    {new Date(config.lastUpdated).toLocaleString()}
-                  </p>
+                  <div className="space-y-2">
+                    <p>
+                      Last updated:{" "}
+                      {new Date(config.lastUpdated).toLocaleString()}
+                    </p>
+                    {lastSyncTime && (
+                      <p className="text-xs text-green-600">
+                        Last synchronized: {lastSyncTime}
+                      </p>
+                    )}
+                    <div className="flex justify-center items-center gap-2 text-xs">
+                      <span
+                        className={`inline-block w-2 h-2 rounded-full ${storageSource === "backend" ? "bg-green-500" : "bg-blue-500"}`}
+                      ></span>
+                      <span>
+                        {storageSource === "backend"
+                          ? "Stored in backend database - shared across all admins"
+                          : "Stored in centralized platform storage - accessible to all platform admins"}
+                      </span>
+                    </div>
+                  </div>
                   <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <p className="text-sm text-yellow-800">
                       <strong>Note:</strong> Changes will be reflected across

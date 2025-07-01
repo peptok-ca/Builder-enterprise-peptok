@@ -181,6 +181,342 @@ class EnhancedApiService {
 
   // ===== COACH-SPECIFIC METHODS =====
 
+  async getCoachProfile(coachId: string): Promise<any> {
+    const user = checkAuthorization(["coach", "platform_admin"], coachId);
+
+    try {
+      const response = await this.request<any>(`/coaches/${coachId}/profile`);
+
+      analytics.trackAction({
+        action: "coach_profile_viewed",
+        component: "coach_api",
+        metadata: { coachId },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock profile:", error);
+
+      // Return mock profile data
+      return {
+        id: coachId,
+        name: user.name || "Coach Name",
+        email: user.email || "coach@example.com",
+        bio: "Experienced coach with expertise in leadership development and team building.",
+        skills: [
+          "Leadership",
+          "Team Building",
+          "Communication",
+          "Problem Solving",
+        ],
+        experience: 5,
+        rating: 4.8,
+        totalRatings: 127,
+        hourlyRate: 150,
+        currency: "USD",
+        availability: {
+          timezone: "EST",
+          schedule: [
+            {
+              day: "Monday",
+              startTime: "09:00",
+              endTime: "17:00",
+              available: true,
+            },
+            {
+              day: "Tuesday",
+              startTime: "09:00",
+              endTime: "17:00",
+              available: true,
+            },
+            {
+              day: "Wednesday",
+              startTime: "09:00",
+              endTime: "17:00",
+              available: true,
+            },
+            {
+              day: "Thursday",
+              startTime: "09:00",
+              endTime: "17:00",
+              available: true,
+            },
+            {
+              day: "Friday",
+              startTime: "09:00",
+              endTime: "15:00",
+              available: true,
+            },
+            {
+              day: "Saturday",
+              startTime: "10:00",
+              endTime: "14:00",
+              available: false,
+            },
+            {
+              day: "Sunday",
+              startTime: "10:00",
+              endTime: "14:00",
+              available: false,
+            },
+          ],
+        },
+        certifications: ["ICF Certified", "Leadership Training Certificate"],
+        languages: ["English", "Spanish"],
+        profileImage: `https://api.dicebear.com/7.x/avataaars/svg?seed=${coachId}`,
+        isActive: true,
+        joinedAt: "2024-01-01T00:00:00Z",
+      };
+    }
+  }
+
+  async getCoachStats(coachId: string): Promise<any> {
+    const user = checkAuthorization(["coach", "platform_admin"], coachId);
+
+    try {
+      const response = await this.request<any>(`/coaches/${coachId}/stats`);
+
+      analytics.trackAction({
+        action: "coach_stats_viewed",
+        component: "coach_api",
+        metadata: { coachId },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock stats:", error);
+
+      // Calculate stats from matches or return mock data
+      const matches = await this.getCoachMatches(coachId);
+      const completedMatches = matches.filter((m) => m.status === "completed");
+      const inProgressMatches = matches.filter(
+        (m) => m.status === "in_progress",
+      );
+
+      return {
+        totalSessions: matches.length,
+        completedSessions: completedMatches.length,
+        averageRating: 4.8,
+        totalEarnings: completedMatches.length * 150,
+        thisMonthEarnings: Math.floor(completedMatches.length * 150 * 0.3),
+        upcomingSessions: inProgressMatches.length,
+        responseTime: 2.5,
+        successRate:
+          completedMatches.length > 0
+            ? (completedMatches.length / matches.length) * 100
+            : 95,
+        repeatClients: Math.floor(completedMatches.length * 0.4),
+        totalClients: Math.max(completedMatches.length, 10),
+        profileViews: 234,
+        matchAcceptanceRate: 85,
+      };
+    }
+  }
+
+  async getCoachSessions(
+    coachId: string,
+    params?: {
+      status?: string;
+      limit?: number;
+      offset?: number;
+    },
+  ): Promise<any[]> {
+    const user = checkAuthorization(["coach", "platform_admin"], coachId);
+
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.status) queryParams.append("status", params.status);
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.offset)
+        queryParams.append("offset", params.offset.toString());
+
+      const response = await this.request<any[]>(
+        `/coaches/${coachId}/sessions?${queryParams.toString()}`,
+      );
+
+      analytics.trackAction({
+        action: "coach_sessions_viewed",
+        component: "coach_api",
+        metadata: { coachId, params },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock sessions:", error);
+
+      // Return mock sessions
+      const mockSessions = [
+        {
+          id: "session-1",
+          title: "Leadership Development Session",
+          description: "Weekly leadership coaching for senior managers",
+          startTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+          endTime: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
+          status: "scheduled",
+          participants: [
+            {
+              id: "p1",
+              name: "John Doe",
+              email: "john@company.com",
+              role: "manager",
+            },
+            {
+              id: "p2",
+              name: "Jane Smith",
+              email: "jane@company.com",
+              role: "director",
+            },
+          ],
+          companyName: "TechCorp Inc.",
+          meetingLink: "https://meet.google.com/abc-defg-hij",
+          earnings: 200,
+          currency: "USD",
+        },
+        {
+          id: "session-2",
+          title: "Team Communication Workshop",
+          description: "Improving team communication and collaboration",
+          startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          endTime: new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString(),
+          status: "scheduled",
+          participants: [
+            {
+              id: "p3",
+              name: "Mike Wilson",
+              email: "mike@startup.com",
+              role: "team_lead",
+            },
+          ],
+          companyName: "StartupCo",
+          meetingLink: "https://meet.google.com/xyz-uvw-rst",
+          earnings: 150,
+          currency: "USD",
+        },
+      ];
+
+      // Filter by status if provided
+      if (params?.status) {
+        return mockSessions.filter(
+          (session) => session.status === params.status,
+        );
+      }
+
+      // Apply limit if provided
+      if (params?.limit) {
+        return mockSessions.slice(0, params.limit);
+      }
+
+      return mockSessions;
+    }
+  }
+
+  async getCoachActivity(
+    coachId: string,
+    params?: {
+      limit?: number;
+      type?: string;
+    },
+  ): Promise<any[]> {
+    const user = checkAuthorization(["coach", "platform_admin"], coachId);
+
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.type) queryParams.append("type", params.type);
+
+      const response = await this.request<any[]>(
+        `/coaches/${coachId}/activity?${queryParams.toString()}`,
+      );
+
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock activity:", error);
+
+      // Return mock activity data
+      return [
+        {
+          id: "1",
+          type: "match_request",
+          title: "New Match Request",
+          description: "Leadership development for TechCorp Inc.",
+          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          metadata: { companyName: "TechCorp Inc." },
+        },
+        {
+          id: "2",
+          type: "session_completed",
+          title: "Session Completed",
+          description: "Team communication workshop completed successfully",
+          timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          metadata: { rating: 5 },
+        },
+        {
+          id: "3",
+          type: "payment_received",
+          title: "Payment Received",
+          description: "$200 for leadership coaching session",
+          timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+          metadata: { amount: 200 },
+        },
+        {
+          id: "4",
+          type: "rating_received",
+          title: "5-Star Rating",
+          description: "Excellent feedback from StartupCo team",
+          timestamp: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
+          metadata: { rating: 5 },
+        },
+        {
+          id: "5",
+          type: "profile_view",
+          title: "Profile Viewed",
+          description: "Your profile was viewed by 3 potential clients",
+          timestamp: new Date(Date.now() - 96 * 60 * 60 * 1000).toISOString(),
+          metadata: { views: 3 },
+        },
+      ].slice(0, params?.limit || 20);
+    }
+  }
+
+  async updateCoachProfile(coachId: string, profileData: any): Promise<any> {
+    const user = checkAuthorization(["coach"], coachId);
+
+    try {
+      const response = await this.request<any>(`/coaches/${coachId}/profile`, {
+        method: "PUT",
+        body: JSON.stringify(profileData),
+      });
+
+      analytics.trackAction({
+        action: "coach_profile_updated",
+        component: "coach_api",
+        metadata: { coachId },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, profile update stored locally:", error);
+
+      // Store in localStorage as fallback
+      const storageKey = `coach_profile_${coachId}`;
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          ...profileData,
+          updatedAt: new Date().toISOString(),
+        }),
+      );
+
+      analytics.trackAction({
+        action: "coach_profile_updated_local",
+        component: "coach_api",
+        metadata: { coachId },
+      });
+
+      return profileData;
+    }
+  }
+
   async getCoachMatches(coachId?: string): Promise<MentorshipRequest[]> {
     const user = checkAuthorization(["coach", "platform_admin"]);
     const targetCoachId = coachId || user.id;

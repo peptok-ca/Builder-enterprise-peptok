@@ -19,6 +19,7 @@ import { apiEnhanced } from "@/services/apiEnhanced";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/layout/Header";
 import { validatePricingConfiguration } from "@/utils/validatePricingConfig";
+import { usePricingConfigSync } from "@/hooks/useCrossBrowserSync";
 
 interface PricingConfiguration {
   companyServiceFee: number;

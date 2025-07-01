@@ -290,6 +290,98 @@ const TeamMemberDashboard = () => {
     setSelectedSession(null);
   };
 
+  const handleAcceptInvitation = async (invitation: TeamInvitation) => {
+    if (!user) {
+      toast.error("Please log in to accept invitations");
+      return;
+    }
+
+    setAcceptingInvitation(invitation.id);
+
+    try {
+      // Since user is already logged in, we just need to accept the invitation
+      const result = await invitationService.acceptInvitation(
+        invitation.token,
+        {
+          firstName: user.firstName || "User",
+          lastName: user.lastName || "",
+          password: "existing-user",
+          acceptTerms: true,
+        },
+      );
+
+      if (result.success) {
+        toast.success(`🎉 Welcome to ${invitation.programTitle}!`, {
+          description:
+            "You've successfully joined the program. Check your programs tab for details.",
+          duration: 5000,
+        });
+
+        // Remove from pending invitations
+        setPendingInvitations((prev) =>
+          prev.filter((inv) => inv.id !== invitation.id),
+        );
+
+        // Add to programs if not already there
+        const newProgram: TeamMemberProgram = {
+          id: invitation.programId,
+          title: invitation.programTitle,
+          description:
+            invitation.metadata?.programDescription ||
+            `Join the ${invitation.programTitle} program`,
+          coach: {
+            name: "Assigned Coach",
+            title: "Professional Coach",
+            avatar: "https://avatar.vercel.sh/coach@example.com",
+          },
+          role: invitation.role,
+          status: "active",
+          progress: 0,
+          totalSessions: invitation.metadata?.sessionCount || 8,
+          completedSessions: 0,
+        };
+
+        setPrograms((prev) => {
+          const exists = prev.some((p) => p.id === invitation.programId);
+          return exists ? prev : [...prev, newProgram];
+        });
+      } else {
+        toast.error(result.error || "Failed to accept invitation");
+      }
+    } catch (error) {
+      console.error("Failed to accept invitation:", error);
+      toast.error("An error occurred while accepting the invitation");
+    } finally {
+      setAcceptingInvitation(null);
+    }
+  };
+
+  const handleDeclineInvitation = async (invitation: TeamInvitation) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to decline the invitation to join "${invitation.programTitle}"? This action cannot be undone.`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const success = await invitationService.declineInvitation(
+        invitation.token,
+      );
+
+      if (success) {
+        toast.success("Invitation declined");
+        setPendingInvitations((prev) =>
+          prev.filter((inv) => inv.id !== invitation.id),
+        );
+      } else {
+        toast.error("Failed to decline invitation");
+      }
+    } catch (error) {
+      console.error("Failed to decline invitation:", error);
+      toast.error("An error occurred while declining the invitation");
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "upcoming":

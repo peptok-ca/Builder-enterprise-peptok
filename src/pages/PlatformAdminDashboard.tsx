@@ -421,7 +421,16 @@ export default function PlatformAdminDashboard() {
         revenue: 0,
       };
 
-      setCompanies([...companies, company]);
+      const updatedCompanies = [...companies, company];
+      setCompanies(updatedCompanies);
+
+      // Sync across browsers
+      crossBrowserSync.save(
+        SYNC_CONFIGS.COMPANY_MANAGEMENT,
+        { companies: updatedCompanies },
+        { id: user?.id || "admin", name: user?.name || "Platform Admin" },
+      );
+
       setIsCreateCompanyOpen(false);
       setNewCompany({
         name: "",

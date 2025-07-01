@@ -226,29 +226,14 @@ class InvitationService {
   /**
    * Get all invitations for a program or company
    */
-  getInvitations(filters?: {
+  async getInvitations(filters?: {
     programId?: string;
     companyId?: string;
     status?: TeamInvitation["status"];
-  }): TeamInvitation[] {
+  }): Promise<TeamInvitation[]> {
     try {
-      let invitations = this.getAllInvitations();
-
-      if (filters?.programId) {
-        invitations = invitations.filter(
-          (inv) => inv.programId === filters.programId,
-        );
-      }
-      if (filters?.companyId) {
-        invitations = invitations.filter(
-          (inv) => inv.companyId === filters.companyId,
-        );
-      }
-      if (filters?.status) {
-        invitations = invitations.filter(
-          (inv) => inv.status === filters.status,
-        );
-      }
+      // Use backend API for getting invitations
+      const invitations = await apiEnhanced.getTeamInvitations(filters);
 
       return invitations.sort(
         (a, b) =>

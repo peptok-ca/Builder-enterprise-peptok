@@ -210,8 +210,8 @@ export default function MentorshipRequestDetails() {
     fetchPricingConfig();
   }, []);
 
-  const calculateTotalCost = (hourlyRate: number) => {
-    if (!request) return 0;
+  const calculateDetailedCosts = (hourlyRate: number) => {
+    if (!request) return null;
 
     const startDate = new Date(request.timeline.startDate);
     const endDate = new Date(request.timeline.endDate);
@@ -229,7 +229,8 @@ export default function MentorshipRequestDetails() {
           : 1;
 
     const totalSessions = sessionsPerWeek * totalWeeks;
-    const baseSessionCost = hourlyRate * hoursPerSession * totalSessions;
+    const sessionCost = hourlyRate * hoursPerSession;
+    const baseSessionsCost = sessionCost * totalSessions;
 
     // Additional participants cost (team members - 1, since first participant is included)
     const additionalParticipants = Math.max(0, request.teamMembers.length - 1);
@@ -238,10 +239,28 @@ export default function MentorshipRequestDetails() {
       pricingConfig.additionalParticipantFee *
       totalSessions;
 
-    const subtotal = baseSessionCost + additionalParticipantsCost;
+    const subtotal = baseSessionsCost + additionalParticipantsCost;
     const serviceFee = subtotal * pricingConfig.companyServiceFee;
+    const totalProgramCost = subtotal + serviceFee;
 
-    return subtotal + serviceFee;
+    return {
+      hourlyRate,
+      sessionCost,
+      totalSessions,
+      baseSessionsCost,
+      additionalParticipants,
+      additionalParticipantsCost,
+      serviceFee,
+      serviceFeePct: pricingConfig.companyServiceFee * 100,
+      totalProgramCost,
+      avgCostPerSession: totalProgramCost / totalSessions,
+      currency: pricingConfig.currency,
+    };
+  };
+
+  const calculateTotalCost = (hourlyRate: number) => {
+    const costs = calculateDetailedCosts(hourlyRate);
+    return costs ? costs.totalProgramCost : 0;
   };
 
   const getAvailabilityColor = (availability: string) => {

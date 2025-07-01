@@ -201,6 +201,7 @@ export default function PricingConfig() {
       lastUpdated: new Date().toISOString(),
     });
     setHasChanges(true);
+    hasChangesRef.current = true;
   };
 
   if (user?.userType !== "platform_admin") {

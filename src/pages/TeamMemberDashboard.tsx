@@ -259,19 +259,39 @@ const TeamMemberDashboard = () => {
         setPrograms(mockPrograms);
 
         // Load pending invitations
-        if (user?.email) {
-          const userPendingInvitations =
-            invitationService.getPendingInvitations(user.email);
-          setPendingInvitations(userPendingInvitations);
+        try {
+          if (user?.email) {
+            console.log("Loading pending invitations for:", user.email);
+            const userPendingInvitations =
+              invitationService.getPendingInvitations(user.email);
+            console.log("Found pending invitations:", userPendingInvitations);
+            setPendingInvitations(userPendingInvitations);
+          }
+        } catch (invitationError) {
+          console.error("Failed to load pending invitations:", invitationError);
+          // Don't fail the entire dashboard for invitation errors
+          setPendingInvitations([]);
         }
+
+        console.log("Dashboard data loaded successfully");
       } catch (error) {
-        toast.error("Failed to load dashboard data");
+        console.error("Failed to load dashboard data:", error);
+        toast.error("Some dashboard data couldn't be loaded");
+        // Set fallback data instead of failing completely
+        setSessions([]);
+        setPrograms([]);
+        setPendingInvitations([]);
       } finally {
         setLoading(false);
       }
     };
 
-    loadDashboardData();
+    if (user) {
+      loadDashboardData();
+    } else {
+      // If no user, still set loading to false
+      setLoading(false);
+    }
   }, [user]);
 
   const handleRateSession = (session: TeamMemberSession) => {

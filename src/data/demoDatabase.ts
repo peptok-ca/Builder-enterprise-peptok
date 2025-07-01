@@ -51,12 +51,24 @@ export interface DemoMentorshipRequest {
     max: number;
     currency: string;
   };
-  timeline: string;
+  timeline: {
+    startDate: string;
+    endDate: string;
+    sessionFrequency: "weekly" | "bi-weekly" | "monthly";
+    hoursPerSession: number;
+    totalSessions: number;
+  };
   priority: "high" | "medium" | "low";
   status: "pending" | "in_progress" | "completed" | "cancelled";
   assignedCoachId?: string;
   createdAt: string;
   updatedAt: string;
+  teamMembers: Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  }>;
   goals: Array<{
     id: string;
     title: string;

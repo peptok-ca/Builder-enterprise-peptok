@@ -82,10 +82,16 @@ const TeamMemberDashboard = () => {
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<TeamMemberSession[]>([]);
   const [programs, setPrograms] = useState<TeamMemberProgram[]>([]);
+  const [pendingInvitations, setPendingInvitations] = useState<
+    TeamInvitation[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] =
     useState<TeamMemberSession | null>(null);
+  const [acceptingInvitation, setAcceptingInvitation] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const loadDashboardData = async () => {

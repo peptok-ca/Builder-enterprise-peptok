@@ -281,17 +281,20 @@ class InvitationService {
   }
 
   /**
-   * Resend invitation
+   * Resend invitation - Backend Database Only
    */
   async resendInvitation(invitationId: string): Promise<boolean> {
     try {
-      // Use backend API for resending invitations
+      console.log(
+        `🗃️ Resending invitation ${invitationId} via backend database`,
+      );
+
+      // Use backend API for resending invitations - NO localStorage
       const success = await apiEnhanced.resendTeamInvitation(invitationId);
 
       if (success) {
-        // Get updated invitation to send email
-        const invitations = this.getAllInvitations();
-        const invitation = invitations.find((inv) => inv.id === invitationId);
+        // Get updated invitation from backend database to send email
+        const invitation = await this.getInvitationFromDatabase(invitationId);
 
         if (invitation) {
           const invitationLink = `${window.location.origin}/invitation/accept?token=${invitation.token}`;
@@ -307,14 +310,59 @@ class InvitationService {
           };
 
           await emailService.sendTeamInvitation(invitation.email, emailData);
+          console.log(`✅ Resent invitation ${invitationId} and sent email`);
+        } else {
+          console.warn(
+            `⚠️ Could not retrieve invitation ${invitationId} from database for email`,
+          );
         }
       }
 
       return success;
     } catch (error) {
-      console.error("Failed to resend invitation:", error);
+      console.error(
+        "❌ Failed to resend invitation via backend database:",
+        error,
+      );
       return false;
     }
+  }
+
+  /**
+   * Get invitation from backend database by ID
+   */
+  private async getInvitationFromDatabase(
+    invitationId: string,
+  ): Promise<TeamInvitation | null> {
+    const backendEndpoints = [
+      `/api/team/invitations/${invitationId}`,
+      `/api/invitations/${invitationId}`,
+      `/team/invitations/${invitationId}`,
+    ];
+
+    for (const endpoint of backendEndpoints) {
+      try {
+        const response = await fetch(endpoint, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Database-Read": "required",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.data && data.data.id && !data.data.id.includes("temp_")) {
+            return data.data;
+          }
+        }
+      } catch (error) {
+        console.warn(`Failed to get invitation from ${endpoint}:`, error);
+        continue;
+      }
+    }
+
+    return null;
   }
 
   /**

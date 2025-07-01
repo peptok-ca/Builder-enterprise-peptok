@@ -138,10 +138,22 @@ export function TeamMemberManagementCard({
       setNewMemberName("");
       setNewMemberRole("participant");
 
-      toast.success(
-        `✅ Team member invitation ${isOnline ? "sent" : "queued"} for ${newMemberEmail}! ${isOnline ? "They will receive an email to join the program." : "Will be sent when back online."}`,
-        { duration: 5000 },
-      );
+      // Check if emails are in mock mode
+      const isMockEmail =
+        import.meta.env.DEV || import.meta.env.VITE_MOCK_EMAIL === "true";
+
+      if (isMockEmail) {
+        toast.success(`✅ Team member added to program: ${newMemberEmail}`, {
+          description:
+            "🔧 Development Mode: Email invitation simulated. In production, they would receive an email to join the program.",
+          duration: 7000,
+        });
+      } else {
+        toast.success(
+          `✅ Team member invitation ${isOnline ? "sent" : "queued"} for ${newMemberEmail}! ${isOnline ? "They will receive an email to join the program." : "Will be sent when back online."}`,
+          { duration: 5000 },
+        );
+      }
     } catch (error) {
       console.error("Failed to add team member:", error);
       toast.error("Failed to send invitation email. Please try again.");

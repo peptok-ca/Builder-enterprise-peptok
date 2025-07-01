@@ -36,6 +36,7 @@ import { invitationService } from "@/services/invitationService";
 import { offlineApi } from "@/services/offlineApiWrapper";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
+import { EmailServiceStatus } from "@/components/common/EmailServiceStatus";
 
 interface TeamMemberManagementCardProps {
   teamMembers: TeamMember[];

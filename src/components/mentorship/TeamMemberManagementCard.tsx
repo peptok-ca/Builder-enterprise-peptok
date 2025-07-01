@@ -81,6 +81,30 @@ export function TeamMemberManagementCard({
     setIsInviting(true);
 
     try {
+      // Create invitation using the new service
+      const invitation = await invitationService.createInvitation({
+        email: newMemberEmail.toLowerCase(),
+        name: newMemberName.trim() || undefined,
+        programId: programId || `program-${Date.now()}`,
+        programTitle: programTitle || "Mentorship Program",
+        companyId: user?.companyId || `company-${Date.now()}`,
+        companyName: user?.businessDetails?.companyName || "Your Company",
+        inviterName: user
+          ? `${user.firstName} ${user.lastName}`
+          : "Your program administrator",
+        inviterEmail: user?.email || "admin@company.com",
+        role: newMemberRole,
+        metadata: {
+          programDescription: `Join our ${programTitle} mentorship program`,
+          sessionCount: 8,
+          duration: "8 weeks",
+          startDate: new Date().toISOString(),
+          endDate: new Date(
+            Date.now() + 8 * 7 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+        },
+      });
+
       // Create new team member entry
       const newTeamMember: TeamMember = {
         id: `member-${Date.now()}`,
@@ -90,26 +114,6 @@ export function TeamMemberManagementCard({
         status: "invited",
         invitedAt: new Date().toISOString(),
       };
-
-      // Send invitation email
-      const invitationData = {
-        inviterName: user
-          ? `${user.firstName} ${user.lastName}`
-          : "Your program administrator",
-        companyName: user?.businessDetails?.companyName || "Your Company",
-        role: newMemberRole,
-        invitationLink: `${window.location.origin}/invitation/accept?token=${btoa(newMemberEmail + ":" + Date.now())}`,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      };
-
-      const emailSent = await emailService.sendTeamInvitation(
-        newMemberEmail.toLowerCase(),
-        invitationData,
-      );
-
-      if (!emailSent) {
-        throw new Error("Failed to send invitation email");
-      }
 
       // Add to team members list
       onUpdateTeamMembers([...teamMembers, newTeamMember]);
@@ -157,19 +161,38 @@ export function TeamMemberManagementCard({
     if (!member) return;
 
     try {
-      const invitationData = {
-        inviterName: user
-          ? `${user.firstName} ${user.lastName}`
-          : "Your program administrator",
-        companyName: user?.businessDetails?.companyName || "Your Company",
-        role: member.role,
-        invitationLink: `${window.location.origin}/invitation/accept?token=${btoa(member.email + ":" + Date.now())}`,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      };
+      // Find the invitation and resend it
+      const invitations = invitationService.getInvitations({
+        companyId: user?.companyId,
+      });
+      const invitation = invitations.find((inv) => inv.email === member.email);
 
-      await emailService.sendTeamInvitation(member.email, invitationData);
-      toast.success(`Invitation resent to ${member.email}`);
+      if (invitation) {
+        const success = await invitationService.resendInvitation(invitation.id);
+        if (success) {
+          toast.success(`Invitation resent to ${member.email}`);
+        } else {
+          throw new Error("Failed to resend invitation");
+        }
+      } else {
+        // Create new invitation if original not found
+        await invitationService.createInvitation({
+          email: member.email,
+          name: member.name,
+          programId: programId || `program-${Date.now()}`,
+          programTitle: programTitle || "Mentorship Program",
+          companyId: user?.companyId || `company-${Date.now()}`,
+          companyName: user?.businessDetails?.companyName || "Your Company",
+          inviterName: user
+            ? `${user.firstName} ${user.lastName}`
+            : "Your program administrator",
+          inviterEmail: user?.email || "admin@company.com",
+          role: member.role,
+        });
+        toast.success(`New invitation sent to ${member.email}`);
+      }
     } catch (error) {
+      console.error("Failed to resend invitation:", error);
       toast.error("Failed to resend invitation");
     }
   };

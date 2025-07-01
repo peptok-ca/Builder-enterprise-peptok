@@ -347,8 +347,10 @@ class AuthService {
         state: this.generateState(),
       });
 
-      // Store state for validation
-      localStorage.setItem("oauth_state", params.get("state") || "");
+      // Store state for validation in backend database
+      await backendStorage.setItem("oauth_state", params.get("state") || "", {
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(), // 10 minutes
+      });
 
       // In development, simulate OAuth response
       if (import.meta.env.DEV) {

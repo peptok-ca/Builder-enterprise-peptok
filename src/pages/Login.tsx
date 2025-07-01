@@ -14,10 +14,24 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Logo from "@/components/ui/logo";
-import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  AlertCircle,
+  Loader2,
+  Users,
+  Building,
+  UserCheck,
+  Crown,
+} from "lucide-react";
 import { authService } from "@/services/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { getDemoLoginCredentials } from "@/data/demoDatabase";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -42,11 +56,24 @@ const Login = () => {
     toast.success("Check console for demo account debug info");
   };
 
+  // Get demo credentials organized by user type
+  const demoCredentials = getDemoLoginCredentials();
+  const platformAdmins = demoCredentials.filter(
+    (u) => u.userType === "platform_admin",
+  );
+  const companyAdmins = demoCredentials.filter(
+    (u) => u.userType === "company_admin",
+  );
+  const coaches = demoCredentials.filter((u) => u.userType === "coach");
+  const teamMembers = demoCredentials.filter(
+    (u) => u.userType === "team_member",
+  );
+
   // Quick demo login function
-  const quickDemoLogin = async () => {
+  const quickDemoLogin = async (email: string, password: string) => {
     setFormData({
-      email: "demo@platform.com",
-      password: "password123",
+      email,
+      password,
       rememberMe: false,
     });
 

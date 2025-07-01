@@ -162,6 +162,9 @@ export function TeamMemberManagementCard({
     const member = teamMembers.find((member) => member.id === memberId);
     if (!member) return;
 
+    // Add to resending set
+    setResendingIds((prev) => new Set(prev).add(memberId));
+
     try {
       // Find the invitation and resend it
       const invitations = invitationService.getInvitations({
@@ -172,7 +175,19 @@ export function TeamMemberManagementCard({
       if (invitation) {
         const success = await invitationService.resendInvitation(invitation.id);
         if (success) {
-          toast.success(`Invitation resent to ${member.email}`);
+          toast.success(`✅ Invitation resent to ${member.email}`, {
+            description:
+              "They will receive a new email with a fresh 7-day link",
+            duration: 4000,
+          });
+
+          // Update the member's invitedAt time to reflect the resend
+          const updatedMembers = teamMembers.map((m) =>
+            m.id === memberId
+              ? { ...m, invitedAt: new Date().toISOString() }
+              : m,
+          );
+          onUpdateTeamMembers(updatedMembers);
         } else {
           throw new Error("Failed to resend invitation");
         }
@@ -191,11 +206,31 @@ export function TeamMemberManagementCard({
           inviterEmail: user?.email || "admin@company.com",
           role: member.role,
         });
-        toast.success(`New invitation sent to ${member.email}`);
+
+        toast.success(`✅ New invitation sent to ${member.email}`, {
+          description: "They will receive an email to join the program",
+          duration: 4000,
+        });
+
+        // Update the member's invitedAt time
+        const updatedMembers = teamMembers.map((m) =>
+          m.id === memberId ? { ...m, invitedAt: new Date().toISOString() } : m,
+        );
+        onUpdateTeamMembers(updatedMembers);
       }
     } catch (error) {
       console.error("Failed to resend invitation:", error);
-      toast.error("Failed to resend invitation");
+      toast.error(`❌ Failed to resend invitation to ${member.email}`, {
+        description:
+          "Please try again or contact support if the issue persists",
+      });
+    } finally {
+      // Remove from resending set
+      setResendingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(memberId);
+        return newSet;
+      });
     }
   };
 

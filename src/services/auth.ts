@@ -197,7 +197,7 @@ class AuthService {
       );
 
       if (!user) {
-        console.error(`❌ No user found for email: "${normalizedEmail}"`);
+        console.error(`�� No user found for email: "${normalizedEmail}"`);
         console.log(
           "📋 Available demo emails:",
           mockUsers.map((u) => `"${u.email}"`),
@@ -559,20 +559,30 @@ class AuthService {
     }
   }
 
-  // Get saved business details for onboarding
-  getSavedBusinessDetails() {
+  // Get saved business details for onboarding from backend database
+  async getSavedBusinessDetails() {
     try {
-      const businessDetails = localStorage.getItem("peptok_business_details");
+      const businessDetails = await backendStorage.getItem(
+        "peptok_business_details",
+        {
+          userId: this.currentUser?.id,
+        },
+      );
       return businessDetails ? JSON.parse(businessDetails) : null;
     } catch (error) {
-      console.error("Failed to load business details:", error);
+      console.error(
+        "Failed to load business details from backend database:",
+        error,
+      );
       return null;
     }
   }
 
-  // Clear saved business details after onboarding
-  clearSavedBusinessDetails() {
-    localStorage.removeItem("peptok_business_details");
+  // Clear saved business details after onboarding from backend database
+  async clearSavedBusinessDetails() {
+    await backendStorage.removeItem("peptok_business_details", {
+      userId: this.currentUser?.id,
+    });
   }
 
   // Password reset (email)

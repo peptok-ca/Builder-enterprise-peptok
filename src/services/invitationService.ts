@@ -40,11 +40,8 @@ export interface AcceptInvitationData {
 }
 
 class InvitationService {
-  private readonly STORAGE_KEY = "peptok_team_invitations";
-  private readonly PENDING_INVITATIONS_KEY = "peptok_pending_invitations";
-
   /**
-   * Create a new team member invitation
+   * Create a new team member invitation - Backend Database Only
    */
   async createInvitation(data: {
     email: string;
@@ -59,7 +56,9 @@ class InvitationService {
     metadata?: TeamInvitation["metadata"];
   }): Promise<TeamInvitation> {
     try {
-      // Use backend API for invitation creation
+      console.log("🗃️ Creating invitation in backend database only");
+
+      // Use backend API for invitation creation - NO localStorage fallback
       const invitation = await apiEnhanced.createTeamInvitation({
         email: data.email.toLowerCase(),
         name: data.name,
@@ -72,6 +71,13 @@ class InvitationService {
         role: data.role,
         metadata: data.metadata,
       });
+
+      // Verify invitation was saved to database
+      if (!invitation.id || invitation.id.includes("temp_")) {
+        throw new Error("Invitation not properly saved to backend database");
+      }
+
+      console.log(`✅ Invitation ${invitation.id} saved to backend database`);
 
       // Send invitation email
       const invitationLink = `${window.location.origin}/invitation/accept?token=${invitation.token}`;
@@ -90,8 +96,13 @@ class InvitationService {
 
       return invitation;
     } catch (error) {
-      console.error("Failed to create invitation:", error);
-      throw new Error("Failed to create team invitation");
+      console.error(
+        "❌ Failed to create invitation in backend database:",
+        error,
+      );
+      throw new Error(
+        `Failed to create team invitation in backend database: ${error.message}`,
+      );
     }
   }
 

@@ -51,7 +51,17 @@ export default function PricingConfig() {
   useEffect(() => {
     fetchPricingConfig();
 
-    // Listen for configuration updates from other admin sessions
+    // Listen for GLOBAL configuration updates from ALL admin sessions
+    const handleGlobalConfigUpdate = (event: CustomEvent) => {
+      const updatedConfig = event.detail;
+      setConfig(updatedConfig);
+      setLastSyncTime(new Date().toLocaleString());
+      setStorageSource("local"); // Simulated backend
+      toast.info(
+        `Configuration updated by ${updatedConfig.updatedByName || "another admin"}`,
+      );
+    };
+
     const handleConfigUpdate = (event: CustomEvent) => {
       const updatedConfig = event.detail;
       setConfig(updatedConfig);
@@ -67,6 +77,23 @@ export default function PricingConfig() {
       }
     };
 
+    // Set up periodic sync to ensure ALL admins see the same data
+    const syncInterval = setInterval(() => {
+      // Silently check for updates every 10 seconds
+      fetchPricingConfig()
+        .then(() => {
+          // Update sync time only if data was actually refreshed
+          setLastSyncTime(new Date().toLocaleString());
+        })
+        .catch(() => {
+          // Ignore errors in background sync
+        });
+    }, 10000);
+
+    window.addEventListener(
+      "globalConfigUpdated",
+      handleGlobalConfigUpdate as EventListener,
+    );
     window.addEventListener(
       "platformConfigUpdated",
       handleConfigUpdate as EventListener,
@@ -77,6 +104,11 @@ export default function PricingConfig() {
     );
 
     return () => {
+      clearInterval(syncInterval);
+      window.removeEventListener(
+        "globalConfigUpdated",
+        handleGlobalConfigUpdate as EventListener,
+      );
       window.removeEventListener(
         "platformConfigUpdated",
         handleConfigUpdate as EventListener,

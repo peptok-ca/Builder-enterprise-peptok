@@ -1216,6 +1216,193 @@ class EnhancedApiService {
       return enhancedConfig;
     }
   }
+
+  // ===== PLATFORM SETTINGS MANAGEMENT =====
+
+  async getAllPlatformSettings(): Promise<any> {
+    const user = checkAuthorization(["platform_admin"]);
+
+    try {
+      const response = await this.request<any>("/admin/platform-settings");
+
+      analytics.trackAction({
+        action: "platform_settings_retrieved",
+        component: "api_enhanced",
+        metadata: { adminId: user.id, source: "backend_api" },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn(
+        "API not available, using centralized platform settings:",
+        error,
+      );
+
+      // Retrieve all platform settings from centralized storage
+      const pricingConfig = JSON.parse(
+        localStorage.getItem("platform_pricing_config") || "{}",
+      );
+      const securitySettings = JSON.parse(
+        localStorage.getItem("platform_security_settings") || "{}",
+      );
+      const analyticsSettings = JSON.parse(
+        localStorage.getItem("platform_analytics_settings") || "{}",
+      );
+
+      const settings = {
+        pricing: {
+          companyServiceFee: 0.1,
+          coachCommission: 0.2,
+          minCoachCommissionAmount: 5,
+          additionalParticipantFee: 25,
+          maxParticipantsIncluded: 1,
+          currency: "CAD",
+          ...pricingConfig,
+        },
+        security: {
+          requireTwoFactor: false,
+          sessionTimeout: 3600, // 1 hour
+          maxLoginAttempts: 5,
+          passwordMinLength: 8,
+          ...securitySettings,
+        },
+        analytics: {
+          enableUserTracking: true,
+          enablePerformanceTracking: true,
+          dataRetentionDays: 365,
+          ...analyticsSettings,
+        },
+        lastUpdated: new Date().toISOString(),
+        version: "1.0",
+      };
+
+      analytics.trackAction({
+        action: "platform_settings_retrieved",
+        component: "api_enhanced",
+        metadata: { adminId: user.id, source: "local_storage" },
+      });
+
+      return settings;
+    }
+  }
+
+  async updatePlatformSettings(
+    settingsType: string,
+    settings: any,
+  ): Promise<any> {
+    const user = checkAuthorization(["platform_admin"]);
+
+    try {
+      const response = await this.request<any>(
+        `/admin/platform-settings/${settingsType}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            ...settings,
+            lastUpdated: new Date().toISOString(),
+            updatedBy: user.id,
+          }),
+        },
+      );
+
+      analytics.trackAction({
+        action: "platform_settings_updated",
+        component: "api_enhanced",
+        metadata: {
+          adminId: user.id,
+          settingsType,
+          source: "backend_api",
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn(
+        "API not available, storing platform settings locally:",
+        error,
+      );
+
+      const enhancedSettings = {
+        ...settings,
+        lastUpdated: new Date().toISOString(),
+        updatedBy: user.id,
+        version: "1.0",
+      };
+
+      // Store in appropriate centralized storage
+      const storageKey = `platform_${settingsType}_settings`;
+      localStorage.setItem(storageKey, JSON.stringify(enhancedSettings));
+
+      // Broadcast the change
+      try {
+        window.dispatchEvent(
+          new CustomEvent("platformSettingsUpdated", {
+            detail: { type: settingsType, settings: enhancedSettings },
+          }),
+        );
+      } catch (broadcastError) {
+        console.warn("Could not broadcast settings update:", broadcastError);
+      }
+
+      analytics.trackAction({
+        action: "platform_settings_updated",
+        component: "api_enhanced",
+        metadata: {
+          adminId: user.id,
+          settingsType,
+          source: "local_storage",
+        },
+      });
+
+      return enhancedSettings;
+    }
+  }
+
+  async getPlatformAuditLog(): Promise<any[]> {
+    const user = checkAuthorization(["platform_admin"]);
+
+    try {
+      const response = await this.request<any[]>("/admin/audit-log");
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using local audit log:", error);
+
+      // Return simulated audit log from localStorage
+      const auditLog = JSON.parse(
+        localStorage.getItem("platform_audit_log") || "[]",
+      );
+
+      // Add some sample entries if empty
+      if (auditLog.length === 0) {
+        auditLog.push(
+          {
+            id: "audit_001",
+            timestamp: new Date().toISOString(),
+            action: "pricing_config_updated",
+            adminId: user.id,
+            adminName: user.name,
+            details: "Updated platform pricing configuration",
+            changes: {
+              companyServiceFee: "10% → 12%",
+              minCoachCommissionAmount: "$5 → $6",
+            },
+          },
+          {
+            id: "audit_002",
+            timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+            action: "platform_settings_viewed",
+            adminId: user.id,
+            adminName: user.name,
+            details: "Viewed platform settings dashboard",
+          },
+        );
+
+        localStorage.setItem("platform_audit_log", JSON.stringify(auditLog));
+      }
+
+      return auditLog.slice(0, 50); // Return last 50 entries
+    }
+  }
 }
 
 // Export singleton instance

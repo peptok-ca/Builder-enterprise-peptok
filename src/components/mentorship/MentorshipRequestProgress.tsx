@@ -363,10 +363,10 @@ export function MentorshipRequestProgress({
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <TrendingUp className="w-4 h-4" />
-                  Tracking Metrics ({request.metricsToTrack.length})
+                  Tracking Metrics ({(request.metricsToTrack || []).length})
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  {request.metricsToTrack.slice(0, 2).map((metric) => (
+                  {(request.metricsToTrack || []).slice(0, 2).map((metric) => (
                     <Badge key={metric} variant="outline" className="text-xs">
                       {metric
                         .replace(/_/g, " ")

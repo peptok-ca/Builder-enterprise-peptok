@@ -1001,3 +1001,5 @@ export default function AnalyticsSettings() {
     </div>
   );
 }
+
+export default AnalyticsSettings;

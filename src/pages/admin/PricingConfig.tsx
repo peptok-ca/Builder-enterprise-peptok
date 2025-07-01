@@ -131,6 +131,9 @@ export default function PricingConfig() {
 
     return () => {
       clearInterval(syncInterval);
+      if (broadcastChannel) {
+        broadcastChannel.close();
+      }
       window.removeEventListener(
         "globalConfigUpdated",
         handleGlobalConfigUpdate as EventListener,

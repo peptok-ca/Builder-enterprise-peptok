@@ -9,7 +9,7 @@
     "test": "vitest --run",
     "format.fix": "prettier --write .",
     "typecheck": "tsc",
-    "postinstall": "if [ \"$(uname)\" = \"Linux\" ]; then npm install @rollup/rollup-linux-x64-gnu @swc/core-linux-x64-gnu; fi"
+    "postinstall": "if [ \"$(uname)\" = \"Linux\" ] && [ ! -f /etc/alpine-release ]; then npm install @rollup/rollup-linux-x64-gnu @swc/core-linux-x64-gnu; fi"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

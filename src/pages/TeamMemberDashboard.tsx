@@ -359,9 +359,14 @@ const TeamMemberDashboard = () => {
   const createTestInvitation = () => {
     if (!user?.email) return;
 
+    const invitationId = `test-invitation-${Date.now()}`;
+    const timestamp = Date.now();
+    // Use same token format as invitation service: email:invitationId:timestamp
+    const token = btoa(`${user.email}:${invitationId}:${timestamp}`);
+
     const testInvitation: TeamInvitation = {
-      id: `test-invitation-${Date.now()}`,
-      token: btoa(`test:${user.email}:${Date.now()}`),
+      id: invitationId,
+      token: token,
       email: user.email,
       name: user.name,
       programId: "test-program-123",

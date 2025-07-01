@@ -2089,14 +2089,16 @@ class EnhancedApiService {
     const backendEndpoints = [
       `/api/team/invitations/pending?email=${encodeURIComponent(email)}`,
       `/api/invitations/pending?email=${encodeURIComponent(email)}`,
-      `/team/invitations/pending?email=${encodeURIComponent(email)}`
+      `/team/invitations/pending?email=${encodeURIComponent(email)}`,
     ];
 
     let lastError: any = null;
 
     for (const endpoint of backendEndpoints) {
       try {
-        console.log(`Fetching pending invitations from backend database: ${endpoint}`);
+        console.log(
+          `Fetching pending invitations from backend database: ${endpoint}`,
+        );
 
         const response = await this.request<any>(endpoint, {
           headers: {
@@ -2106,7 +2108,9 @@ class EnhancedApiService {
 
         // Verify we got database data (not just cached/local data)
         if (response.data && Array.isArray(response.data)) {
-          console.log(`✅ Successfully fetched ${response.data.length} pending invitations from backend database`);
+          console.log(
+            `✅ Successfully fetched ${response.data.length} pending invitations from backend database`,
+          );
 
           analytics.trackAction({
             action: "pending_invitations_fetched_database",
@@ -2122,17 +2126,22 @@ class EnhancedApiService {
           return response.data;
         }
       } catch (error) {
-        console.warn(`Backend endpoint ${endpoint} failed for pending invitations:`, error);
+        console.warn(
+          `Backend endpoint ${endpoint} failed for pending invitations:`,
+          error,
+        );
         lastError = error;
         continue;
       }
     }
 
     // If all backend endpoints fail, throw error to trigger offline sync
-    console.error("❌ Failed to fetch pending invitations from backend database via all endpoints");
-    throw new Error(`Failed to fetch pending invitations from backend database: ${lastError?.message || 'All endpoints unavailable'}`);
-  }
-    }
+    console.error(
+      "❌ Failed to fetch pending invitations from backend database via all endpoints",
+    );
+    throw new Error(
+      `Failed to fetch pending invitations from backend database: ${lastError?.message || "All endpoints unavailable"}`,
+    );
   }
 }
 

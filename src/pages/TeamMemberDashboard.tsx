@@ -414,12 +414,11 @@ const TeamMemberDashboard = () => {
     }
   };
 
-  const refreshPendingInvitations = () => {
+  const refreshPendingInvitations = async () => {
     if (user?.email) {
       try {
-        const userPendingInvitations = invitationService.getPendingInvitations(
-          user.email,
-        );
+        const userPendingInvitations =
+          await invitationService.getPendingInvitations(user.email);
         setPendingInvitations(userPendingInvitations);
         console.log("Refreshed pending invitations:", userPendingInvitations);
       } catch (error) {

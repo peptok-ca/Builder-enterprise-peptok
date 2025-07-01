@@ -176,7 +176,10 @@ export default function InvitationAccept() {
     );
   }
 
-  if (!invitation.isValid) {
+  if (
+    invitation.status === "expired" ||
+    new Date() > new Date(invitation.expiresAt)
+  ) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -185,8 +188,53 @@ export default function InvitationAccept() {
             <CardTitle>Invitation Expired</CardTitle>
             <CardDescription>
               This invitation expired on{" "}
-              {invitation.expiresAt.toLocaleDateString()}. Please contact your
-              team admin for a new invitation.
+              {new Date(invitation.expiresAt).toLocaleDateString()}. Please
+              contact {invitation.inviterName} for a new invitation.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate("/")} className="w-full">
+              Go to Homepage
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (invitation.status === "accepted") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+            <CardTitle>Invitation Already Accepted</CardTitle>
+            <CardDescription>
+              This invitation has already been accepted. If you need access,
+              please contact {invitation.inviterName}.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate("/login")} className="w-full">
+              Go to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (invitation.status === "declined") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <AlertTriangle className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+            <CardTitle>Invitation Declined</CardTitle>
+            <CardDescription>
+              This invitation was previously declined. If you've changed your
+              mind, please contact {invitation.inviterName} for a new
+              invitation.
             </CardDescription>
           </CardHeader>
           <CardContent>

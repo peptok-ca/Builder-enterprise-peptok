@@ -199,8 +199,11 @@ export default function CreateMentorshipRequest() {
         console.error("Failed to send program details emails:", emailError);
       }
 
-      // Clear saved draft
+      // Clear saved draft and program ID
       localStorage.removeItem("mentorship-request-draft");
+      localStorage.removeItem("current-program-id");
+      setTeamMembers([]);
+      setProgramId("");
 
       toast.success(
         "Mentorship request submitted successfully! Team members have been notified.",

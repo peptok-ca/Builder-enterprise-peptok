@@ -472,13 +472,14 @@ export default function PricingConfig() {
 
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
                   <h4 className="font-semibold text-purple-900 mb-2">
-                    Additional Participant
+                    Additional Participant Fee
                   </h4>
                   <p className="text-2xl font-bold text-purple-600">
                     ${config.additionalParticipantFee}
                   </p>
                   <p className="text-sm text-purple-700">
-                    per extra participant
+                    after {config.maxParticipantsIncluded} participant
+                    {config.maxParticipantsIncluded !== 1 ? "s" : ""}
                   </p>
                 </div>
               </div>

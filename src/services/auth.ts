@@ -112,9 +112,6 @@ class AuthService {
       this.currentUser = null;
     }
   }
-    localStorage.removeItem("peptok_token");
-    this.currentUser = null;
-  }
 
   // Get current user
   getCurrentUser(): User | null {

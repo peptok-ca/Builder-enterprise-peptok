@@ -340,7 +340,7 @@ export const CoachDashboard: React.FC = () => {
     if (!user) return;
 
     try {
-      await apiEnhanced.updateCoachAvailability(availability);
+      const result = await apiEnhanced.updateCoachAvailability(availability);
 
       // Update local profile
       if (profile) {
@@ -357,6 +357,13 @@ export const CoachDashboard: React.FC = () => {
     } catch (error) {
       console.error("Error updating availability:", error);
       toast.error("Failed to update availability");
+
+      analytics.trackError(
+        error instanceof Error
+          ? error
+          : new Error("Availability update failed"),
+        { component: "coach_dashboard", coachId: user.id },
+      );
     }
   };
 

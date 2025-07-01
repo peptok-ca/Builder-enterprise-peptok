@@ -2018,14 +2018,16 @@ class EnhancedApiService {
     const backendEndpoints = [
       "/api/team/invitations/accept",
       "/api/invitations/accept",
-      "/team/invitations/accept"
+      "/team/invitations/accept",
     ];
 
     let lastError: any = null;
 
     for (const endpoint of backendEndpoints) {
       try {
-        console.log(`Attempting to accept invitation via backend database: ${endpoint}`);
+        console.log(
+          `Attempting to accept invitation via backend database: ${endpoint}`,
+        );
 
         const response = await this.request<any>(endpoint, {
           method: "POST",
@@ -2042,8 +2044,14 @@ class EnhancedApiService {
         });
 
         // Verify the acceptance was saved to database
-        if (response.success && response.user?.id && !response.user.id.includes('temp_')) {
-          console.log(`✅ Successfully saved invitation acceptance to backend database`);
+        if (
+          response.success &&
+          response.user?.id &&
+          !response.user.id.includes("temp_")
+        ) {
+          console.log(
+            `✅ Successfully saved invitation acceptance to backend database`,
+          );
 
           analytics.trackAction({
             action: "team_invitation_accepted_database",
@@ -2058,58 +2066,22 @@ class EnhancedApiService {
           return response;
         }
       } catch (error) {
-        console.warn(`Backend endpoint ${endpoint} failed for invitation acceptance:`, error);
+        console.warn(
+          `Backend endpoint ${endpoint} failed for invitation acceptance:`,
+          error,
+        );
         lastError = error;
         continue;
       }
     }
 
     // If all backend endpoints fail, throw error to trigger offline sync
-    console.error("❌ Failed to save invitation acceptance to backend database via all endpoints");
-    throw new Error(`Failed to save invitation acceptance to backend database: ${lastError?.message || 'All endpoints unavailable'}`);
-  }
-        "peptok_pending_invitations",
-      );
-      if (pendingInvitations) {
-        const invitations = JSON.parse(pendingInvitations);
-        const userEmail = invitation.email.toLowerCase();
-        if (invitations[userEmail]) {
-          invitations[userEmail] = invitations[userEmail].filter(
-            (inv: any) => inv.id !== invitation.id,
-          );
-          if (invitations[userEmail].length === 0) {
-            delete invitations[userEmail];
-          }
-          localStorage.setItem(
-            "peptok_pending_invitations",
-            JSON.stringify(invitations),
-          );
-        }
-      }
-
-      // Create user object
-      const user = {
-        id: `user_${Date.now()}`,
-        email: invitation.email,
-        name: `${acceptanceData.firstName} ${acceptanceData.lastName}`,
-        firstName: acceptanceData.firstName,
-        lastName: acceptanceData.lastName,
-        userType: "team_member",
-        companyId: invitation.companyId,
-        companyName: invitation.companyName,
-        role: invitation.role,
-        programId: invitation.programId,
-        programTitle: invitation.programTitle,
-        invitedBy: invitation.inviterName,
-        joinedAt: new Date().toISOString(),
-        isAuthenticated: true,
-        picture: `https://api.dicebear.com/7.x/avataaars/svg?seed=${acceptanceData.firstName}`,
-        provider: "invitation",
-        status: "active",
-      };
-
-      return { success: true, user };
-    }
+    console.error(
+      "❌ Failed to save invitation acceptance to backend database via all endpoints",
+    );
+    throw new Error(
+      `Failed to save invitation acceptance to backend database: ${lastError?.message || "All endpoints unavailable"}`,
+    );
   }
 
   async getPendingInvitations(email: string): Promise<any[]> {

@@ -20,6 +20,9 @@ export interface InvitationValidation extends DatabaseValidationResult {
 
 class DatabaseValidationService {
   private readonly VALIDATION_TIMEOUT = 10000; // 10 seconds
+  private validationEnabled = true;
+  private consecutiveFailures = 0;
+  private readonly MAX_CONSECUTIVE_FAILURES = 3;
 
   /**
    * Validate that an invitation was properly saved to the backend database

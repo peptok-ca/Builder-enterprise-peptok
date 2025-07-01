@@ -147,11 +147,33 @@ class OfflineApiWrapper {
       entityId: invitationId,
     };
 
-    return offlineSync.executeWithOfflineSupport(
-      () => apiEnhanced.resendTeamInvitation(invitationId),
-      true, // Optimistically return success
-      syncOperation,
-    );
+    try {
+      // Execute with database validation
+      const result = await offlineSync.executeWithOfflineSupport(
+        () => apiEnhanced.resendTeamInvitation(invitationId),
+        true, // Optimistically return success
+        syncOperation,
+      );
+
+      // Validate that the resend was actually saved to the backend database
+      if (result) {
+        setTimeout(async () => {
+          const validation = await databaseValidation.validateResendStorage(
+            invitationId,
+            new Date().toISOString(),
+          );
+          databaseValidation.showValidationResults(
+            "Invitation resend",
+            validation,
+          );
+        }, 2000); // Validate after 2 seconds to allow for database write
+      }
+
+      return result;
+    } catch (error) {
+      console.error("Team invitation resend failed:", error);
+      throw error;
+    }
   }
 
   /**

@@ -55,6 +55,7 @@ export function TeamMemberManagementCard({
     "participant" | "observer"
   >("participant");
   const [isInviting, setIsInviting] = useState(false);
+  const [resendingIds, setResendingIds] = useState<Set<string>>(new Set());
 
   const addTeamMember = async () => {
     if (!newMemberEmail.trim()) {

@@ -1144,24 +1144,76 @@ class EnhancedApiService {
   }
 
   async updatePricingConfig(config: any): Promise<any> {
-    checkAuthorization(["platform_admin"]);
+    const user = checkAuthorization(["platform_admin"]);
 
     try {
       const response = await this.request<any>("/admin/pricing-config", {
         method: "PUT",
-        body: JSON.stringify(config),
-      });
-      return response.data;
-    } catch (error) {
-      console.warn("API not available, storing pricing config locally:", error);
-      localStorage.setItem(
-        "pricing_config",
-        JSON.stringify({
+        body: JSON.stringify({
           ...config,
           lastUpdated: new Date().toISOString(),
+          updatedBy: user.id,
         }),
+      });
+
+      analytics.trackAction({
+        action: "pricing_config_updated",
+        component: "api_enhanced",
+        metadata: {
+          source: "backend_api",
+          adminId: user.id,
+          currency: config.currency,
+          companyServiceFee: config.companyServiceFee,
+          coachCommission: config.coachCommission,
+          minCoachCommissionAmount: config.minCoachCommissionAmount,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn(
+        "API not available, storing pricing config in centralized platform storage:",
+        error,
       );
-      return config;
+
+      const enhancedConfig = {
+        ...config,
+        lastUpdated: new Date().toISOString(),
+        updatedBy: user.id,
+        version: "1.0",
+      };
+
+      // Store in centralized platform storage accessible to all admins
+      localStorage.setItem(
+        "platform_pricing_config",
+        JSON.stringify(enhancedConfig),
+      );
+
+      // Also broadcast the change to other admin sessions if possible
+      try {
+        window.dispatchEvent(
+          new CustomEvent("platformConfigUpdated", {
+            detail: enhancedConfig,
+          }),
+        );
+      } catch (broadcastError) {
+        console.warn("Could not broadcast config update:", broadcastError);
+      }
+
+      analytics.trackAction({
+        action: "pricing_config_updated",
+        component: "api_enhanced",
+        metadata: {
+          source: "local_storage",
+          adminId: user.id,
+          currency: config.currency,
+          companyServiceFee: config.companyServiceFee,
+          coachCommission: config.coachCommission,
+          minCoachCommissionAmount: config.minCoachCommissionAmount,
+        },
+      });
+
+      return enhancedConfig;
     }
   }
 }

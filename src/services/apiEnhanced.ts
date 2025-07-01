@@ -2068,35 +2068,6 @@ class EnhancedApiService {
     console.error("❌ Failed to save invitation acceptance to backend database via all endpoints");
     throw new Error(`Failed to save invitation acceptance to backend database: ${lastError?.message || 'All endpoints unavailable'}`);
   }
-
-      // Fallback to localStorage processing
-      const allInvitations = JSON.parse(
-        localStorage.getItem("peptok_team_invitations") || "[]",
-      );
-      const invitation = allInvitations.find((inv: any) => inv.token === token);
-
-      if (!invitation) {
-        return { success: false, error: "Invalid invitation token" };
-      }
-
-      if (invitation.status !== "pending") {
-        return { success: false, error: `Invitation is ${invitation.status}` };
-      }
-
-      if (new Date() > new Date(invitation.expiresAt)) {
-        return { success: false, error: "Invitation has expired" };
-      }
-
-      // Update invitation status
-      invitation.status = "accepted";
-      invitation.acceptedAt = new Date().toISOString();
-      localStorage.setItem(
-        "peptok_team_invitations",
-        JSON.stringify(allInvitations),
-      );
-
-      // Remove from pending invitations
-      const pendingInvitations = localStorage.getItem(
         "peptok_pending_invitations",
       );
       if (pendingInvitations) {

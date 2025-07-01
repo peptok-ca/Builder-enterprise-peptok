@@ -364,22 +364,41 @@ export default function InvitationAccept() {
 
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  placeholder="Create a password"
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    placeholder="Create a password (min. 8 characters)"
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Password must be at least 8 characters long
+                </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={formData.confirmPassword}
                   onChange={(e) =>
                     setFormData({
@@ -389,6 +408,37 @@ export default function InvitationAccept() {
                   }
                   placeholder="Confirm your password"
                 />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="acceptTerms"
+                  checked={formData.acceptTerms}
+                  onCheckedChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      acceptTerms: checked as boolean,
+                    })
+                  }
+                />
+                <Label htmlFor="acceptTerms" className="text-sm">
+                  I accept the{" "}
+                  <a
+                    href="/terms"
+                    target="_blank"
+                    className="text-blue-600 hover:underline"
+                  >
+                    Terms of Service
+                  </a>{" "}
+                  and{" "}
+                  <a
+                    href="/privacy"
+                    target="_blank"
+                    className="text-blue-600 hover:underline"
+                  >
+                    Privacy Policy
+                  </a>
+                </Label>
               </div>
             </div>
 

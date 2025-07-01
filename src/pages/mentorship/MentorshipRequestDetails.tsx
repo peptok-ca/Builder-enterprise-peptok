@@ -48,6 +48,17 @@ export default function MentorshipRequestDetails() {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const handleUpdateTeamMembers = (updatedMembers: any[]) => {
+    setTeamMembers(updatedMembers);
+    // In a real app, this would also update the backend
+    if (request) {
+      setRequest({
+        ...request,
+        teamMembers: updatedMembers,
+      });
+    }
+  };
+
   useEffect(() => {
     const fetchRequest = async () => {
       if (!id) return;

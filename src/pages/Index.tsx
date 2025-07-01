@@ -175,12 +175,7 @@ const fallbackPricingPlans = [
   },
 ];
 
-const stats = [
-  { value: "500+", label: "Coach Mentors", icon: Users },
-  { value: "10k+", label: "Connections Made", icon: Target },
-  { value: "95%", label: "Success Rate", icon: TrendingUp },
-  { value: "50+", label: "Countries", icon: Globe },
-];
+// Dynamic stats will be calculated from demo data
 
 const Index = () => {
   const navigate = useNavigate();
@@ -245,7 +240,8 @@ const Index = () => {
                   <div className="space-y-6">
                     <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium bg-blue-50/80 text-blue-700 border-blue-200/50 backdrop-blur-sm">
                       <Zap className="mr-1 h-3 w-3" />
-                      Trusted by 500+ companies worldwide
+                      Trusted by {demoStats?.platformStats?.totalCompanies || 8}
+                      + companies worldwide
                     </div>
                     <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
                       Connect with

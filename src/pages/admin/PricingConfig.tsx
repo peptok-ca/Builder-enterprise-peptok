@@ -94,6 +94,7 @@ export default function PricingConfig() {
     setConfig({
       companyServiceFee: 0.1,
       coachCommission: 0.2,
+      minCoachCommissionAmount: 5,
       additionalParticipantFee: 25,
       maxParticipantsIncluded: 1,
       currency: "CAD",

@@ -147,6 +147,57 @@ export function TeamMemberManagementCard({
     }
   };
 
+  const resendAllInvitations = async () => {
+    const pendingMembers = teamMembers.filter(
+      (member) => member.status === "invited",
+    );
+
+    if (pendingMembers.length === 0) {
+      toast.info("No pending invitations to resend");
+      return;
+    }
+
+    // Confirm bulk action
+    const confirmed = window.confirm(
+      `Are you sure you want to resend invitations to all ${pendingMembers.length} pending team members?`,
+    );
+
+    if (!confirmed) return;
+
+    let successCount = 0;
+    let failureCount = 0;
+
+    // Process each invitation
+    for (const member of pendingMembers) {
+      try {
+        await resendInvitation(member.id);
+        successCount++;
+      } catch (error) {
+        failureCount++;
+      }
+    }
+
+    // Show summary toast
+    if (successCount > 0 && failureCount === 0) {
+      toast.success(`✅ Successfully resent ${successCount} invitations`, {
+        description: "All team members will receive fresh invitation emails",
+        duration: 5000,
+      });
+    } else if (successCount > 0 && failureCount > 0) {
+      toast.warning(
+        `⚠️ Resent ${successCount} invitations, ${failureCount} failed`,
+        {
+          description: "Please try again for the failed invitations",
+          duration: 5000,
+        },
+      );
+    } else {
+      toast.error(`❌ Failed to resend invitations`, {
+        description: "Please check your connection and try again",
+      });
+    }
+  };
+
   const updateMemberRole = (
     memberId: string,
     newRole: "participant" | "observer",

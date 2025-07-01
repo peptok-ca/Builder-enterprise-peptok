@@ -437,6 +437,14 @@ const TeamMemberDashboard = () => {
     setAcceptingInvitation(invitation.id);
 
     try {
+      console.log("Attempting to accept invitation:", {
+        invitationId: invitation.id,
+        token: invitation.token,
+        email: invitation.email,
+        status: invitation.status,
+        expiresAt: invitation.expiresAt,
+      });
+
       // Since user is already logged in, we just need to accept the invitation
       const result = await invitationService.acceptInvitation(
         invitation.token,
@@ -447,6 +455,8 @@ const TeamMemberDashboard = () => {
           acceptTerms: true,
         },
       );
+
+      console.log("Invitation acceptance result:", result);
 
       if (result.success) {
         toast.success(`🎉 Welcome to ${invitation.programTitle}!`, {

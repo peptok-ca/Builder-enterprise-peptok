@@ -254,15 +254,29 @@ export function TeamMemberManagementCard({
           maxRetries: 3,
         });
         if (success) {
-          toast.success(
-            `✅ Invitation ${isOnline ? "resent" : "queued for resend"} to ${member.email}`,
-            {
-              description: isOnline
-                ? "They will receive a new email with a fresh 7-day link"
-                : "Will be sent when back online",
-              duration: 4000,
-            },
-          );
+          const isMockEmail =
+            import.meta.env.DEV || import.meta.env.VITE_MOCK_EMAIL === "true";
+
+          if (isMockEmail) {
+            toast.success(
+              `✅ Invitation resend simulated for ${member.email}`,
+              {
+                description:
+                  "🔧 Development Mode: In production, they would receive a new email with a fresh 7-day link",
+                duration: 5000,
+              },
+            );
+          } else {
+            toast.success(
+              `✅ Invitation ${isOnline ? "resent" : "queued for resend"} to ${member.email}`,
+              {
+                description: isOnline
+                  ? "They will receive a new email with a fresh 7-day link"
+                  : "Will be sent when back online",
+                duration: 4000,
+              },
+            );
+          }
 
           // Update the member's invitedAt time to reflect the resend
           const updatedMembers = teamMembers.map((m) =>

@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { api } from "@/services/api";
+import { apiEnhanced } from "@/services/apiEnhanced";
 import { MentorshipRequest } from "@/types";
 import { toast } from "sonner";
 

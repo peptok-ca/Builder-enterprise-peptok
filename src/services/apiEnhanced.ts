@@ -1944,14 +1944,16 @@ class EnhancedApiService {
     const backendEndpoints = [
       `/api/team/invitations/${invitationId}/resend`,
       `/api/invitations/${invitationId}/resend`,
-      `/team/invitations/${invitationId}/resend`
+      `/team/invitations/${invitationId}/resend`,
     ];
 
     let lastError: any = null;
 
     for (const endpoint of backendEndpoints) {
       try {
-        console.log(`Attempting to resend invitation via backend database: ${endpoint}`);
+        console.log(
+          `Attempting to resend invitation via backend database: ${endpoint}`,
+        );
 
         const response = await this.request<any>(endpoint, {
           method: "POST",
@@ -1962,14 +1964,18 @@ class EnhancedApiService {
           body: JSON.stringify({
             resentBy: user.id,
             resentAt: new Date().toISOString(),
-            newExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+            newExpiresAt: new Date(
+              Date.now() + 7 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
             requiresDatabaseStorage: true,
           }),
         });
 
         // Verify the resend was saved to database
         if (response.success || response.data?.updated) {
-          console.log(`✅ Successfully updated invitation resend in backend database`);
+          console.log(
+            `✅ Successfully updated invitation resend in backend database`,
+          );
 
           analytics.trackAction({
             action: "team_invitation_resent_database",
@@ -1991,21 +1997,12 @@ class EnhancedApiService {
     }
 
     // If all backend endpoints fail, throw error to trigger offline sync
-    console.error("❌ Failed to save invitation resend to backend database via all endpoints");
-    throw new Error(`Failed to save invitation resend to backend database: ${lastError?.message || 'All endpoints unavailable'}`);
-  }
-          });
-          localStorage.setItem(
-            "peptok_pending_invitations",
-            JSON.stringify(invitations),
-          );
-        }
-
-        return true;
-      }
-
-      return false;
-    }
+    console.error(
+      "❌ Failed to save invitation resend to backend database via all endpoints",
+    );
+    throw new Error(
+      `Failed to save invitation resend to backend database: ${lastError?.message || "All endpoints unavailable"}`,
+    );
   }
 
   async acceptTeamInvitation(

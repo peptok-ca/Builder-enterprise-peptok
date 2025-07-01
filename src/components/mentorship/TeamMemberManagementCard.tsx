@@ -454,9 +454,19 @@ export function TeamMemberManagementCard({
                           variant="ghost"
                           size="sm"
                           onClick={() => resendInvitation(member.id)}
-                          title="Resend invitation"
+                          disabled={resendingIds.has(member.id)}
+                          title={
+                            resendingIds.has(member.id)
+                              ? "Sending..."
+                              : "Resend invitation"
+                          }
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                         >
-                          <Mail className="w-4 h-4" />
+                          {resendingIds.has(member.id) ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent" />
+                          ) : (
+                            <Mail className="w-4 h-4" />
+                          )}
                         </Button>
                       )}
 

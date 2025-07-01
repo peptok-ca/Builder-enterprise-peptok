@@ -201,7 +201,7 @@ export default function MentorshipRequestDetails() {
   useEffect(() => {
     const fetchPricingConfig = async () => {
       try {
-        const config = await api.getPricingConfig();
+        const config = await apiEnhanced.getPricingConfig();
         setPricingConfig(config);
       } catch (error) {
         console.warn("Using default pricing config:", error);

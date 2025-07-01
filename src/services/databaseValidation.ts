@@ -473,6 +473,46 @@ class DatabaseValidationService {
 
     return true;
   }
+
+  /**
+   * Track validation failure and disable validation if too many consecutive failures
+   */
+  private handleValidationFailure(): void {
+    this.consecutiveFailures++;
+    console.warn(
+      `Database validation failure count: ${this.consecutiveFailures}`,
+    );
+
+    if (this.consecutiveFailures >= this.MAX_CONSECUTIVE_FAILURES) {
+      this.validationEnabled = false;
+      console.warn(
+        `🚫 Database validation disabled after ${this.MAX_CONSECUTIVE_FAILURES} consecutive failures`,
+      );
+      console.warn(
+        `This likely means the backend validation endpoints are not available`,
+      );
+
+      // Re-enable after 5 minutes
+      setTimeout(
+        () => {
+          this.validationEnabled = true;
+          this.consecutiveFailures = 0;
+          console.log(`✅ Database validation re-enabled after timeout`);
+        },
+        5 * 60 * 1000,
+      );
+    }
+  }
+
+  /**
+   * Reset failure count on successful validation
+   */
+  private handleValidationSuccess(): void {
+    if (this.consecutiveFailures > 0) {
+      console.log(`✅ Database validation success - resetting failure count`);
+      this.consecutiveFailures = 0;
+    }
+  }
 }
 
 // Export singleton instance

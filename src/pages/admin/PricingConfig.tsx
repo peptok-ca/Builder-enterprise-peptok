@@ -47,7 +47,7 @@ export default function PricingConfig() {
   const fetchPricingConfig = async () => {
     try {
       setLoading(true);
-      const pricingConfig = await api.getPricingConfig();
+      const pricingConfig = await apiEnhanced.getPricingConfig();
       setConfig(pricingConfig);
       setHasChanges(false);
     } catch (error) {

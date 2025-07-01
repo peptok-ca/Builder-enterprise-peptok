@@ -301,11 +301,12 @@ class AuthService {
         businessDetails: userData.businessDetails,
       };
 
-      // Save business details to localStorage for onboarding reuse
+      // Save business details to backend database for onboarding reuse
       if (userData.businessDetails) {
-        localStorage.setItem(
+        await backendStorage.setItem(
           "peptok_business_details",
-          JSON.stringify(userData.businessDetails),
+          userData.businessDetails,
+          { userId: newUser.id },
         );
       }
 

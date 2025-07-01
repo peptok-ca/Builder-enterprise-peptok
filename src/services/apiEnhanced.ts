@@ -1803,74 +1803,76 @@ class EnhancedApiService {
   }): Promise<any> {
     const user = checkAuthorization(["company_admin", "enterprise_admin"]);
 
-    try {
-      const response = await this.request<any>("/team/invitations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(invitationData),
-      });
+    // First try multiple backend endpoints to ensure database storage
+    const backendEndpoints = [
+      "/api/team/invitations",
+      "/api/invitations",
+      "/team/invitations",
+    ];
 
-      analytics.trackAction({
-        action: "team_invitation_created",
-        component: "team_api",
-        metadata: {
-          programId: invitationData.programId,
-          inviteeEmail: invitationData.email,
-          role: invitationData.role,
-        },
-      });
+    let lastError: any = null;
 
-      return response.data;
-    } catch (error) {
-      console.warn(
-        "Team invitation API not available, creating mock invitation:",
-        error,
-      );
+    for (const endpoint of backendEndpoints) {
+      try {
+        console.log(
+          `Attempting to save invitation to backend database via ${endpoint}`,
+        );
 
-      // Fallback to local invitation creation
-      const invitationId = `inv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const token = btoa(
-        `${invitationData.email}:${invitationId}:${Date.now()}`,
-      );
+        const response = await this.request<any>(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Database-Write": "required", // Signal that database write is required
+          },
+          body: JSON.stringify({
+            ...invitationData,
+            createdBy: user.id,
+            createdAt: new Date().toISOString(),
+            expiresAt: new Date(
+              Date.now() + 7 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+            requiresDatabaseStorage: true,
+          }),
+        });
 
-      const invitation = {
-        id: invitationId,
-        token,
-        ...invitationData,
-        status: "pending",
-        createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      };
+        // Verify the response contains a database-generated ID
+        if (
+          response.data &&
+          response.data.id &&
+          !response.data.id.includes("temp_")
+        ) {
+          console.log(
+            `✅ Successfully saved invitation to backend database with ID: ${response.data.id}`,
+          );
 
-      // Store in both localStorage locations for compatibility
-      const existingInvitations = JSON.parse(
-        localStorage.getItem("peptok_team_invitations") || "[]",
-      );
-      existingInvitations.push(invitation);
-      localStorage.setItem(
-        "peptok_team_invitations",
-        JSON.stringify(existingInvitations),
-      );
+          analytics.trackAction({
+            action: "team_invitation_created_database",
+            component: "team_api",
+            metadata: {
+              programId: invitationData.programId,
+              inviteeEmail: invitationData.email,
+              role: invitationData.role,
+              savedToDatabase: true,
+              endpoint,
+            },
+          });
 
-      // Also store in pending invitations
-      const pendingInvitations = localStorage.getItem(
-        "peptok_pending_invitations",
-      );
-      const invitations: Record<string, any[]> = pendingInvitations
-        ? JSON.parse(pendingInvitations)
-        : {};
-      const userEmail = invitationData.email.toLowerCase();
-      if (!invitations[userEmail]) {
-        invitations[userEmail] = [];
+          return response.data;
+        }
+      } catch (error) {
+        console.warn(`Backend endpoint ${endpoint} failed:`, error);
+        lastError = error;
+        continue;
       }
-      invitations[userEmail].push(invitation);
-      localStorage.setItem(
-        "peptok_pending_invitations",
-        JSON.stringify(invitations),
-      );
-
-      return invitation;
     }
+
+    // If all backend endpoints fail, throw error to trigger offline sync
+    console.error(
+      "❌ Failed to save invitation to backend database via all endpoints",
+    );
+    throw new Error(
+      `Failed to save invitation to backend database: ${lastError?.message || "All endpoints unavailable"}`,
+    );
   }
 
   async getTeamInvitations(filters?: {

@@ -177,6 +177,9 @@ export function MentorshipRequestProgress({
 
   const getNextSession = (request: MentorshipRequest) => {
     // Mock next session calculation
+    if (!request.timeline || !request.timeline.sessionFrequency) {
+      return "No sessions scheduled";
+    }
     const frequency = request.timeline.sessionFrequency;
     const now = new Date();
     const nextSession = new Date(now);

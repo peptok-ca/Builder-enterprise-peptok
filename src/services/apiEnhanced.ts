@@ -32,6 +32,8 @@ import {
 } from "../data/demoDatabase";
 import { crossBrowserSync, SYNC_CONFIGS } from "./crossBrowserSync";
 import { cacheInvalidation } from "./cacheInvalidation";
+import { securityService } from "./securityService";
+import { analyticsService } from "./analyticsService";
 
 const API_BASE_URL = Environment.getApiBaseUrl();
 

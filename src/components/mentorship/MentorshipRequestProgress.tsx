@@ -227,10 +227,10 @@ export function MentorshipRequestProgress({
       {requests.map((request) => {
         const progress = calculateProgress(request);
         const nextSession = getNextSession(request);
-        const acceptedMembers = request.teamMembers.filter(
+        const acceptedMembers = (request.teamMembers || []).filter(
           (m) => m.status === "accepted",
         );
-        const pendingMembers = request.teamMembers.filter(
+        const pendingMembers = (request.teamMembers || []).filter(
           (m) => m.status === "invited",
         );
 

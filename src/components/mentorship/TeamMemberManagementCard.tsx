@@ -565,7 +565,7 @@ export function TeamMemberManagementCard({
                     <div className="flex items-center gap-1">
                       {!readOnly && member.status === "invited" && (
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
                           onClick={() => resendInvitation(member.id)}
                           disabled={resendingIds.has(member.id)}
@@ -574,12 +574,18 @@ export function TeamMemberManagementCard({
                               ? "Sending..."
                               : "Resend invitation"
                           }
-                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                          className="text-blue-600 border-blue-200 hover:text-blue-700 hover:bg-blue-50 hover:border-blue-300"
                         >
                           {resendingIds.has(member.id) ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent" />
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent mr-1" />
+                              <span className="text-xs">Sending...</span>
+                            </>
                           ) : (
-                            <Mail className="w-4 h-4" />
+                            <>
+                              <Mail className="w-4 h-4 mr-1" />
+                              <span className="text-xs">Resend</span>
+                            </>
                           )}
                         </Button>
                       )}

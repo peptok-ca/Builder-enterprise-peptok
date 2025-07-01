@@ -1940,63 +1940,60 @@ class EnhancedApiService {
   async resendTeamInvitation(invitationId: string): Promise<boolean> {
     const user = checkAuthorization(["company_admin", "enterprise_admin"]);
 
-    try {
-      const response = await this.request<any>(
-        `/team/invitations/${invitationId}/resend`,
-        {
+    // Try multiple backend endpoints to ensure database update
+    const backendEndpoints = [
+      `/api/team/invitations/${invitationId}/resend`,
+      `/api/invitations/${invitationId}/resend`,
+      `/team/invitations/${invitationId}/resend`
+    ];
+
+    let lastError: any = null;
+
+    for (const endpoint of backendEndpoints) {
+      try {
+        console.log(`Attempting to resend invitation via backend database: ${endpoint}`);
+
+        const response = await this.request<any>(endpoint, {
           method: "POST",
-        },
-      );
+          headers: {
+            "Content-Type": "application/json",
+            "X-Database-Write": "required", // Signal that database write is required
+          },
+          body: JSON.stringify({
+            resentBy: user.id,
+            resentAt: new Date().toISOString(),
+            newExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+            requiresDatabaseStorage: true,
+          }),
+        });
 
-      analytics.trackAction({
-        action: "team_invitation_resent",
-        component: "team_api",
-        metadata: { invitationId },
-      });
+        // Verify the resend was saved to database
+        if (response.success || response.data?.updated) {
+          console.log(`✅ Successfully updated invitation resend in backend database`);
 
-      return response.success;
-    } catch (error) {
-      console.warn(
-        "Resend invitation API not available, using local fallback:",
-        error,
-      );
+          analytics.trackAction({
+            action: "team_invitation_resent_database",
+            component: "team_api",
+            metadata: {
+              invitationId,
+              savedToDatabase: true,
+              endpoint,
+            },
+          });
 
-      // Fallback to localStorage update
-      const allInvitations = JSON.parse(
-        localStorage.getItem("peptok_team_invitations") || "[]",
-      );
-      const invitationIndex = allInvitations.findIndex(
-        (inv: any) => inv.id === invitationId,
-      );
+          return true;
+        }
+      } catch (error) {
+        console.warn(`Backend endpoint ${endpoint} failed for resend:`, error);
+        lastError = error;
+        continue;
+      }
+    }
 
-      if (invitationIndex >= 0) {
-        allInvitations[invitationIndex].expiresAt = new Date(
-          Date.now() + 7 * 24 * 60 * 60 * 1000,
-        ).toISOString();
-        allInvitations[invitationIndex].lastReminderSent =
-          new Date().toISOString();
-        localStorage.setItem(
-          "peptok_team_invitations",
-          JSON.stringify(allInvitations),
-        );
-
-        // Also update pending invitations
-        const pendingInvitations = localStorage.getItem(
-          "peptok_pending_invitations",
-        );
-        if (pendingInvitations) {
-          const invitations = JSON.parse(pendingInvitations);
-          Object.keys(invitations).forEach((email) => {
-            const userInvitations = invitations[email];
-            const pendingIndex = userInvitations.findIndex(
-              (inv: any) => inv.id === invitationId,
-            );
-            if (pendingIndex >= 0) {
-              userInvitations[pendingIndex].expiresAt =
-                allInvitations[invitationIndex].expiresAt;
-              userInvitations[pendingIndex].lastReminderSent =
-                allInvitations[invitationIndex].lastReminderSent;
-            }
+    // If all backend endpoints fail, throw error to trigger offline sync
+    console.error("❌ Failed to save invitation resend to backend database via all endpoints");
+    throw new Error(`Failed to save invitation resend to backend database: ${lastError?.message || 'All endpoints unavailable'}`);
+  }
           });
           localStorage.setItem(
             "peptok_pending_invitations",

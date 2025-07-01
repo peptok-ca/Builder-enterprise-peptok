@@ -271,8 +271,12 @@ export default function Pricing() {
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">
                             Additional participants ({sessions} ×{" "}
-                            {participants - 1} × $
-                            {pricingConfig.additionalParticipantFee})
+                            {Math.max(
+                              0,
+                              participants -
+                                (pricingConfig.maxParticipantsIncluded || 1),
+                            )}{" "}
+                            × ${pricingConfig.additionalParticipantFee})
                           </span>
                           <span className="font-medium">
                             ${costs.additionalParticipantsCost.toFixed(2)}

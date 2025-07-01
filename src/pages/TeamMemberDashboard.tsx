@@ -251,6 +251,13 @@ const TeamMemberDashboard = () => {
 
         setSessions(mockSessions);
         setPrograms(mockPrograms);
+
+        // Load pending invitations
+        if (user?.email) {
+          const userPendingInvitations =
+            invitationService.getPendingInvitations(user.email);
+          setPendingInvitations(userPendingInvitations);
+        }
       } catch (error) {
         toast.error("Failed to load dashboard data");
       } finally {

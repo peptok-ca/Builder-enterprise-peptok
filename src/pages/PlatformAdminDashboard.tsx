@@ -838,7 +838,10 @@ export default function PlatformAdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow">
+            <Card
+              className="hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => navigate("/admin/security-settings")}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
@@ -850,16 +853,25 @@ export default function PlatformAdminDashboard() {
                       <p className="text-sm text-gray-600">
                         Security settings and access controls
                       </p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="inline-block w-2 h-2 rounded-full bg-blue-500"></span>
+                        <span className="text-xs text-blue-600">
+                          Advanced security features
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" disabled>
+                  <Button variant="outline" size="sm">
                     Manage
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow">
+            <Card
+              className="hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => navigate("/admin/analytics-settings")}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
@@ -871,9 +883,15 @@ export default function PlatformAdminDashboard() {
                       <p className="text-sm text-gray-600">
                         Configure analytics and reporting
                       </p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="inline-block w-2 h-2 rounded-full bg-purple-500"></span>
+                        <span className="text-xs text-purple-600">
+                          Data insights & reports
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" disabled>
+                  <Button variant="outline" size="sm">
                     Settings
                   </Button>
                 </div>

@@ -210,6 +210,20 @@ export default function PricingConfig() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
+                <Badge
+                  variant={
+                    storageSource === "backend" ? "default" : "secondary"
+                  }
+                  className={
+                    storageSource === "backend"
+                      ? "text-green-700 bg-green-100"
+                      : "text-blue-700 bg-blue-100"
+                  }
+                >
+                  {storageSource === "backend"
+                    ? "Backend DB"
+                    : "Platform Storage"}
+                </Badge>
                 {hasChanges && (
                   <Badge
                     variant="outline"

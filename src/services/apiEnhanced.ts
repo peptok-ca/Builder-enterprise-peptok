@@ -1093,28 +1093,53 @@ class EnhancedApiService {
 
   // Existing methods from original API service that don't need auth changes
   async getPricingConfig(): Promise<any> {
-    // Implementation remains the same
     try {
       const response = await this.request<any>("/admin/pricing-config");
+
+      analytics.trackAction({
+        action: "pricing_config_retrieved",
+        component: "api_enhanced",
+        metadata: { source: "backend_api" },
+      });
+
       return response.data;
     } catch (error) {
       console.warn(
-        "API not available, using localStorage pricing config:",
+        "API not available, using centralized platform storage:",
         error,
       );
 
-      const stored = localStorage.getItem("pricing_config");
+      // Use centralized platform storage that persists across all admin sessions
+      const stored = localStorage.getItem("platform_pricing_config");
+      let config;
+
       if (stored) {
-        return JSON.parse(stored);
+        config = JSON.parse(stored);
+      } else {
+        // Default configuration with all new fields
+        config = {
+          companyServiceFee: 0.1,
+          coachCommission: 0.2,
+          minCoachCommissionAmount: 5,
+          additionalParticipantFee: 25,
+          maxParticipantsIncluded: 1,
+          currency: "CAD",
+          lastUpdated: new Date().toISOString(),
+          version: "1.0",
+          createdBy: "system",
+        };
+
+        // Store default config
+        localStorage.setItem("platform_pricing_config", JSON.stringify(config));
       }
 
-      return {
-        serviceFeePercentage: 10,
-        commissionPercentage: 20,
-        additionalParticipantFee: 25,
-        currency: "CAD",
-        lastUpdated: new Date().toISOString(),
-      };
+      analytics.trackAction({
+        action: "pricing_config_retrieved",
+        component: "api_enhanced",
+        metadata: { source: "local_storage", version: config.version },
+      });
+
+      return config;
     }
   }
 

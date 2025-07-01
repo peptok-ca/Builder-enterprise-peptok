@@ -20,6 +20,7 @@ import { api } from "@/services/api";
 import { apiEnhanced } from "@/services/apiEnhanced";
 import { MentorshipRequest } from "@/types";
 import { toast } from "sonner";
+import { TeamMemberManagementCard } from "@/components/mentorship/TeamMemberManagementCard";
 
 interface MatchedCoach {
   id: string;

@@ -236,8 +236,33 @@ export default function PricingConfig() {
                     />
                   </div>
                   <p className="text-sm text-gray-600">
-                    Fee charged per additional participant beyond the first in
-                    group sessions
+                    Fee charged per additional participant beyond the included
+                    participants
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="maxParticipantsIncluded">
+                    Participants Included in Base Price
+                  </Label>
+                  <Input
+                    id="maxParticipantsIncluded"
+                    type="number"
+                    min="1"
+                    max="20"
+                    step="1"
+                    value={config.maxParticipantsIncluded}
+                    onChange={(e) =>
+                      handleConfigChange(
+                        "maxParticipantsIncluded",
+                        parseInt(e.target.value),
+                      )
+                    }
+                    className="flex-1"
+                  />
+                  <p className="text-sm text-gray-600">
+                    Number of participants included in base session price.
+                    Additional fees apply beyond this count.
                   </p>
                 </div>
 

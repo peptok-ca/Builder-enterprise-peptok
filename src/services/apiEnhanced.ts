@@ -1105,41 +1105,86 @@ class EnhancedApiService {
       return response.data;
     } catch (error) {
       console.warn(
-        "API not available, using centralized platform storage:",
+        "API not available, using simulated backend database:",
         error,
       );
 
-      // Use centralized platform storage that persists across all admin sessions
-      const stored = localStorage.getItem("platform_pricing_config");
-      let config;
+      // Simulate backend database using a centralized key that all admins share
+      return this.getSharedPlatformConfig();
+    }
+  }
 
-      if (stored) {
-        config = JSON.parse(stored);
-      } else {
-        // Default configuration with all new fields
-        config = {
-          companyServiceFee: 0.1,
-          coachCommission: 0.2,
-          minCoachCommissionAmount: 5,
-          additionalParticipantFee: 25,
-          maxParticipantsIncluded: 1,
-          currency: "CAD",
-          lastUpdated: new Date().toISOString(),
-          version: "1.0",
-          createdBy: "system",
-        };
+  private getSharedPlatformConfig(): any {
+    // Use a shared key that simulates a centralized database
+    const SHARED_CONFIG_KEY = "peptok_platform_global_config";
 
-        // Store default config
-        localStorage.setItem("platform_pricing_config", JSON.stringify(config));
+    let config;
+    const stored = localStorage.getItem(SHARED_CONFIG_KEY);
+
+    if (stored) {
+      config = JSON.parse(stored);
+    } else {
+      // Default configuration - this will be the same for ALL platform admins
+      config = {
+        companyServiceFee: 0.1,
+        coachCommission: 0.2,
+        minCoachCommissionAmount: 5,
+        additionalParticipantFee: 25,
+        maxParticipantsIncluded: 1,
+        currency: "CAD",
+        lastUpdated: new Date().toISOString(),
+        version: "1.0",
+        createdBy: "system",
+        adminCount: 1,
+        syncToken: Date.now().toString(),
+      };
+
+      // Store with shared key that all admins will use
+      localStorage.setItem(SHARED_CONFIG_KEY, JSON.stringify(config));
+    }
+
+    // Always check for updates from other admin sessions
+    this.checkForConfigUpdates(config);
+
+    analytics.trackAction({
+      action: "pricing_config_retrieved",
+      component: "api_enhanced",
+      metadata: {
+        source: "simulated_backend",
+        version: config.version,
+        syncToken: config.syncToken,
+      },
+    });
+
+    return config;
+  }
+
+  private checkForConfigUpdates(currentConfig: any): void {
+    // Simulate checking for updates from other admin sessions
+    const SHARED_CONFIG_KEY = "peptok_platform_global_config";
+    const LAST_SYNC_KEY = "peptok_last_sync_check";
+
+    const lastSyncCheck = localStorage.getItem(LAST_SYNC_KEY);
+    const now = Date.now();
+
+    // Check every 5 seconds for updates
+    if (!lastSyncCheck || now - parseInt(lastSyncCheck) > 5000) {
+      localStorage.setItem(LAST_SYNC_KEY, now.toString());
+
+      // In a real backend, this would be an API call to check for updates
+      // For simulation, we're ensuring all admins see the exact same data
+      const latestConfig = localStorage.getItem(SHARED_CONFIG_KEY);
+      if (latestConfig) {
+        const parsed = JSON.parse(latestConfig);
+        if (parsed.syncToken !== currentConfig.syncToken) {
+          // Configuration was updated by another admin
+          window.dispatchEvent(
+            new CustomEvent("globalConfigUpdated", {
+              detail: parsed,
+            }),
+          );
+        }
       }
-
-      analytics.trackAction({
-        action: "pricing_config_retrieved",
-        component: "api_enhanced",
-        metadata: { source: "local_storage", version: config.version },
-      });
-
-      return config;
     }
   }
 

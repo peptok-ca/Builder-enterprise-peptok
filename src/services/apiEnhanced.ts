@@ -141,10 +141,8 @@ class EnhancedApiService {
         },
       ];
 
-      localStorage.setItem(
-        "mentorship_requests",
-        JSON.stringify(sampleRequests),
-      );
+      await backendStorage.setItem("mentorship_requests", sampleRequests);
+      console.log("✅ Sample mentorship requests stored in backend database");
     }
   }
 

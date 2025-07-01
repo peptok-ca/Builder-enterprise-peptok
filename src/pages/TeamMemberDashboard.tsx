@@ -825,6 +825,118 @@ const TeamMemberDashboard = () => {
             ))}
           </TabsContent>
 
+          <TabsContent value="invitations" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="w-5 h-5" />
+                  Pending Invitations
+                </CardTitle>
+                <CardDescription>
+                  Program invitations waiting for your response
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {pendingInvitations.length > 0 ? (
+                  <div className="space-y-4">
+                    {pendingInvitations.map((invitation) => (
+                      <div
+                        key={invitation.id}
+                        className="border rounded-lg p-6 bg-gradient-to-r from-blue-50 to-orange-50 border-blue-200"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-start gap-4">
+                              <div className="p-3 bg-blue-100 rounded-lg">
+                                <UserPlus className="w-6 h-6 text-blue-600" />
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="text-lg font-semibold text-gray-900">
+                                  {invitation.programTitle}
+                                </h4>
+                                <p className="text-gray-600 mb-2">
+                                  {invitation.metadata?.programDescription}
+                                </p>
+                                <div className="space-y-2 text-sm text-gray-500">
+                                  <div className="flex items-center gap-4">
+                                    <span>From: {invitation.companyName}</span>
+                                    <span>
+                                      Invited by: {invitation.inviterName}
+                                    </span>
+                                    <Badge
+                                      className={getRoleColor(invitation.role)}
+                                    >
+                                      {invitation.role}
+                                    </Badge>
+                                  </div>
+                                  <div className="flex items-center gap-4">
+                                    <span>
+                                      Sessions:{" "}
+                                      {invitation.metadata?.sessionCount ||
+                                        "TBD"}
+                                    </span>
+                                    <span>
+                                      Duration:{" "}
+                                      {invitation.metadata?.duration || "TBD"}
+                                    </span>
+                                    <span className="text-orange-600 font-medium">
+                                      Expires:{" "}
+                                      {new Date(
+                                        invitation.expiresAt,
+                                      ).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 ml-4">
+                            <Button
+                              onClick={() => handleAcceptInvitation(invitation)}
+                              disabled={acceptingInvitation === invitation.id}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              {acceptingInvitation === invitation.id ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                                  Accepting...
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="w-4 h-4 mr-2" />
+                                  Accept
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                handleDeclineInvitation(invitation)
+                              }
+                              disabled={acceptingInvitation === invitation.id}
+                              className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                            >
+                              <X className="w-4 h-4 mr-2" />
+                              Decline
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-gray-500">
+                    <Mail className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p className="font-medium">No pending invitations</p>
+                    <p className="text-sm">
+                      When you receive program invitations, they'll appear here.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="feedback" className="space-y-6">
             <Card>
               <CardHeader>

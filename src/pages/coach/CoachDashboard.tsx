@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   CheckCircle,
-  X,
   Clock,
   Calendar,
   Users,
@@ -13,28 +12,129 @@ import {
   DollarSign,
   Award,
   Bell,
+  Eye,
+  ThumbsUp,
+  ThumbsDown,
+  Filter,
+  Search,
+  RefreshCw,
+  Settings,
+  BarChart3,
+  Target,
+  AlertCircle,
+  Plus,
 } from "lucide-react";
-import Header from "../../components/layout/Header";
-import { useAuth } from "../../contexts/AuthContext";
-import { MentorshipRequest } from "../../types";
-import { Session } from "../../types/session";
-import { CoachSessionSettings } from "../../components/coach/CoachSessionSettings";
-import { SessionManagement } from "../../components/sessions/SessionManagement";
-import { apiEnhanced } from "../../services/apiEnhanced";
-import { analytics } from "../../services/analytics";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import Header from "@/components/layout/Header";
+import { useAuth } from "@/contexts/AuthContext";
+import { apiEnhanced } from "@/services/apiEnhanced";
+import { analytics } from "@/services/analytics";
 import { toast } from "sonner";
 
-interface PendingRequest {
+interface CoachProfile {
+  id: string;
+  name: string;
+  email: string;
+  bio: string;
+  skills: string[];
+  experience: number;
+  rating: number;
+  totalRatings: number;
+  hourlyRate: number;
+  currency: string;
+  availability: {
+    timezone: string;
+    schedule: Array<{
+      day: string;
+      startTime: string;
+      endTime: string;
+      available: boolean;
+    }>;
+  };
+  certifications: string[];
+  languages: string[];
+  profileImage: string;
+  isActive: boolean;
+  joinedAt: string;
+}
+
+interface MatchRequest {
   id: string;
   title: string;
-  company: string;
   description: string;
-  goals: string[];
-  teamSize: number;
+  companyName: string;
+  companyId: string;
+  skills: string[];
+  participants: number;
+  duration: string;
+  budget: {
+    min: number;
+    max: number;
+    currency: string;
+  };
   urgency: "low" | "medium" | "high";
-  budget?: number;
-  preferredSchedule: string;
-  submittedAt: Date;
+  status: "pending" | "accepted" | "declined" | "in_progress" | "completed";
+  submittedAt: string;
+  deadlineAt?: string;
+  requirements: string[];
+  preferredStartDate: string;
+  sessionFrequency: string;
+  goals: Array<{
+    id: string;
+    title: string;
+    description: string;
+    priority: "high" | "medium" | "low";
+  }>;
+}
+
+interface CoachSession {
+  id: string;
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  status: "scheduled" | "in_progress" | "completed" | "cancelled";
+  participants: Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  }>;
+  companyName: string;
+  meetingLink?: string;
+  notes?: string;
+  rating?: number;
+  feedback?: string;
+  earnings: number;
+  currency: string;
 }
 
 interface CoachStats {
@@ -42,321 +142,222 @@ interface CoachStats {
   completedSessions: number;
   averageRating: number;
   totalEarnings: number;
+  thisMonthEarnings: number;
   upcomingSessions: number;
-  responseTime: number;
-  successRate: number;
+  responseTime: number; // in hours
+  successRate: number; // percentage
+  repeatClients: number;
+  totalClients: number;
+  profileViews: number;
+  matchAcceptanceRate: number;
+}
+
+interface ActivityItem {
+  id: string;
+  type:
+    | "match_request"
+    | "session_completed"
+    | "payment_received"
+    | "rating_received"
+    | "profile_view";
+  title: string;
+  description: string;
+  timestamp: string;
+  metadata?: Record<string, any>;
 }
 
 export const CoachDashboard: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  console.log("CoachDashboard component rendering");
-  console.log("Current user:", user);
-  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
-  const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
-  const [stats, setStats] = useState<CoachStats>({
-    totalSessions: 0,
-    completedSessions: 0,
-    averageRating: 0,
-    totalEarnings: 0,
-    upcomingSessions: 0,
-    responseTime: 0,
-    successRate: 0,
-  });
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
-  const [sessions, setSessions] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // State management
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [profile, setProfile] = useState<CoachProfile | null>(null);
+  const [stats, setStats] = useState<CoachStats | null>(null);
+  const [pendingMatches, setPendingMatches] = useState<MatchRequest[]>([]);
+  const [upcomingSessions, setUpcomingSessions] = useState<CoachSession[]>([]);
+  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+
+  // Filter states
+  const [matchFilter, setMatchFilter] = useState("all");
+  const [sessionFilter, setSessionFilter] = useState("upcoming");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Dialog states
+  const [selectedMatch, setSelectedMatch] = useState<MatchRequest | null>(null);
+  const [isMatchDialogOpen, setIsMatchDialogOpen] = useState(false);
+  const [declineReason, setDeclineReason] = useState("");
+  const [acceptanceMessage, setAcceptanceMessage] = useState("");
 
   useEffect(() => {
+    if (!user || user.userType !== "coach") {
+      navigate("/login");
+      return;
+    }
+
     loadDashboardData();
-  }, []);
+
+    // Track page view
+    analytics.pageView({
+      page: "coach_dashboard",
+      userId: user.id,
+      userType: user.userType,
+    });
+  }, [user, navigate]);
 
   const loadDashboardData = async () => {
+    if (!user) return;
+
     try {
-      setIsLoading(true);
+      setLoading(true);
 
-      if (!user?.id) {
-        toast.error("User not found. Please log in again.");
-        return;
-      }
+      // Load all data in parallel
+      const [profileData, statsData, matchesData, sessionsData, activityData] =
+        await Promise.all([
+          apiEnhanced.request<CoachProfile>(`/coaches/${user.id}/profile`),
+          apiEnhanced.request<CoachStats>(`/coaches/${user.id}/stats`),
+          apiEnhanced.getCoachMatches(user.id),
+          apiEnhanced.request<CoachSession[]>(
+            `/coaches/${user.id}/sessions?status=upcoming&limit=10`,
+          ),
+          apiEnhanced.request<ActivityItem[]>(
+            `/coaches/${user.id}/activity?limit=20`,
+          ),
+        ]);
 
-      console.log("Loading coach dashboard data for user:", user.id);
-
-      // Track page view
-      analytics.pageView({
-        page: "coach_dashboard",
-        userId: user.id,
-        userType: user.userType,
-      });
-
-      // Fetch coach-specific matches and requests
-      const coachMatches = await apiEnhanced.getCoachMatches(user.id);
-      console.log("Fetched coach matches:", coachMatches);
-
-      // Convert matches to pending requests format
-      const pendingRequestsData = coachMatches
-        .filter((match) => match.status === "pending")
-        .map((match) => ({
-          id: match.id,
-          title: match.title,
-          company: match.companyId, // This would be resolved to company name in real API
-          description: match.description,
-          goals: match.goals?.map((g) => g.title) || [],
-          teamSize: match.participants || 1,
-          urgency: match.priority as "low" | "medium" | "high",
-          budget: match.budget?.max,
-          preferredSchedule: match.timeline || "TBD",
-          submittedAt: new Date(match.createdAt),
-        }));
-
-      // Generate coach stats from matches
-      const completedMatches = coachMatches.filter(
-        (m) => m.status === "completed",
+      setProfile(profileData.data);
+      setStats(statsData.data);
+      setPendingMatches(
+        matchesData.filter((match) => match.status === "pending"),
       );
-      const inProgressMatches = coachMatches.filter(
-        (m) => m.status === "in_progress",
-      );
-
-      const statsData: CoachStats = {
-        totalSessions: coachMatches.length,
-        completedSessions: completedMatches.length,
-        averageRating: 4.8, // This would come from actual ratings
-        totalEarnings: completedMatches.length * 150, // Estimated
-        upcomingSessions: inProgressMatches.length,
-        responseTime: 2.5, // Hours
-        successRate:
-          completedMatches.length > 0
-            ? (completedMatches.length / coachMatches.length) * 100
-            : 0,
-      };
-
-      console.log("Generated coach stats:", statsData);
+      setUpcomingSessions(sessionsData.data);
+      setRecentActivity(activityData.data);
 
       analytics.trackAction({
-        action: "coach_dashboard_loaded",
+        action: "dashboard_loaded",
         component: "coach_dashboard",
         metadata: {
           coachId: user.id,
-          totalMatches: coachMatches.length,
-          pendingMatches: pendingRequestsData.length,
-          completedMatches: completedMatches.length,
+          pendingMatches: matchesData.filter((m) => m.status === "pending")
+            .length,
+          upcomingSessions: sessionsData.data.length,
         },
       });
-
-      const mockSessions = [
-        {
-          id: "session-1",
-          title: "Leadership Fundamentals",
-          description: "Introduction to leadership principles and goal setting",
-          date: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
-          duration: 60,
-          status: "upcoming",
-          type: "video",
-          coach: {
-            id: user?.id || "coach-1",
-            name: user?.name || "Sarah Johnson",
-            avatar:
-              user?.picture || "https://avatar.vercel.sh/sarah@example.com",
-          },
-          participants: [
-            {
-              id: "participant-1",
-              name: "John Doe",
-              email: "john@example.com",
-              role: "participant",
-              status: "confirmed",
-            },
-            {
-              id: "participant-2",
-              name: "Jane Smith",
-              email: "jane@example.com",
-              role: "observer",
-              status: "confirmed",
-            },
-          ],
-          programTitle: "Leadership Development Program",
-          canManage: true,
-          meetingLink: "/session/video?sessionId=session-1",
-        },
-        {
-          id: "session-2",
-          title: "Team Communication Skills",
-          description: "Effective communication strategies for team leaders",
-          date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-          duration: 60,
-          status: "upcoming",
-          type: "video",
-          coach: {
-            id: user?.id || "coach-1",
-            name: user?.name || "Sarah Johnson",
-            avatar:
-              user?.picture || "https://avatar.vercel.sh/sarah@example.com",
-          },
-          participants: [
-            {
-              id: "participant-3",
-              name: "Mike Wilson",
-              email: "mike@example.com",
-              role: "participant",
-              status: "confirmed",
-            },
-          ],
-          programTitle: "Leadership Development Program",
-          canManage: true,
-          meetingLink: "/session/video?sessionId=session-2",
-        },
-        {
-          id: "session-3",
-          title: "Performance Management",
-          description:
-            "Building high-performing teams through effective management",
-          date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-          duration: 60,
-          status: "completed",
-          type: "video",
-          coach: {
-            id: user?.id || "coach-1",
-            name: user?.name || "Sarah Johnson",
-            avatar:
-              user?.picture || "https://avatar.vercel.sh/sarah@example.com",
-          },
-          participants: [
-            {
-              id: "participant-1",
-              name: "John Doe",
-              email: "john@example.com",
-              role: "participant",
-              status: "confirmed",
-            },
-          ],
-          programTitle: "Leadership Development Program",
-          canManage: true,
-        },
-      ];
-
-      const mockActivity = [
-        {
-          id: "1",
-          type: "session_completed",
-          title: "Completed session with Alex Chen",
-          message: "New coaching request from TechStart Inc.",
-          timestamp: new Date("2024-01-16T10:30:00"),
-        },
-        {
-          id: "2",
-          type: "request_received",
-          title: "New request received",
-          message: "Leadership coaching for Growth Corp team",
-          timestamp: new Date("2024-01-15T14:22:00"),
-        },
-      ];
-
-      // Update state with fetched data
-      setPendingRequests(pendingRequestsData);
-      setStats(statsData);
-      setRecentActivity(mockActivity); // Keep for now, can be updated later
-      setSessions(mockSessions); // Keep for now, can be updated later
-
-      toast.success(
-        `Loaded ${pendingRequestsData.length} pending requests from backend`,
-      );
     } catch (error) {
       console.error("Error loading dashboard data:", error);
-      toast.error("Failed to load dashboard data");
+      toast.error("Failed to load dashboard data. Please try again.");
+
+      analytics.trackError(
+        error instanceof Error ? error : new Error("Dashboard load failed"),
+        { component: "coach_dashboard", coachId: user.id },
+      );
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleAcceptRequest = async (requestId: string) => {
-    try {
-      if (!user?.id) {
-        toast.error("User not found");
-        return;
-      }
+  const refreshData = async () => {
+    setRefreshing(true);
+    await loadDashboardData();
+    setRefreshing(false);
+    toast.success("Dashboard refreshed");
+  };
 
-      console.log("Accepting request:", requestId);
-      const result = await apiEnhanced.acceptMatch(requestId);
+  const handleAcceptMatch = async (matchId: string) => {
+    if (!user) return;
+
+    try {
+      const result = await apiEnhanced.acceptMatch(matchId);
 
       if (result.success) {
-        setPendingRequests((prev) =>
-          prev.filter((req) => req.id !== requestId),
-        );
-        toast.success(
-          result.message || "Coaching request accepted successfully!",
+        // Remove from pending matches
+        setPendingMatches((prev) =>
+          prev.filter((match) => match.id !== matchId),
         );
 
-        // Update stats
-        setStats((prev) => ({
-          ...prev,
-          upcomingSessions: prev.upcomingSessions + 1,
-        }));
+        toast.success("Match accepted successfully!");
+
+        // Refresh stats
+        await loadDashboardData();
 
         analytics.trackAction({
-          action: "request_accepted_dashboard",
+          action: "match_accepted",
           component: "coach_dashboard",
-          metadata: { requestId, coachId: user.id },
+          metadata: { matchId, coachId: user.id },
         });
-
-        // Reload dashboard data to get updated stats
-        loadDashboardData();
-      } else {
-        toast.error("Failed to accept request");
       }
     } catch (error) {
-      console.error("Error accepting request:", error);
+      console.error("Error accepting match:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to accept request",
+        error instanceof Error ? error.message : "Failed to accept match",
       );
 
       analytics.trackError(
-        error instanceof Error ? error : new Error("Request accept failed"),
-        { component: "coach_dashboard", requestId, coachId: user.id },
+        error instanceof Error ? error : new Error("Match accept failed"),
+        { component: "coach_dashboard", matchId, coachId: user.id },
       );
     }
   };
 
-  const handleRejectRequest = async (requestId: string) => {
-    try {
-      if (!user?.id) {
-        toast.error("User not found");
-        return;
-      }
+  const handleDeclineMatch = async (matchId: string, reason: string) => {
+    if (!user) return;
 
-      console.log("Declining request:", requestId);
-      const result = await apiEnhanced.declineMatch(
-        requestId,
-        "Thank you for your interest. Unfortunately, I'm not available for this project at the moment.",
-      );
+    try {
+      const result = await apiEnhanced.declineMatch(matchId, reason);
 
       if (result.success) {
-        setPendingRequests((prev) =>
-          prev.filter((req) => req.id !== requestId),
+        // Remove from pending matches
+        setPendingMatches((prev) =>
+          prev.filter((match) => match.id !== matchId),
         );
-        toast.success(result.message || "Request declined");
+
+        toast.success("Match declined");
+
+        setIsMatchDialogOpen(false);
+        setSelectedMatch(null);
+        setDeclineReason("");
 
         analytics.trackAction({
-          action: "request_declined_dashboard",
+          action: "match_declined",
           component: "coach_dashboard",
-          metadata: { requestId, coachId: user.id },
+          metadata: { matchId, coachId: user.id, reason },
         });
-
-        // Reload dashboard data to get updated stats
-        loadDashboardData();
-      } else {
-        toast.error("Failed to decline request");
       }
     } catch (error) {
-      console.error("Error rejecting request:", error);
+      console.error("Error declining match:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to decline request",
+        error instanceof Error ? error.message : "Failed to decline match",
       );
 
       analytics.trackError(
-        error instanceof Error ? error : new Error("Request decline failed"),
-        { component: "coach_dashboard", requestId, coachId: user.id },
+        error instanceof Error ? error : new Error("Match decline failed"),
+        { component: "coach_dashboard", matchId, coachId: user.id },
       );
+    }
+  };
+
+  const updateAvailability = async (availability: any) => {
+    if (!user) return;
+
+    try {
+      await apiEnhanced.updateCoachAvailability(availability);
+
+      // Update local profile
+      if (profile) {
+        setProfile({ ...profile, availability });
+      }
+
+      toast.success("Availability updated successfully");
+
+      analytics.trackAction({
+        action: "availability_updated",
+        component: "coach_dashboard",
+        metadata: { coachId: user.id },
+      });
+    } catch (error) {
+      console.error("Error updating availability:", error);
+      toast.error("Failed to update availability");
     }
   };
 
@@ -373,21 +374,72 @@ export const CoachDashboard: React.FC = () => {
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800";
+      case "scheduled":
+        return "bg-purple-100 text-purple-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
 
-  if (isLoading) {
+  const filteredMatches = pendingMatches.filter((match) => {
+    const matchesSearch =
+      searchQuery === "" ||
+      match.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      match.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      match.skills.some((skill) =>
+        skill.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+
+    const matchesFilter =
+      matchFilter === "all" || match.urgency === matchFilter;
+
+    return matchesSearch && matchesFilter;
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-lg text-muted-foreground">
+                Loading your dashboard...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile || !stats) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-500">Loading dashboard...</p>
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">
+              Unable to Load Dashboard
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              We couldn't load your coaching dashboard. Please try refreshing
+              the page.
+            </p>
+            <Button onClick={loadDashboardData}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Retry
+            </Button>
           </div>
         </div>
       </div>
@@ -396,317 +448,650 @@ export const CoachDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header userType="coach" />
+      <Header />
 
-      <main className="container mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user?.name || "Coach"}!
-          </h1>
-          <p className="text-gray-600">
-            Manage your coaching requests and sessions
-          </p>
-          {/* Debug info to show data source */}
-          <div className="mt-2 text-xs text-blue-600">
-            ✅ Data loaded from backend API • {pendingRequests.length} pending
-            requests • Stats updated
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        {/* Header Section */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Welcome back, {profile.name}
+            </h1>
+            <p className="text-gray-600">
+              Manage your coaching sessions, view match requests, and track your
+              progress.
+            </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="outline"
+              onClick={refreshData}
+              disabled={refreshing}
+              className="flex items-center"
+            >
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
+              />
+              Refresh
+            </Button>
+            <Button onClick={() => navigate("/coach/settings")}>
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Total Sessions
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {stats.totalSessions}
-                </p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-full">
-                <Video className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Average Rating
-                </p>
-                <div className="flex items-center space-x-1">
-                  <p className="text-2xl font-bold text-gray-900">
-                    {stats.averageRating}
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <Target className="h-8 w-8 text-blue-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Sessions
                   </p>
-                  <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.totalSessions}
+                  </p>
+                  <p className="text-xs text-green-600">
+                    +{stats.completedSessions} completed
+                  </p>
                 </div>
               </div>
-              <div className="bg-yellow-100 p-3 rounded-full">
-                <Award className="w-6 h-6 text-yellow-600" />
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Total Earnings
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {formatCurrency(stats.totalEarnings)}
-                </p>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <Star className="h-8 w-8 text-yellow-500" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">
+                    Average Rating
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.averageRating.toFixed(1)}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    from {stats.totalClients} clients
+                  </p>
+                </div>
               </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <DollarSign className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Success Rate
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {stats.successRate}%
-                </p>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <DollarSign className="h-8 w-8 text-green-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">
+                    This Month
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    ${stats.thisMonthEarnings.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Total: ${stats.totalEarnings.toLocaleString()}
+                  </p>
+                </div>
               </div>
-              <div className="bg-purple-100 p-3 rounded-full">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <TrendingUp className="h-8 w-8 text-purple-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">
+                    Success Rate
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.successRate}%
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {stats.repeatClients} repeat clients
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Pending Requests */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  Pending Coaching Requests
-                </h2>
-                <p className="text-gray-600 mt-1">
-                  Review and respond to new coaching opportunities
-                </p>
-              </div>
-              <div className="p-6">
-                {pendingRequests.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="matches" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="matches">
+              Match Requests
+              {pendingMatches.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {pendingMatches.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="sessions">
+              Upcoming Sessions
+              {upcomingSessions.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {upcomingSessions.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="activity">Recent Activity</TabsTrigger>
+          </TabsList>
+
+          {/* Match Requests Tab */}
+          <TabsContent value="matches" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Match Requests</CardTitle>
+                    <CardDescription>
+                      Review and respond to coaching match requests
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search requests..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10 w-64"
+                      />
+                    </div>
+                    <Select value={matchFilter} onValueChange={setMatchFilter}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="high">High Priority</SelectItem>
+                        <SelectItem value="medium">Medium Priority</SelectItem>
+                        <SelectItem value="low">Low Priority</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {filteredMatches.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      No pending requests
+                      No match requests
                     </h3>
-                    <p className="text-gray-500">
-                      New coaching requests will appear here.
+                    <p className="text-gray-600">
+                      {searchQuery || matchFilter !== "all"
+                        ? "No requests match your current filters."
+                        : "You don't have any pending match requests at the moment."}
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-6">
-                    {pendingRequests.map((request) => (
+                  <div className="space-y-4">
+                    {filteredMatches.map((match) => (
                       <div
-                        key={request.id}
-                        className="border border-gray-200 rounded-lg p-6"
+                        key={match.id}
+                        className="border rounded-lg p-6 hover:shadow-md transition-shadow"
                       >
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              {request.title}
-                            </h3>
-                            <p className="text-gray-600">{request.company}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(
-                                request.urgency,
-                              )}`}
-                            >
-                              {request.urgency} priority
-                            </span>
-                            {request.budget && (
-                              <span className="text-sm font-medium text-green-600">
-                                {formatCurrency(request.budget)}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h3 className="text-lg font-semibold">
+                                {match.title}
+                              </h3>
+                              <Badge className={getUrgencyColor(match.urgency)}>
+                                {match.urgency} priority
+                              </Badge>
+                            </div>
+                            <p className="text-gray-600 mb-3">
+                              {match.description}
+                            </p>
+                            <div className="flex items-center space-x-6 text-sm text-gray-500 mb-3">
+                              <span className="flex items-center">
+                                <Users className="w-4 h-4 mr-1" />
+                                {match.participants} participants
                               </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <p className="text-gray-700 mb-4">
-                          {request.description}
-                        </p>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-900 mb-2">
-                              Goals:
-                            </h4>
-                            <ul className="text-sm text-gray-600 space-y-1">
-                              {request.goals.map((goal, index) => (
-                                <li key={index} className="flex items-start">
-                                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0" />
-                                  {goal}
-                                </li>
+                              <span className="flex items-center">
+                                <Calendar className="w-4 h-4 mr-1" />
+                                {match.duration}
+                              </span>
+                              <span className="flex items-center">
+                                <DollarSign className="w-4 h-4 mr-1" />$
+                                {match.budget.min.toLocaleString()} - $
+                                {match.budget.max.toLocaleString()}
+                              </span>
+                              <span className="flex items-center">
+                                <Clock className="w-4 h-4 mr-1" />
+                                Start:{" "}
+                                {new Date(
+                                  match.preferredStartDate,
+                                ).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {match.skills.map((skill, index) => (
+                                <Badge key={index} variant="outline">
+                                  {skill}
+                                </Badge>
                               ))}
-                            </ul>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="flex items-center text-sm">
-                              <Users className="w-4 h-4 text-gray-400 mr-2" />
-                              <span>Team size: {request.teamSize} people</span>
                             </div>
-                            <div className="flex items-center text-sm">
-                              <Clock className="w-4 h-4 text-gray-400 mr-2" />
-                              <span>
-                                Preferred: {request.preferredSchedule}
-                              </span>
-                            </div>
-                            <div className="flex items-center text-sm">
-                              <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                              <span>
-                                Submitted:{" "}
-                                {request.submittedAt.toLocaleDateString()}
-                              </span>
+                            <div className="text-sm text-gray-600">
+                              <strong>Company:</strong> {match.companyName} •{" "}
+                              <strong>Submitted:</strong>{" "}
+                              {new Date(match.submittedAt).toLocaleDateString()}
+                              {match.deadlineAt && (
+                                <>
+                                  {" • "}
+                                  <strong>Deadline:</strong>{" "}
+                                  {new Date(
+                                    match.deadlineAt,
+                                  ).toLocaleDateString()}
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex justify-end space-x-3">
-                          <button
-                            onClick={() => handleRejectRequest(request.id)}
-                            className="flex items-center px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                        <div className="flex items-center justify-between pt-4 border-t">
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedMatch(match);
+                              setIsMatchDialogOpen(true);
+                            }}
                           >
-                            <X className="w-4 h-4 mr-2" />
-                            Decline
-                          </button>
-                          <button
-                            onClick={() => handleAcceptRequest(request.id)}
-                            className="flex items-center px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-                          >
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Accept
-                          </button>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </Button>
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                handleDeclineMatch(
+                                  match.id,
+                                  "Not a good fit at this time",
+                                )
+                              }
+                            >
+                              <ThumbsDown className="w-4 h-4 mr-2" />
+                              Decline
+                            </Button>
+                            <Button onClick={() => handleAcceptMatch(match.id)}>
+                              <ThumbsUp className="w-4 h-4 mr-2" />
+                              Accept
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Upcoming Sessions Tab */}
+          <TabsContent value="sessions" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Upcoming Sessions</CardTitle>
+                <CardDescription>
+                  Your scheduled coaching sessions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {upcomingSessions.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      No upcoming sessions
+                    </h3>
+                    <p className="text-gray-600">
+                      You don't have any sessions scheduled at the moment.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {upcomingSessions.map((session) => (
+                      <div
+                        key={session.id}
+                        className="border rounded-lg p-6 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h3 className="text-lg font-semibold">
+                                {session.title}
+                              </h3>
+                              <Badge className={getStatusColor(session.status)}>
+                                {session.status.replace("_", " ")}
+                              </Badge>
+                            </div>
+                            <p className="text-gray-600 mb-3">
+                              {session.description}
+                            </p>
+                            <div className="flex items-center space-x-6 text-sm text-gray-500 mb-3">
+                              <span className="flex items-center">
+                                <Calendar className="w-4 h-4 mr-1" />
+                                {new Date(
+                                  session.startTime,
+                                ).toLocaleDateString()}
+                              </span>
+                              <span className="flex items-center">
+                                <Clock className="w-4 h-4 mr-1" />
+                                {new Date(
+                                  session.startTime,
+                                ).toLocaleTimeString()}{" "}
+                                -{" "}
+                                {new Date(session.endTime).toLocaleTimeString()}
+                              </span>
+                              <span className="flex items-center">
+                                <Users className="w-4 h-4 mr-1" />
+                                {session.participants.length} participants
+                              </span>
+                              <span className="flex items-center">
+                                <DollarSign className="w-4 h-4 mr-1" />$
+                                {session.earnings}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              <strong>Company:</strong> {session.companyName}
+                            </p>
+                          </div>
+                          <div className="flex space-x-2">
+                            {session.meetingLink && (
+                              <Button variant="outline" asChild>
+                                <a
+                                  href={session.meetingLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <Video className="w-4 h-4 mr-2" />
+                                  Join Session
+                                </a>
+                              </Button>
+                            )}
+                            <Button variant="outline">
+                              <MessageCircle className="w-4 h-4 mr-2" />
+                              Messages
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Performance Metrics</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span>Response Time</span>
+                    <span className="font-semibold">
+                      {stats.responseTime}h avg
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Match Acceptance Rate</span>
+                    <span className="font-semibold">
+                      {stats.matchAcceptanceRate}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Profile Views</span>
+                    <span className="font-semibold">{stats.profileViews}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Repeat Clients</span>
+                    <span className="font-semibold">
+                      {stats.repeatClients}/{stats.totalClients}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Earnings Overview</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span>This Month</span>
+                    <span className="font-semibold">
+                      ${stats.thisMonthEarnings.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Total Earnings</span>
+                    <span className="font-semibold">
+                      ${stats.totalEarnings.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Average per Session</span>
+                    <span className="font-semibold">
+                      $
+                      {stats.completedSessions > 0
+                        ? Math.round(
+                            stats.totalEarnings / stats.completedSessions,
+                          )
+                        : 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Hourly Rate</span>
+                    <span className="font-semibold">${profile.hourlyRate}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Recent Activity Tab */}
+          <TabsContent value="activity" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Activity</CardTitle>
+                <CardDescription>
+                  Your recent coaching activities and notifications
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {recentActivity.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      No recent activity
+                    </h3>
+                    <p className="text-gray-600">
+                      Your recent activities will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {recentActivity.map((activity) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-start space-x-4 p-4 border rounded-lg"
+                      >
+                        <div className="flex-shrink-0">
+                          {activity.type === "match_request" && (
+                            <Target className="w-5 h-5 text-blue-500" />
+                          )}
+                          {activity.type === "session_completed" && (
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                          )}
+                          {activity.type === "payment_received" && (
+                            <DollarSign className="w-5 h-5 text-green-500" />
+                          )}
+                          {activity.type === "rating_received" && (
+                            <Star className="w-5 h-5 text-yellow-500" />
+                          )}
+                          {activity.type === "profile_view" && (
+                            <Eye className="w-5 h-5 text-purple-500" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium">{activity.title}</h4>
+                          <p className="text-sm text-gray-600">
+                            {activity.description}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(activity.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Match Details Dialog */}
+      <Dialog open={isMatchDialogOpen} onOpenChange={setIsMatchDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Match Request Details</DialogTitle>
+            <DialogDescription>
+              Review the complete details of this coaching opportunity
+            </DialogDescription>
+          </DialogHeader>
+          {selectedMatch && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">
+                  {selectedMatch.title}
+                </h3>
+                <p className="text-gray-600">{selectedMatch.description}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <Label className="text-sm font-medium">Company</Label>
+                  <p className="text-sm text-gray-600">
+                    {selectedMatch.companyName}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Participants</Label>
+                  <p className="text-sm text-gray-600">
+                    {selectedMatch.participants} people
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Duration</Label>
+                  <p className="text-sm text-gray-600">
+                    {selectedMatch.duration}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Budget</Label>
+                  <p className="text-sm text-gray-600">
+                    ${selectedMatch.budget.min.toLocaleString()} - $
+                    {selectedMatch.budget.max.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Required Skills</Label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {selectedMatch.skills.map((skill, index) => (
+                    <Badge key={index} variant="outline">
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Goals</Label>
+                <div className="space-y-2 mt-1">
+                  {selectedMatch.goals.map((goal) => (
+                    <div key={goal.id} className="border rounded p-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-medium">{goal.title}</h4>
+                        <Badge
+                          variant={
+                            goal.priority === "high"
+                              ? "destructive"
+                              : "secondary"
+                          }
+                        >
+                          {goal.priority}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        {goal.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Requirements</Label>
+                <ul className="list-disc list-inside space-y-1 mt-1">
+                  {selectedMatch.requirements.map((req, index) => (
+                    <li key={index} className="text-sm text-gray-600">
+                      {req}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <Separator />
+
+              <div className="flex justify-between space-x-4">
+                <div className="flex-1">
+                  <Label htmlFor="decline-reason">
+                    Decline Reason (Optional)
+                  </Label>
+                  <Textarea
+                    id="decline-reason"
+                    placeholder="Provide a reason for declining this match..."
+                    value={declineReason}
+                    onChange={(e) => setDeclineReason(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    handleDeclineMatch(selectedMatch.id, declineReason);
+                  }}
+                >
+                  Decline
+                </Button>
+                <Button onClick={() => handleAcceptMatch(selectedMatch.id)}>
+                  Accept Match
+                </Button>
               </div>
             </div>
-
-            {/* Session Management */}
-            <SessionManagement
-              sessions={sessions}
-              onSessionUpdate={(sessionId, updates) => {
-                setSessions((prev) =>
-                  prev.map((session) =>
-                    session.id === sessionId
-                      ? { ...session, ...updates }
-                      : session,
-                  ),
-                );
-              }}
-              userType="coach"
-            />
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Quick Actions
-              </h3>
-              <div className="space-y-3">
-                <button
-                  onClick={() => navigate("/coach/profile")}
-                  className="w-full text-left px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center">
-                    <Users className="w-5 h-5 text-gray-400 mr-3" />
-                    <div>
-                      <p className="font-medium text-gray-900">Coach Profile</p>
-                      <p className="text-sm text-gray-500">
-                        Update your profile
-                      </p>
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => navigate("/coach/calendar")}
-                  className="w-full text-left px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center">
-                    <Calendar className="w-5 h-5 text-gray-400 mr-3" />
-                    <div>
-                      <p className="font-medium text-gray-900">Calendar</p>
-                      <p className="text-sm text-gray-500">
-                        Manage availability
-                      </p>
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => navigate("/coach/earnings")}
-                  className="w-full text-left px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center">
-                    <DollarSign className="w-5 h-5 text-gray-400 mr-3" />
-                    <div>
-                      <p className="font-medium text-gray-900">Earnings</p>
-                      <p className="text-sm text-gray-500">
-                        View payment history
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            {/* Session Settings */}
-            <CoachSessionSettings
-              onSettingsUpdated={(settings) => {
-                toast.success("Session settings updated successfully!");
-                console.log("Updated settings:", settings);
-              }}
-            />
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Recent Activity
-              </h3>
-              <div className="space-y-4">
-                {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-3">
-                    <div className="bg-blue-100 p-2 rounded-full">
-                      <MessageCircle className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">
-                        {activity.title}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {activity.message}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        {activity.timestamp.toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
+export default CoachDashboard;

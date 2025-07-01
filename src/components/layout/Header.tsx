@@ -358,6 +358,17 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
             <div className="flex items-center space-x-4">
               <nav className="hidden md:flex items-center space-x-6">
                 <Link
+                  to="/invitations"
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-primary",
+                    isActive("/invitations")
+                      ? "text-primary"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  Check Invitations
+                </Link>
+                <Link
                   to="/pricing"
                   className={cn(
                     "text-sm font-medium transition-colors hover:text-primary",

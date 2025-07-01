@@ -21,6 +21,15 @@ import {
 
 import { Environment } from "../utils/environment";
 import { analytics } from "./analytics";
+import {
+  demoUsers,
+  demoCompanies,
+  demoMentorshipRequests,
+  demoSessions,
+  demoReviews,
+  getDemoStatistics,
+  type DemoUser,
+} from "../data/demoDatabase";
 
 const API_BASE_URL = Environment.getApiBaseUrl();
 
@@ -542,12 +551,9 @@ class EnhancedApiService {
     } catch (error) {
       console.warn("API not available, using filtered mock matches:", error);
 
-      // Get requests from localStorage and filter for this coach
-      const allRequests = JSON.parse(
-        localStorage.getItem("mentorship_requests") || "[]",
-      );
-      const coachMatches = allRequests.filter(
-        (req: MentorshipRequest) =>
+      // Use demo database requests and filter for this coach
+      const coachMatches = demoMentorshipRequests.filter(
+        (req) =>
           req.assignedCoachId === targetCoachId ||
           (req.status === "pending" && !req.assignedCoachId), // Show pending matches coaches can accept
       );
@@ -793,15 +799,9 @@ class EnhancedApiService {
     } catch (error) {
       console.warn("API not available, using mock platform stats:", error);
 
-      // Generate realistic mock data
-      const stats = {
-        totalUsers: 1247 + Math.floor(Math.random() * 100),
-        totalCompanies: 89 + Math.floor(Math.random() * 10),
-        totalCoaches: 156 + Math.floor(Math.random() * 20),
-        totalSessions: 3842 + Math.floor(Math.random() * 200),
-        monthlyRevenue: 47580 + Math.floor(Math.random() * 5000),
-        activeSubscriptions: 67 + Math.floor(Math.random() * 10),
-      };
+      // Use real demo database statistics
+      const demoStats = getDemoStatistics();
+      const stats = demoStats.platformStats;
 
       analytics.platform.dailyActiveUsers(stats.totalUsers, new Date());
       analytics.platform.revenue(
@@ -844,44 +844,19 @@ class EnhancedApiService {
     } catch (error) {
       console.warn("API not available, using mock users:", error);
 
-      // Generate mock users with filtering
-      let mockUsers: User[] = [
-        {
-          id: "user-1",
-          name: "John Smith",
-          email: "john@techcorp.com",
-          userType: "company_admin",
-          companyId: "company-1",
-          status: "active",
-          firstName: "John",
-          lastName: "Smith",
-          picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
-          provider: "email",
-        },
-        {
-          id: "user-2",
-          name: "Sarah Johnson",
-          email: "sarah@mentor.com",
-          userType: "coach",
-          status: "active",
-          firstName: "Sarah",
-          lastName: "Johnson",
-          picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
-          provider: "email",
-        },
-        {
-          id: "user-3",
-          name: "Mike Chen",
-          email: "mike@startup.com",
-          userType: "team_member",
-          companyId: "company-2",
-          status: "active",
-          firstName: "Mike",
-          lastName: "Chen",
-          picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=mike",
-          provider: "email",
-        },
-      ];
+      // Use demo database users
+      let mockUsers: User[] = demoUsers.map((user) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        userType: user.userType as any,
+        companyId: user.companyId,
+        status: user.status as any,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        picture: user.picture,
+        provider: user.provider,
+      }));
 
       // Apply filters
       if (filters?.userType) {
@@ -925,28 +900,19 @@ class EnhancedApiService {
     } catch (error) {
       console.warn("API not available, using mock companies:", error);
 
-      return [
-        {
-          id: "company-1",
-          name: "TechCorp Inc.",
-          industry: "Technology",
-          userCount: 25,
-          status: "active",
-          subscription: "Growth Plan",
-          joinedAt: "2024-01-15",
-          revenue: 4950,
-        },
-        {
-          id: "company-2",
-          name: "StartupCo",
-          industry: "Fintech",
-          userCount: 8,
-          status: "trial",
-          subscription: "Starter Plan",
-          joinedAt: "2024-01-05",
-          revenue: 792,
-        },
-      ];
+      return demoCompanies.map((company) => ({
+        id: company.id,
+        name: company.name,
+        industry: company.industry,
+        userCount: company.employeeCount,
+        status: company.status,
+        subscription: company.subscriptionTier,
+        joinedAt: company.joinedAt,
+        revenue: company.revenue,
+        adminId: company.adminId,
+        activePrograms: company.activePrograms,
+        totalSessions: company.totalSessions,
+      }));
     }
   }
 

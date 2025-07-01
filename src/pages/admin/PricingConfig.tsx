@@ -273,19 +273,58 @@ export default function PricingConfig() {
                   <div className="text-sm text-blue-800 space-y-1">
                     <div>Coach Rate: $150/hour</div>
                     <div>
-                      3 Participants (2 additional): 2 × $
-                      {config.additionalParticipantFee} = $
-                      {config.additionalParticipantFee * 2}
+                      {config.maxParticipantsIncluded + 2} Participants (
+                      {Math.max(
+                        0,
+                        config.maxParticipantsIncluded +
+                          2 -
+                          config.maxParticipantsIncluded,
+                      )}{" "}
+                      additional):{" "}
+                      {Math.max(
+                        0,
+                        config.maxParticipantsIncluded +
+                          2 -
+                          config.maxParticipantsIncluded,
+                      )}{" "}
+                      × ${config.additionalParticipantFee} = $
+                      {Math.max(
+                        0,
+                        config.maxParticipantsIncluded +
+                          2 -
+                          config.maxParticipantsIncluded,
+                      ) * config.additionalParticipantFee}
                     </div>
                     <div>
-                      Subtotal: $150 + ${config.additionalParticipantFee * 2} =
-                      ${150 + config.additionalParticipantFee * 2}
+                      Subtotal: $150 + $
+                      {Math.max(
+                        0,
+                        config.maxParticipantsIncluded +
+                          2 -
+                          config.maxParticipantsIncluded,
+                      ) * config.additionalParticipantFee}{" "}
+                      = $
+                      {150 +
+                        Math.max(
+                          0,
+                          config.maxParticipantsIncluded +
+                            2 -
+                            config.maxParticipantsIncluded,
+                        ) *
+                          config.additionalParticipantFee}
                     </div>
                     <div>
                       Service Fee ({(config.companyServiceFee * 100).toFixed(1)}
                       %): $
                       {(
-                        (150 + config.additionalParticipantFee * 2) *
+                        (150 +
+                          Math.max(
+                            0,
+                            config.maxParticipantsIncluded +
+                              2 -
+                              config.maxParticipantsIncluded,
+                          ) *
+                            config.additionalParticipantFee) *
                         config.companyServiceFee
                       ).toFixed(2)}
                     </div>
@@ -293,11 +332,28 @@ export default function PricingConfig() {
                       Total: $
                       {(
                         150 +
-                        config.additionalParticipantFee * 2 +
-                        (150 + config.additionalParticipantFee * 2) *
+                        Math.max(
+                          0,
+                          config.maxParticipantsIncluded +
+                            2 -
+                            config.maxParticipantsIncluded,
+                        ) *
+                          config.additionalParticipantFee +
+                        (150 +
+                          Math.max(
+                            0,
+                            config.maxParticipantsIncluded +
+                              2 -
+                              config.maxParticipantsIncluded,
+                          ) *
+                            config.additionalParticipantFee) *
                           config.companyServiceFee
                       ).toFixed(2)}{" "}
                       {config.currency}
+                    </div>
+                    <div className="text-xs text-blue-600 mt-2 pt-1 border-t border-blue-300">
+                      Note: Coaches earn session rate only. Additional
+                      participant fees are platform charges.
                     </div>
                   </div>
                 </div>

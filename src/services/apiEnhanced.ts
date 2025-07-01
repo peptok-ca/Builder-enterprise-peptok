@@ -1318,6 +1318,9 @@ class EnhancedApiService {
         name: user.name,
       });
 
+      // Invalidate pricing-related cache for all users
+      cacheInvalidation.invalidatePricingConfig(user.name);
+
       analytics.trackAction({
         action: "pricing_config_updated",
         component: "api_enhanced",

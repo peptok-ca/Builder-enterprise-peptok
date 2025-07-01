@@ -564,6 +564,77 @@ class EnhancedApiService {
     }
   }
 
+  async getCompanyCoaches(companyId?: string): Promise<any[]> {
+    const user = checkAuthorization(["company_admin", "platform_admin"]);
+    const targetCompanyId = companyId || user.companyId;
+
+    // Company admins can only see coaches for their company's requests
+    if (
+      user.userType === "company_admin" &&
+      targetCompanyId !== user.companyId
+    ) {
+      throw new Error(
+        "Company admins can only view coaches for their own company",
+      );
+    }
+
+    try {
+      const response = await this.request<any[]>(
+        `/companies/${targetCompanyId}/coaches`,
+      );
+
+      analytics.trackAction({
+        action: "company_coaches_viewed",
+        component: "company_dashboard",
+        metadata: {
+          companyId: targetCompanyId,
+          coachCount: response.data.length,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using demo coaches:", error);
+
+      // Filter coaches based on company's active requests and assignments
+      const companyRequests = demoMentorshipRequests.filter(
+        (req) => req.companyId === targetCompanyId,
+      );
+
+      const assignedCoachIds = companyRequests
+        .filter((req) => req.assignedCoachId)
+        .map((req) => req.assignedCoachId);
+
+      const availableCoaches = demoUsers
+        .filter((user) => user.userType === "coach")
+        .filter(
+          (coach) =>
+            assignedCoachIds.includes(coach.id) ||
+            companyRequests.some((req) => req.status === "pending"),
+        )
+        .map((coach) => ({
+          ...coach,
+          assignedRequests: companyRequests.filter(
+            (req) => req.assignedCoachId === coach.id,
+          ),
+          availableForRequests: companyRequests.filter(
+            (req) => req.status === "pending" && !req.assignedCoachId,
+          ),
+        }));
+
+      analytics.trackAction({
+        action: "company_coaches_viewed",
+        component: "company_dashboard",
+        metadata: {
+          companyId: targetCompanyId,
+          coachCount: availableCoaches.length,
+        },
+      });
+
+      return availableCoaches;
+    }
+  }
+
   async acceptMatch(
     matchId: string,
   ): Promise<{ success: boolean; message?: string }> {

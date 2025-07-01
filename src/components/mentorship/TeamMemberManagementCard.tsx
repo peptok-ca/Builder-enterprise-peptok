@@ -562,7 +562,7 @@ export function TeamMemberManagementCard({
                     </Badge>
 
                     <div className="flex items-center gap-1">
-                      {member.status === "invited" && (
+                      {!readOnly && member.status === "invited" && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -583,22 +583,34 @@ export function TeamMemberManagementCard({
                         </Button>
                       )}
 
-                      <Select
-                        value={member.role}
-                        onValueChange={(value: "participant" | "observer") =>
-                          updateMemberRole(member.id, value)
-                        }
-                      >
-                        <SelectTrigger className="w-auto h-8 px-2 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="participant">
-                            Participant
-                          </SelectItem>
-                          <SelectItem value="observer">Observer</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {!readOnly ? (
+                        <Select
+                          value={member.role}
+                          onValueChange={(value: "participant" | "observer") =>
+                            updateMemberRole(member.id, value)
+                          }
+                        >
+                          <SelectTrigger className="w-auto h-8 px-2 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="participant">
+                              Participant
+                            </SelectItem>
+                            <SelectItem value="observer">Observer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Badge
+                          variant={
+                            member.role === "participant"
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
+                          {member.role}
+                        </Badge>
+                      )}
 
                       <Button
                         variant="ghost"

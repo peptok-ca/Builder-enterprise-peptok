@@ -30,6 +30,7 @@ import {
   getDemoStatistics,
   type DemoUser,
 } from "../data/demoDatabase";
+import { crossBrowserSync, SYNC_CONFIGS } from "./crossBrowserSync";
 
 const API_BASE_URL = Environment.getApiBaseUrl();
 

@@ -154,6 +154,14 @@ export function MentorshipRequestProgress({
   };
 
   const calculateProgress = (request: MentorshipRequest) => {
+    if (
+      !request.timeline ||
+      !request.timeline.startDate ||
+      !request.timeline.endDate
+    ) {
+      return 0;
+    }
+
     const startDate = new Date(request.timeline.startDate);
     const endDate = new Date(request.timeline.endDate);
     const now = new Date();

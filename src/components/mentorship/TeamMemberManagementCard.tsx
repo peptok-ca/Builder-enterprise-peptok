@@ -90,29 +90,35 @@ export function TeamMemberManagementCard({
     setIsInviting(true);
 
     try {
-      // Create invitation using the new service
-      const invitation = await invitationService.createInvitation({
-        email: newMemberEmail.toLowerCase(),
-        name: newMemberName.trim() || undefined,
-        programId: programId || `program-${Date.now()}`,
-        programTitle: programTitle || "Mentorship Program",
-        companyId: user?.companyId || `company-${Date.now()}`,
-        companyName: user?.businessDetails?.companyName || "Your Company",
-        inviterName: user
-          ? `${user.firstName} ${user.lastName}`
-          : "Your program administrator",
-        inviterEmail: user?.email || "admin@company.com",
-        role: newMemberRole,
-        metadata: {
-          programDescription: `Join our ${programTitle} mentorship program`,
-          sessionCount: 8,
-          duration: "8 weeks",
-          startDate: new Date().toISOString(),
-          endDate: new Date(
-            Date.now() + 8 * 7 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
+      // Create invitation using offline-enabled API
+      const invitation = await offlineApi.createTeamInvitation(
+        {
+          email: newMemberEmail.toLowerCase(),
+          name: newMemberName.trim() || undefined,
+          programId: programId || `program-${Date.now()}`,
+          programTitle: programTitle || "Mentorship Program",
+          companyId: user?.companyId || `company-${Date.now()}`,
+          companyName: user?.businessDetails?.companyName || "Your Company",
+          inviterName: user
+            ? `${user.firstName} ${user.lastName}`
+            : "Your program administrator",
+          inviterEmail: user?.email || "admin@company.com",
+          role: newMemberRole,
+          metadata: {
+            programDescription: `Join our ${programTitle} mentorship program`,
+            sessionCount: 8,
+            duration: "8 weeks",
+            startDate: new Date().toISOString(),
+            endDate: new Date(
+              Date.now() + 8 * 7 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+          },
         },
-      });
+        {
+          priority: "high",
+          maxRetries: 5,
+        },
+      );
 
       // Create new team member entry
       const newTeamMember: TeamMember = {

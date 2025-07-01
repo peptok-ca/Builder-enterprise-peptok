@@ -319,9 +319,7 @@ const TeamMemberDashboard = () => {
   const refreshPendingInvitations = () => {
     if (user?.email) {
       try {
-        const userPendingInvitations = invitationService.getPendingInvitations(
-          user.email,
-        );
+        const userPendingInvitations = invitationService.getPendingInvitations(user.email);
         setPendingInvitations(userPendingInvitations);
         console.log("Refreshed pending invitations:", userPendingInvitations);
       } catch (error) {
@@ -408,7 +406,7 @@ const TeamMemberDashboard = () => {
 
       if (success) {
         toast.success("Invitation declined");
-        setPendingInvitations((prev) =>
+        refreshPendingInvitations();
           prev.filter((inv) => inv.id !== invitation.id),
         );
       } else {

@@ -510,13 +510,13 @@ export default function PricingConfig() {
 
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <h4 className="font-semibold text-green-900 mb-2">
-                    Coach Revenue Per Session
+                    Coach Commission
                   </h4>
                   <p className="text-2xl font-bold text-green-600">
                     {(config.coachCommission * 100).toFixed(1)}%
                   </p>
                   <p className="text-sm text-green-700">
-                    commission on earnings
+                    min ${config.minCoachCommissionAmount} {config.currency}
                   </p>
                 </div>
 

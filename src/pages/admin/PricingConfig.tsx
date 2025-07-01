@@ -133,6 +133,7 @@ export default function PricingConfig() {
       const pricingConfig = await apiEnhanced.getPricingConfig();
       setConfig(pricingConfig);
       setHasChanges(false);
+      hasChangesRef.current = false;
       setLastSyncTime(new Date().toLocaleString());
 
       // Determine storage source based on API response

@@ -2085,38 +2085,53 @@ class EnhancedApiService {
   }
 
   async getPendingInvitations(email: string): Promise<any[]> {
-    try {
-      const response = await this.request<any>(
-        `/team/invitations/pending?email=${encodeURIComponent(email)}`,
-      );
+    // Try multiple backend endpoints to ensure database access
+    const backendEndpoints = [
+      `/api/team/invitations/pending?email=${encodeURIComponent(email)}`,
+      `/api/invitations/pending?email=${encodeURIComponent(email)}`,
+      `/team/invitations/pending?email=${encodeURIComponent(email)}`
+    ];
 
-      analytics.trackAction({
-        action: "pending_invitations_fetched",
-        component: "team_api",
-        metadata: { email: email.substring(0, 5) + "..." },
-      });
+    let lastError: any = null;
 
-      return response.data;
-    } catch (error) {
-      console.warn(
-        "Pending invitations API not available, using local data:",
-        error,
-      );
+    for (const endpoint of backendEndpoints) {
+      try {
+        console.log(`Fetching pending invitations from backend database: ${endpoint}`);
 
-      // Fallback to localStorage
-      const pendingInvitations = localStorage.getItem(
-        "peptok_pending_invitations",
-      );
-      if (!pendingInvitations) return [];
+        const response = await this.request<any>(endpoint, {
+          headers: {
+            "X-Database-Read": "required", // Signal that database read is required
+          },
+        });
 
-      const invitations = JSON.parse(pendingInvitations);
-      const userInvitations = invitations[email.toLowerCase()] || [];
+        // Verify we got database data (not just cached/local data)
+        if (response.data && Array.isArray(response.data)) {
+          console.log(`✅ Successfully fetched ${response.data.length} pending invitations from backend database`);
 
-      // Filter out expired invitations
-      const now = new Date();
-      return userInvitations.filter(
-        (inv: any) => new Date(inv.expiresAt) > now,
-      );
+          analytics.trackAction({
+            action: "pending_invitations_fetched_database",
+            component: "team_api",
+            metadata: {
+              email: email.substring(0, 5) + "...",
+              count: response.data.length,
+              fromDatabase: true,
+              endpoint,
+            },
+          });
+
+          return response.data;
+        }
+      } catch (error) {
+        console.warn(`Backend endpoint ${endpoint} failed for pending invitations:`, error);
+        lastError = error;
+        continue;
+      }
+    }
+
+    // If all backend endpoints fail, throw error to trigger offline sync
+    console.error("❌ Failed to fetch pending invitations from backend database via all endpoints");
+    throw new Error(`Failed to fetch pending invitations from backend database: ${lastError?.message || 'All endpoints unavailable'}`);
+  }
     }
   }
 }

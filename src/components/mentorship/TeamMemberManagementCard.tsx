@@ -334,98 +334,99 @@ export function TeamMemberManagementCard({
         {/* Add New Team Member */}
         {!readOnly && (
           <div className="space-y-4 p-4 border rounded-lg bg-blue-50/50 border-blue-200">
-          <div className="flex items-center gap-2">
-            <UserPlus className="w-4 h-4 text-blue-600" />
-            <h3 className="font-semibold text-blue-900">
-              Add Team Member to Program
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="memberEmail">Email Address *</Label>
-              <Input
-                id="memberEmail"
-                type="email"
-                value={newMemberEmail}
-                onChange={(e) => setNewMemberEmail(e.target.value)}
-                placeholder="member@company.com"
-                onKeyPress={(e) => e.key === "Enter" && addTeamMember()}
-                disabled={isInviting}
-              />
+            <div className="flex items-center gap-2">
+              <UserPlus className="w-4 h-4 text-blue-600" />
+              <h3 className="font-semibold text-blue-900">
+                Add Team Member to Program
+              </h3>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="memberName">Full Name (Optional)</Label>
-              <Input
-                id="memberName"
-                value={newMemberName}
-                onChange={(e) => setNewMemberName(e.target.value)}
-                placeholder="John Doe"
-                disabled={isInviting}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="memberEmail">Email Address *</Label>
+                <Input
+                  id="memberEmail"
+                  type="email"
+                  value={newMemberEmail}
+                  onChange={(e) => setNewMemberEmail(e.target.value)}
+                  placeholder="member@company.com"
+                  onKeyPress={(e) => e.key === "Enter" && addTeamMember()}
+                  disabled={isInviting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="memberName">Full Name (Optional)</Label>
+                <Input
+                  id="memberName"
+                  value={newMemberName}
+                  onChange={(e) => setNewMemberName(e.target.value)}
+                  placeholder="John Doe"
+                  disabled={isInviting}
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="memberRole">Role in Program</Label>
+                <Select
+                  value={newMemberRole}
+                  onValueChange={(value: "participant" | "observer") =>
+                    setNewMemberRole(value)
+                  }
+                  disabled={isInviting}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="participant">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <div>
+                          <div className="font-medium">Participant</div>
+                          <div className="text-xs text-muted-foreground">
+                            Actively participate in mentorship sessions
+                          </div>
+                        </div>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="observer">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-blue-600" />
+                        <div>
+                          <div className="font-medium">Observer</div>
+                          <div className="text-xs text-muted-foreground">
+                            View sessions and materials, limited participation
+                          </div>
+                        </div>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="memberRole">Role in Program</Label>
-              <Select
-                value={newMemberRole}
-                onValueChange={(value: "participant" | "observer") =>
-                  setNewMemberRole(value)
-                }
-                disabled={isInviting}
+            <div className="flex justify-end">
+              <Button
+                onClick={addTeamMember}
+                disabled={isInviting || !newMemberEmail.trim()}
+                className="bg-blue-600 hover:bg-blue-700"
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="participant">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <div>
-                        <div className="font-medium">Participant</div>
-                        <div className="text-xs text-muted-foreground">
-                          Actively participate in mentorship sessions
-                        </div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="observer">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-blue-600" />
-                      <div>
-                        <div className="font-medium">Observer</div>
-                        <div className="text-xs text-muted-foreground">
-                          View sessions and materials, limited participation
-                        </div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                {isInviting ? (
+                  <>
+                    <Clock className="w-4 h-4 mr-2 animate-spin" />
+                    Inviting Team Member...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Team Member
+                  </>
+                )}
+              </Button>
             </div>
           </div>
-
-          <div className="flex justify-end">
-            <Button
-              onClick={addTeamMember}
-              disabled={isInviting || !newMemberEmail.trim()}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {isInviting ? (
-                <>
-                  <Clock className="w-4 h-4 mr-2 animate-spin" />
-                  Inviting Team Member...
-                </>
-              ) : (
-                <>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Team Member
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
+        )}
 
         {/* Current Team Members */}
         {teamMembers.length > 0 ? (

@@ -262,9 +262,49 @@ const TeamMemberDashboard = () => {
         try {
           if (user?.email) {
             console.log("Loading pending invitations for:", user.email);
-            const userPendingInvitations =
+            let userPendingInvitations =
               invitationService.getPendingInvitations(user.email);
             console.log("Found pending invitations:", userPendingInvitations);
+
+            // For testing: Add a sample invitation if none exist
+            if (
+              userPendingInvitations.length === 0 &&
+              user.userType === "team_member"
+            ) {
+              console.log(
+                "No pending invitations found, creating test invitation for demo",
+              );
+              const testInvitation: TeamInvitation = {
+                id: `test-invitation-${Date.now()}`,
+                token: btoa(`test:${user.email}:${Date.now()}`),
+                email: user.email,
+                name: user.name,
+                programId: "test-program-123",
+                programTitle: "Leadership Development Program",
+                companyId: user.companyId || "test-company",
+                companyName: user.companyName || "Sample Company",
+                inviterName: "John Doe",
+                inviterEmail: "john@company.com",
+                role: "participant",
+                status: "pending",
+                createdAt: new Date().toISOString(),
+                expiresAt: new Date(
+                  Date.now() + 5 * 24 * 60 * 60 * 1000,
+                ).toISOString(), // 5 days
+                metadata: {
+                  programDescription:
+                    "Join our leadership development program to enhance your skills",
+                  sessionCount: 8,
+                  duration: "8 weeks",
+                  startDate: new Date().toISOString(),
+                  endDate: new Date(
+                    Date.now() + 8 * 7 * 24 * 60 * 60 * 1000,
+                  ).toISOString(),
+                },
+              };
+              userPendingInvitations = [testInvitation];
+            }
+
             setPendingInvitations(userPendingInvitations);
           }
         } catch (invitationError) {

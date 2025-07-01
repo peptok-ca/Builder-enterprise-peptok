@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, authService } from "@/services/auth";
-import { setCurrentUser } from "@/services/api";
+import { setCurrentUser } from "@/services/apiEnhanced";
 import { analytics } from "@/services/analytics";
 
 interface AuthContextType {

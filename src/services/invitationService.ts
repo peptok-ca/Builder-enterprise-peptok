@@ -128,53 +128,18 @@ class InvitationService {
     acceptanceData: AcceptInvitationData,
   ): Promise<{ success: boolean; user?: any; error?: string }> {
     try {
-      const invitation = await this.getInvitationByToken(token);
+      // Use backend API for invitation acceptance
+      const result = await apiEnhanced.acceptTeamInvitation(
+        token,
+        acceptanceData,
+      );
 
-      if (!invitation) {
-        return { success: false, error: "Invalid invitation token" };
+      if (result.success && result.user) {
+        // Store user in localStorage for frontend state management
+        this.storeNewUser(result.user);
       }
 
-      if (invitation.status !== "pending") {
-        return { success: false, error: `Invitation is ${invitation.status}` };
-      }
-
-      if (new Date() > new Date(invitation.expiresAt)) {
-        return { success: false, error: "Invitation has expired" };
-      }
-
-      // Create user account (in real app, this would call the backend)
-      const user = {
-        id: `user_${Date.now()}`,
-        email: invitation.email,
-        name: `${acceptanceData.firstName} ${acceptanceData.lastName}`,
-        firstName: acceptanceData.firstName,
-        lastName: acceptanceData.lastName,
-        userType: "team_member" as const,
-        companyId: invitation.companyId,
-        companyName: invitation.companyName,
-        role: invitation.role,
-        programId: invitation.programId,
-        programTitle: invitation.programTitle,
-        invitedBy: invitation.inviterName,
-        joinedAt: new Date().toISOString(),
-        isAuthenticated: true,
-        picture: `https://api.dicebear.com/7.x/avataaars/svg?seed=${acceptanceData.firstName}`,
-        provider: "invitation",
-        status: "active",
-      };
-
-      // Update invitation status
-      await this.updateInvitationStatus(invitation.id, "accepted", {
-        acceptedAt: new Date().toISOString(),
-      });
-
-      // Remove from pending invitations
-      this.removePendingInvitation(invitation.email, invitation.id);
-
-      // Store user in localStorage (simulate account creation)
-      this.storeNewUser(user);
-
-      return { success: true, user };
+      return result;
     } catch (error) {
       console.error("Failed to accept invitation:", error);
       return {

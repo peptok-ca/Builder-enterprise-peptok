@@ -51,52 +51,67 @@ class AuthService {
     this.loadUserFromStorage();
   }
 
-  // Load user from localStorage
-  private loadUserFromStorage() {
+  // Load user from backend database
+  private async loadUserFromStorage() {
     try {
-      console.log("🔄 Loading user from localStorage...");
-      const userData = localStorage.getItem("peptok_user");
-      const token = localStorage.getItem("peptok_token");
+      console.log("🔄 Loading user from backend database...");
 
-      console.log("📦 Storage data found:", {
-        hasUserData: !!userData,
-        hasToken: !!token,
-        userDataLength: userData?.length || 0,
-      });
+      const session = await backendStorage.getUserSession();
 
-      if (userData && token) {
-        this.currentUser = JSON.parse(userData);
+      if (session && session.userId) {
+        this.currentUser = {
+          id: session.userId,
+          email: session.email,
+          name: session.name,
+          userType: session.userType,
+          companyId: session.companyId,
+          isAuthenticated: true,
+        };
+
         console.log(
-          `✅ User loaded from storage: ${this.currentUser.email} (${this.currentUser.userType})`,
+          `✅ User loaded from backend database: ${this.currentUser.email} (${this.currentUser.userType})`,
         );
       } else {
-        console.log("ℹ️ No valid auth data found in localStorage");
+        console.log("ℹ️ No valid auth session found in backend database");
       }
     } catch (error) {
-      console.error("❌ Failed to load user from storage:", error);
+      console.error("❌ Failed to load user from backend database:", error);
       this.clearAuth();
     }
   }
 
-  // Save user to localStorage
-  private saveUserToStorage(user: User, token: string) {
+  // Save user to backend database
+  private async saveUserToStorage(user: User, token: string) {
     try {
       console.log(
-        `💾 Saving user to storage: ${user.email} (${user.userType})`,
+        `💾 Saving user to backend database: ${user.email} (${user.userType})`,
       );
-      localStorage.setItem("peptok_user", JSON.stringify(user));
-      localStorage.setItem("peptok_token", token);
-      this.currentUser = user;
-      console.log(`✅ User saved successfully to localStorage`);
+
+      const success = await backendStorage.storeUserSession(user, token);
+
+      if (success) {
+        this.currentUser = user;
+        console.log(`✅ User saved successfully to backend database`);
+      } else {
+        throw new Error("Failed to save user session to backend database");
+      }
     } catch (error) {
-      console.error("❌ Failed to save user to storage:", error);
+      console.error("❌ Failed to save user to backend database:", error);
       throw error;
     }
   }
 
-  // Clear authentication data
-  private clearAuth() {
-    localStorage.removeItem("peptok_user");
+  // Clear authentication data from backend database
+  private async clearAuth() {
+    try {
+      await backendStorage.clearUserSession(this.currentUser?.id);
+      this.currentUser = null;
+      console.log("🧹 Authentication data cleared from backend database");
+    } catch (error) {
+      console.error("❌ Failed to clear auth from backend database:", error);
+      this.currentUser = null;
+    }
+  }
     localStorage.removeItem("peptok_token");
     this.currentUser = null;
   }

@@ -1301,8 +1301,9 @@ class EnhancedApiService {
       syncToken: Date.now().toString(), // Unique token for this update
     };
 
-    // Store in THE SINGLE SOURCE OF TRUTH that ALL admins will read from
+    // Store in multiple locations for cross-browser synchronization
     localStorage.setItem(SHARED_CONFIG_KEY, JSON.stringify(enhancedConfig));
+    this.setCrossBrowserConfig(enhancedConfig);
 
     // Also store update in audit log
     this.addToAuditLog({

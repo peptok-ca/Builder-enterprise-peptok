@@ -288,6 +288,19 @@ export default function PricingConfig() {
                   <Save className="w-4 h-4 mr-2" />
                   {saving ? "Saving..." : "Save Changes"}
                 </Button>
+                <Button
+                  onClick={() => {
+                    const result = validatePricingConfiguration();
+                    toast.success(
+                      `Validation complete: ${result.configExists ? "Config found" : "No config"}, Performance: ${result.performanceMs.toFixed(2)}ms`,
+                    );
+                  }}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Test System
+                </Button>
               </div>
             </div>
           </div>

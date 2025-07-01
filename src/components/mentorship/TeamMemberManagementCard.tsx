@@ -39,14 +39,18 @@ interface TeamMemberManagementCardProps {
   teamMembers: TeamMember[];
   onUpdateTeamMembers: (teamMembers: TeamMember[]) => void;
   programTitle?: string;
+  programId?: string;
   className?: string;
+  readOnly?: boolean;
 }
 
 export function TeamMemberManagementCard({
   teamMembers,
   onUpdateTeamMembers,
   programTitle = "Mentorship Program",
+  programId,
   className,
+  readOnly = false,
 }: TeamMemberManagementCardProps) {
   const { user } = useAuth();
   const [newMemberEmail, setNewMemberEmail] = useState("");

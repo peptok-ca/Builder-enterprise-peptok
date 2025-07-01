@@ -43,7 +43,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/layout/Header";
-import { CSVUserUpload } from "@/components/admin/CSVUserUpload";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/services/api";
 import { toast } from "sonner";
@@ -120,7 +119,6 @@ export default function PlatformAdminDashboard() {
   const [filterUserType, setFilterUserType] = useState("all");
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
   const [isCreateCompanyOpen, setIsCreateCompanyOpen] = useState(false);
-  const [isCSVUploadOpen, setIsCSVUploadOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isUserDetailsOpen, setIsUserDetailsOpen] = useState(false);
 
@@ -159,7 +157,21 @@ export default function PlatformAdminDashboard() {
 
   const loadPlatformData = async () => {
     try {
-      // Mock data - in real app, this would come from API
+      // Try to get data from API first
+      try {
+        const platformStats = await api.getPlatformStats();
+        const allUsers = await api.getAllUsers();
+        const allCompanies = await api.getAllCompanies();
+
+        setStats(platformStats);
+        setUsers(allUsers);
+        setCompanies(allCompanies);
+        return;
+      } catch (apiError) {
+        console.warn("API not available, using mock data:", apiError);
+      }
+
+      // Fallback to mock data
       const mockStats: PlatformStats = {
         totalUsers: 1247,
         totalCompanies: 89,
@@ -236,7 +248,35 @@ export default function PlatformAdminDashboard() {
       setUsers(mockUsers);
       setCompanies(mockCompanies);
     } catch (error) {
+      console.error("Error loading platform data:", error);
       toast.error("Failed to load platform data");
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "active":
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case "suspended":
+        return <XCircle className="w-4 h-4 text-red-500" />;
+      case "inactive":
+      case "trial":
+        return <Clock className="w-4 h-4 text-yellow-500" />;
+      default:
+        return <AlertTriangle className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  const getUserTypeColor = (userType: string) => {
+    switch (userType) {
+      case "platform_admin":
+        return "bg-red-100 text-red-800";
+      case "company_admin":
+        return "bg-blue-100 text-blue-800";
+      case "coach":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -265,32 +305,23 @@ export default function PlatformAdminDashboard() {
   };
 
   const handleCreateUser = async () => {
-    if (
-      !newUser.firstName ||
-      !newUser.lastName ||
-      !newUser.email ||
-      !newUser.password
-    ) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
     try {
+      // In real app, this would be an API call
       const user: User = {
         id: `user_${Date.now()}`,
         name: `${newUser.firstName} ${newUser.lastName}`,
         email: newUser.email,
         userType: newUser.userType,
         status: "active",
-        company:
-          newUser.userType === "company_admin" ? newUser.company : undefined,
+        company: newUser.company,
         joinedAt: new Date().toISOString().split("T")[0],
         lastActive: new Date().toISOString().split("T")[0],
         sessionsCount: 0,
         revenue: 0,
       };
 
-      setUsers((prev) => [...prev, user]);
+      setUsers([...users, user]);
+      setIsCreateUserOpen(false);
       setNewUser({
         firstName: "",
         lastName: "",
@@ -299,7 +330,6 @@ export default function PlatformAdminDashboard() {
         company: "",
         password: "",
       });
-      setIsCreateUserOpen(false);
       toast.success("User created successfully");
     } catch (error) {
       toast.error("Failed to create user");
@@ -307,18 +337,8 @@ export default function PlatformAdminDashboard() {
   };
 
   const handleCreateCompany = async () => {
-    if (
-      !newCompany.name ||
-      !newCompany.industry ||
-      !newCompany.adminFirstName ||
-      !newCompany.adminLastName ||
-      !newCompany.adminEmail
-    ) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
     try {
+      // In real app, this would be an API call
       const company: Company = {
         id: `comp_${Date.now()}`,
         name: newCompany.name,
@@ -331,22 +351,8 @@ export default function PlatformAdminDashboard() {
         revenue: 0,
       };
 
-      // Also create the admin user
-      const adminUser: User = {
-        id: `user_${Date.now()}`,
-        name: `${newCompany.adminFirstName} ${newCompany.adminLastName}`,
-        email: newCompany.adminEmail,
-        userType: "company_admin",
-        status: "active",
-        company: newCompany.name,
-        joinedAt: new Date().toISOString().split("T")[0],
-        lastActive: new Date().toISOString().split("T")[0],
-        sessionsCount: 0,
-        revenue: 0,
-      };
-
-      setCompanies((prev) => [...prev, company]);
-      setUsers((prev) => [...prev, adminUser]);
+      setCompanies([...companies, company]);
+      setIsCreateCompanyOpen(false);
       setNewCompany({
         name: "",
         industry: "",
@@ -355,34 +361,13 @@ export default function PlatformAdminDashboard() {
         adminEmail: "",
         subscription: "starter",
       });
-      setIsCreateCompanyOpen(false);
-      toast.success("Company and admin user created successfully");
+      toast.success("Company created successfully");
     } catch (error) {
       toast.error("Failed to create company");
     }
   };
 
-  const handleCSVUpload = (csvUsers: any[]) => {
-    // Convert CSV users to User format
-    const newUsers: User[] = csvUsers.map((csvUser, index) => ({
-      id: `csv-user-${Date.now()}-${index}`,
-      name: `${csvUser.firstName} ${csvUser.lastName}`,
-      firstName: csvUser.firstName,
-      lastName: csvUser.lastName,
-      email: csvUser.email,
-      userType: csvUser.userType,
-      status: "active",
-      company: csvUser.company,
-      joinedAt: new Date().toISOString().split("T")[0],
-      lastActive: new Date().toISOString().split("T")[0],
-      sessionsCount: 0,
-      revenue: 0,
-    }));
-
-    setUsers((prev) => [...prev, ...newUsers]);
-    toast.success(`Successfully imported ${newUsers.length} users from CSV`);
-  };
-
+  // Filter users based on search and filters
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -392,143 +377,342 @@ export default function PlatformAdminDashboard() {
 
     const matchesStatus =
       filterStatus === "all" || user.status === filterStatus;
-    const matchesType =
+
+    const matchesUserType =
       filterUserType === "all" || user.userType === filterUserType;
 
-    return matchesSearch && matchesStatus && matchesType;
+    return matchesSearch && matchesStatus && matchesUserType;
   });
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "active":
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case "suspended":
-        return <XCircle className="w-4 h-4 text-red-500" />;
-      case "trial":
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      default:
-        return <AlertTriangle className="w-4 h-4 text-gray-500" />;
-    }
-  };
-
-  const getUserTypeColor = (userType: string) => {
-    switch (userType) {
-      case "platform_admin":
-        return "bg-purple-100 text-purple-800";
-      case "company_admin":
-        return "bg-blue-100 text-blue-800";
-      case "coach":
-        return "bg-green-100 text-green-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  if (user?.userType !== "platform_admin") {
+  if (!user || user.userType !== "platform_admin") {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-blue-100/30">
-      <Header userType="platform_admin" />
+    <div className="min-h-screen bg-gray-50">
+      <Header />
 
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">
-          {/* Page Header */}
+          {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <Shield className="w-8 h-8 text-purple-600" />
+              <h1 className="text-3xl font-bold text-gray-900">
                 Platform Administration
               </h1>
-              <p className="text-muted-foreground">
-                Manage users, companies, and platform-wide settings
+              <p className="text-gray-600">
+                Manage users, companies, and platform settings
               </p>
             </div>
-            <div className="flex gap-2">
-              <Button onClick={() => navigate("/mentorship/new")}>
-                <Plus className="w-4 h-4 mr-2" />
-                Create Program
-              </Button>
+            <div className="flex gap-3">
+              <Dialog
+                open={isCreateCompanyOpen}
+                onOpenChange={setIsCreateCompanyOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button>
+                    <Building2 className="w-4 h-4 mr-2" />
+                    Create Company
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Company</DialogTitle>
+                    <DialogDescription>
+                      Add a new company to the platform
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="companyName">Company Name</Label>
+                        <Input
+                          id="companyName"
+                          value={newCompany.name}
+                          onChange={(e) =>
+                            setNewCompany({
+                              ...newCompany,
+                              name: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="industry">Industry</Label>
+                        <Input
+                          id="industry"
+                          value={newCompany.industry}
+                          onChange={(e) =>
+                            setNewCompany({
+                              ...newCompany,
+                              industry: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="adminFirstName">Admin First Name</Label>
+                        <Input
+                          id="adminFirstName"
+                          value={newCompany.adminFirstName}
+                          onChange={(e) =>
+                            setNewCompany({
+                              ...newCompany,
+                              adminFirstName: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="adminLastName">Admin Last Name</Label>
+                        <Input
+                          id="adminLastName"
+                          value={newCompany.adminLastName}
+                          onChange={(e) =>
+                            setNewCompany({
+                              ...newCompany,
+                              adminLastName: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="adminEmail">Admin Email</Label>
+                      <Input
+                        id="adminEmail"
+                        type="email"
+                        value={newCompany.adminEmail}
+                        onChange={(e) =>
+                          setNewCompany({
+                            ...newCompany,
+                            adminEmail: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="subscription">Subscription Plan</Label>
+                      <Select
+                        value={newCompany.subscription}
+                        onValueChange={(value) =>
+                          setNewCompany({ ...newCompany, subscription: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="starter">Starter Plan</SelectItem>
+                          <SelectItem value="growth">Growth Plan</SelectItem>
+                          <SelectItem value="enterprise">
+                            Enterprise Plan
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button onClick={handleCreateCompany} className="w-full">
+                      Create Company
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog
+                open={isCreateUserOpen}
+                onOpenChange={setIsCreateUserOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <Users className="w-4 h-4 mr-2" />
+                    Create User
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New User</DialogTitle>
+                    <DialogDescription>
+                      Add a new user to the platform
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="firstName">First Name</Label>
+                        <Input
+                          id="firstName"
+                          value={newUser.firstName}
+                          onChange={(e) =>
+                            setNewUser({
+                              ...newUser,
+                              firstName: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName">Last Name</Label>
+                        <Input
+                          id="lastName"
+                          value={newUser.lastName}
+                          onChange={(e) =>
+                            setNewUser({ ...newUser, lastName: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={newUser.email}
+                        onChange={(e) =>
+                          setNewUser({ ...newUser, email: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="userType">User Type</Label>
+                      <Select
+                        value={newUser.userType}
+                        onValueChange={(value: any) =>
+                          setNewUser({ ...newUser, userType: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="company_admin">
+                            Company Admin
+                          </SelectItem>
+                          <SelectItem value="coach">Coach</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="company">Company</Label>
+                      <Input
+                        id="company"
+                        value={newUser.company}
+                        onChange={(e) =>
+                          setNewUser({ ...newUser, company: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="password">Temporary Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        value={newUser.password}
+                        onChange={(e) =>
+                          setNewUser({ ...newUser, password: e.target.value })
+                        }
+                      />
+                    </div>
+                    <Button onClick={handleCreateUser} className="w-full">
+                      Create User
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 
-          {/* Platform Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center space-x-2">
-                  <Users className="w-5 h-5 text-blue-600" />
-                  <div>
-                    <p className="text-2xl font-bold">{stats.totalUsers}</p>
-                    <p className="text-xs text-muted-foreground">Total Users</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center space-x-2">
-                  <Building2 className="w-5 h-5 text-green-600" />
-                  <div>
-                    <p className="text-2xl font-bold">{stats.totalCompanies}</p>
-                    <p className="text-xs text-muted-foreground">Companies</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center space-x-2">
-                  <UserCheck className="w-5 h-5 text-purple-600" />
-                  <div>
-                    <p className="text-2xl font-bold">{stats.totalCoaches}</p>
-                    <p className="text-xs text-muted-foreground">Coaches</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center space-x-2">
-                  <Calendar className="w-5 h-5 text-orange-600" />
-                  <div>
-                    <p className="text-2xl font-bold">{stats.totalSessions}</p>
-                    <p className="text-xs text-muted-foreground">Sessions</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center space-x-2">
-                  <DollarSign className="w-5 h-5 text-green-600" />
-                  <div>
-                    <p className="text-2xl font-bold">
-                      ${(stats.monthlyRevenue / 1000).toFixed(0)}k
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <Users className="h-8 w-8 text-blue-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">
+                      Total Users
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stats.totalUsers.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <Building2 className="h-8 w-8 text-green-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">
+                      Companies
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stats.totalCompanies}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <Shield className="h-8 w-8 text-purple-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Coaches</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stats.totalCoaches}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <Activity className="h-8 w-8 text-orange-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">
+                      Sessions
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stats.totalSessions.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <DollarSign className="h-8 w-8 text-green-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">
                       Monthly Revenue
                     </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      ${stats.monthlyRevenue.toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center space-x-2">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {stats.activeSubscriptions}
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <TrendingUp className="h-8 w-8 text-blue-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">
+                      Active Subs
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      Active Subscriptions
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stats.activeSubscriptions}
                     </p>
                   </div>
                 </div>
@@ -536,531 +720,219 @@ export default function PlatformAdminDashboard() {
             </Card>
           </div>
 
-          {/* Management Tabs */}
-          <div className="space-y-6">
-            {/* User Management */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="w-5 h-5" />
-                      User Management
-                    </CardTitle>
-                    <CardDescription>
-                      Manage all platform users and their permissions
-                    </CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsCSVUploadOpen(true)}
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Import CSV
-                    </Button>
-                    <Dialog
-                      open={isCreateUserOpen}
-                      onOpenChange={setIsCreateUserOpen}
-                    >
-                      <DialogTrigger asChild>
-                        <Button>
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create User
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Create New User</DialogTitle>
-                          <DialogDescription>
-                            Add a new user to the platform
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="firstName">First Name *</Label>
-                              <Input
-                                id="firstName"
-                                value={newUser.firstName}
-                                onChange={(e) =>
-                                  setNewUser({
-                                    ...newUser,
-                                    firstName: e.target.value,
-                                  })
-                                }
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="lastName">Last Name *</Label>
-                              <Input
-                                id="lastName"
-                                value={newUser.lastName}
-                                onChange={(e) =>
-                                  setNewUser({
-                                    ...newUser,
-                                    lastName: e.target.value,
-                                  })
-                                }
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <Label htmlFor="email">Email *</Label>
-                            <Input
-                              id="email"
-                              type="email"
-                              value={newUser.email}
-                              onChange={(e) =>
-                                setNewUser({
-                                  ...newUser,
-                                  email: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="userType">User Type *</Label>
-                            <Select
-                              value={newUser.userType}
-                              onValueChange={(value: any) =>
-                                setNewUser({ ...newUser, userType: value })
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="platform_admin">
-                                  Platform Admin
-                                </SelectItem>
-                                <SelectItem value="company_admin">
-                                  Company Admin
-                                </SelectItem>
-                                <SelectItem value="coach">Coach</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          {newUser.userType === "company_admin" && (
-                            <div>
-                              <Label htmlFor="company">Company</Label>
-                              <Input
-                                id="company"
-                                value={newUser.company}
-                                onChange={(e) =>
-                                  setNewUser({
-                                    ...newUser,
-                                    company: e.target.value,
-                                  })
-                                }
-                              />
-                            </div>
-                          )}
-                          <div>
-                            <Label htmlFor="password">
-                              Temporary Password *
-                            </Label>
-                            <Input
-                              id="password"
-                              type="password"
-                              value={newUser.password}
-                              onChange={(e) =>
-                                setNewUser({
-                                  ...newUser,
-                                  password: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className="flex justify-end space-x-2">
-                            <Button
-                              variant="outline"
-                              onClick={() => setIsCreateUserOpen(false)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button onClick={handleCreateUser}>
-                              Create User
-                            </Button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Search and Filters */}
-                <div className="flex flex-col md:flex-row gap-4 mb-6">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      <Input
-                        placeholder="Search users..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
-                      />
+          {/* Users Management */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Users Management</CardTitle>
+                      <CardDescription>
+                        Manage platform users and their permissions
+                      </CardDescription>
                     </div>
                   </div>
-                  <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Statuses</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="suspended">Suspended</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={filterUserType}
-                    onValueChange={setFilterUserType}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Filter by type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
-                      <SelectItem value="platform_admin">
-                        Platform Admin
-                      </SelectItem>
-                      <SelectItem value="company_admin">
-                        Company Admin
-                      </SelectItem>
-                      <SelectItem value="coach">Coach</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Users Table */}
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Company</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Sessions</TableHead>
-                      <TableHead>Revenue</TableHead>
-                      <TableHead>Joined</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium">{user.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {user.email}
-                            </p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="secondary"
-                            className={getUserTypeColor(user.userType)}
-                          >
-                            {user.userType.replace("_", " ")}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{user.company || "-"}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {getStatusIcon(user.status)}
-                            <span className="capitalize">{user.status}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{user.sessionsCount}</TableCell>
-                        <TableCell>
-                          {user.revenue
-                            ? `$${user.revenue.toLocaleString()}`
-                            : "-"}
-                        </TableCell>
-                        <TableCell>{user.joinedAt}</TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setSelectedUser(user);
-                                  setIsUserDetailsOpen(true);
-                                }}
-                              >
-                                <Eye className="w-4 h-4 mr-2" />
-                                View Details
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Edit className="w-4 h-4 mr-2" />
-                                Edit User
-                              </DropdownMenuItem>
-                              {user.status === "active" ? (
-                                <DropdownMenuItem
-                                  onClick={() => handleSuspendUser(user.id)}
-                                  className="text-red-600"
-                                >
-                                  <UserX className="w-4 h-4 mr-2" />
-                                  Suspend
-                                </DropdownMenuItem>
-                              ) : (
-                                <DropdownMenuItem
-                                  onClick={() => handleActivateUser(user.id)}
-                                  className="text-green-600"
-                                >
-                                  <UserCheck className="w-4 h-4 mr-2" />
-                                  Activate
-                                </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-
-                {filteredUsers.length === 0 && (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No users found</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Company Management */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Building2 className="w-5 h-5" />
-                      Company Management
-                    </CardTitle>
-                    <CardDescription>
-                      Manage companies and their subscriptions
-                    </CardDescription>
-                  </div>
-                  <Dialog
-                    open={isCreateCompanyOpen}
-                    onOpenChange={setIsCreateCompanyOpen}
-                  >
-                    <DialogTrigger asChild>
-                      <Button>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Create Company
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Create New Company</DialogTitle>
-                        <DialogDescription>
-                          Add a new company and create its admin user
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="companyName">Company Name *</Label>
-                          <Input
-                            id="companyName"
-                            value={newCompany.name}
-                            onChange={(e) =>
-                              setNewCompany({
-                                ...newCompany,
-                                name: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="industry">Industry *</Label>
-                          <Select
-                            value={newCompany.industry}
-                            onValueChange={(value) =>
-                              setNewCompany({ ...newCompany, industry: value })
-                            }
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select industry" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Technology">
-                                Technology
-                              </SelectItem>
-                              <SelectItem value="Healthcare">
-                                Healthcare
-                              </SelectItem>
-                              <SelectItem value="Finance">Finance</SelectItem>
-                              <SelectItem value="Education">
-                                Education
-                              </SelectItem>
-                              <SelectItem value="Manufacturing">
-                                Manufacturing
-                              </SelectItem>
-                              <SelectItem value="Other">Other</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="adminFirstName">
-                              Admin First Name *
-                            </Label>
-                            <Input
-                              id="adminFirstName"
-                              value={newCompany.adminFirstName}
-                              onChange={(e) =>
-                                setNewCompany({
-                                  ...newCompany,
-                                  adminFirstName: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="adminLastName">
-                              Admin Last Name *
-                            </Label>
-                            <Input
-                              id="adminLastName"
-                              value={newCompany.adminLastName}
-                              onChange={(e) =>
-                                setNewCompany({
-                                  ...newCompany,
-                                  adminLastName: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="adminEmail">Admin Email *</Label>
-                          <Input
-                            id="adminEmail"
-                            type="email"
-                            value={newCompany.adminEmail}
-                            onChange={(e) =>
-                              setNewCompany({
-                                ...newCompany,
-                                adminEmail: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="subscription">
-                            Initial Subscription
-                          </Label>
-                          <Select
-                            value={newCompany.subscription}
-                            onValueChange={(value) =>
-                              setNewCompany({
-                                ...newCompany,
-                                subscription: value,
-                              })
-                            }
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="starter">
-                                Starter Plan
-                              </SelectItem>
-                              <SelectItem value="growth">
-                                Growth Plan
-                              </SelectItem>
-                              <SelectItem value="enterprise">
-                                Enterprise Plan
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => setIsCreateCompanyOpen(false)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button onClick={handleCreateCompany}>
-                            Create Company
-                          </Button>
-                        </div>
+                </CardHeader>
+                <CardContent>
+                  {/* Filters */}
+                  <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div className="flex-1">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search users..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10"
+                        />
                       </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Company</TableHead>
-                      <TableHead>Industry</TableHead>
-                      <TableHead>Admin</TableHead>
-                      <TableHead>Users</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Subscription</TableHead>
-                      <TableHead>Revenue</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {companies.map((company) => (
-                      <TableRow key={company.id}>
-                        <TableCell className="font-medium">
-                          {company.name}
-                        </TableCell>
-                        <TableCell>{company.industry}</TableCell>
-                        <TableCell>{company.adminEmail}</TableCell>
-                        <TableCell>{company.userCount}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {getStatusIcon(company.status)}
-                            <span className="capitalize">{company.status}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{company.subscription}</TableCell>
-                        <TableCell>
-                          ${company.revenue.toLocaleString()}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
-                                <Eye className="w-4 h-4 mr-2" />
-                                View Details
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Edit className="w-4 h-4 mr-2" />
-                                Edit Company
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Activity className="w-4 h-4 mr-2" />
-                                View Activity
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
+                    </div>
+                    <Select
+                      value={filterStatus}
+                      onValueChange={setFilterStatus}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="suspended">Suspended</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={filterUserType}
+                      onValueChange={setFilterUserType}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="platform_admin">
+                          Platform Admin
+                        </SelectItem>
+                        <SelectItem value="company_admin">
+                          Company Admin
+                        </SelectItem>
+                        <SelectItem value="coach">Coach</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Users Table */}
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>User</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Company</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Sessions</TableHead>
+                        <TableHead>Revenue</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredUsers.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{user.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {user.email}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="secondary"
+                              className={getUserTypeColor(user.userType)}
+                            >
+                              {user.userType.replace("_", " ")}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{user.company || "-"}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getStatusIcon(user.status)}
+                              <span className="capitalize">{user.status}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>{user.sessionsCount}</TableCell>
+                          <TableCell>
+                            {user.revenue
+                              ? `$${user.revenue.toLocaleString()}`
+                              : "-"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setIsUserDetailsOpen(true);
+                                  }}
+                                >
+                                  <Eye className="w-4 h-4 mr-2" />
+                                  View Details
+                                </DropdownMenuItem>
+                                {user.status === "active" ? (
+                                  <DropdownMenuItem
+                                    onClick={() => handleSuspendUser(user.id)}
+                                  >
+                                    <UserX className="w-4 h-4 mr-2" />
+                                    Suspend User
+                                  </DropdownMenuItem>
+                                ) : (
+                                  <DropdownMenuItem
+                                    onClick={() => handleActivateUser(user.id)}
+                                  >
+                                    <UserCheck className="w-4 h-4 mr-2" />
+                                    Activate User
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Companies Management */}
+            <div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Companies</CardTitle>
+                  <CardDescription>Manage company accounts</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Company</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Users</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {companies.map((company) => (
+                        <TableRow key={company.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{company.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {company.industry}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getStatusIcon(company.status)}
+                              <span className="capitalize">
+                                {company.status}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>{company.userCount}</TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <Eye className="w-4 h-4 mr-2" />
+                                  View Details
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Edit className="w-4 h-4 mr-2" />
+                                  Edit Company
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
@@ -1104,7 +976,7 @@ export default function PlatformAdminDashboard() {
                   <p className="font-medium">{selectedUser.sessionsCount}</p>
                 </div>
                 <div>
-                  <Label>Revenue Generated</Label>
+                  <Label>Revenue</Label>
                   <p className="font-medium">
                     {selectedUser.revenue
                       ? `$${selectedUser.revenue.toLocaleString()}`
@@ -1112,21 +984,14 @@ export default function PlatformAdminDashboard() {
                   </p>
                 </div>
                 <div>
-                  <Label>Last Active</Label>
-                  <p className="font-medium">{selectedUser.lastActive}</p>
+                  <Label>Joined</Label>
+                  <p className="font-medium">{selectedUser.joinedAt}</p>
                 </div>
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
-
-      {/* CSV Upload Modal */}
-      <CSVUserUpload
-        isOpen={isCSVUploadOpen}
-        onClose={() => setIsCSVUploadOpen(false)}
-        onUsersAdded={handleCSVUpload}
-      />
     </div>
   );
 }

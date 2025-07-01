@@ -30,6 +30,7 @@ import InvitationAccept from "./pages/InvitationAccept";
 import TestPermissions from "./pages/TestPermissions";
 import Terms from "./pages/Terms";
 import PricingConfig from "./pages/admin/PricingConfig";
+import AnalyticsDashboard from "./components/analytics/AnalyticsDashboard";
 import Connections from "./pages/Connections";
 import ConnectionDetails from "./pages/ConnectionDetails";
 import NotFound from "./pages/NotFound";
@@ -183,6 +184,16 @@ const App: React.FC = () => {
               <Route path="/test-permissions" element={<TestPermissions />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/admin/pricing-config" element={<PricingConfig />} />
+              <Route
+                path="/analytics"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["platform_admin", "company_admin", "coach"]}
+                  >
+                    <AnalyticsDashboard />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/connections"
                 element={

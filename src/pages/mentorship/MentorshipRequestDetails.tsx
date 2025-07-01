@@ -106,6 +106,26 @@ export default function MentorshipRequestDetails() {
                 status: "accepted" as const,
                 invitedAt: new Date().toISOString(),
               },
+              {
+                id: "member_2",
+                email: "jane.smith@company.com",
+                name: "Jane Smith",
+                role: "participant" as const,
+                status: "invited" as const,
+                invitedAt: new Date(
+                  Date.now() - 2 * 24 * 60 * 60 * 1000,
+                ).toISOString(),
+              },
+              {
+                id: "member_3",
+                email: "bob.wilson@company.com",
+                name: "Bob Wilson",
+                role: "observer" as const,
+                status: "invited" as const,
+                invitedAt: new Date(
+                  Date.now() - 5 * 24 * 60 * 60 * 1000,
+                ).toISOString(),
+              },
             ],
             preferredExpertise: ["React", "JavaScript", "Frontend Development"],
             budget: { min: 100, max: 200 },

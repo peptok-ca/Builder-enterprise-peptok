@@ -237,13 +237,20 @@ export function TeamMemberManagementCard({
       const invitation = invitations.find((inv) => inv.email === member.email);
 
       if (invitation) {
-        const success = await invitationService.resendInvitation(invitation.id);
+        const success = await offlineApi.resendTeamInvitation(invitation.id, {
+          priority: "medium",
+          maxRetries: 3,
+        });
         if (success) {
-          toast.success(`✅ Invitation resent to ${member.email}`, {
-            description:
-              "They will receive a new email with a fresh 7-day link",
-            duration: 4000,
-          });
+          toast.success(
+            `✅ Invitation ${isOnline ? "resent" : "queued for resend"} to ${member.email}`,
+            {
+              description: isOnline
+                ? "They will receive a new email with a fresh 7-day link"
+                : "Will be sent when back online",
+              duration: 4000,
+            },
+          );
 
           // Update the member's invitedAt time to reflect the resend
           const updatedMembers = teamMembers.map((m) =>

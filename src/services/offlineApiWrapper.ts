@@ -157,16 +157,40 @@ class OfflineApiWrapper {
 
       // Validate that the resend was actually saved to the backend database
       if (result) {
+        // Store the resend timestamp before the operation
+        const resendTimestamp = new Date().toISOString();
+
         setTimeout(async () => {
-          const validation = await databaseValidation.validateResendStorage(
-            invitationId,
-            new Date().toISOString(),
-          );
-          databaseValidation.showValidationResults(
-            "Invitation resend",
-            validation,
-          );
-        }, 2000); // Validate after 2 seconds to allow for database write
+          try {
+            const validation = await databaseValidation.validateResendStorage(
+              invitationId,
+              resendTimestamp,
+            );
+
+            // Only show validation results if there are actual errors (not warnings)
+            if (validation.errors.length > 0) {
+              databaseValidation.showValidationResults(
+                "Invitation resend",
+                validation,
+              );
+            } else if (validation.isValid) {
+              console.log(
+                `✅ Resend validation passed for invitation ${invitationId}`,
+              );
+            } else if (validation.warnings.length > 0) {
+              console.warn(
+                `⚠️ Resend validation warnings for invitation ${invitationId}:`,
+                validation.warnings,
+              );
+            }
+          } catch (error) {
+            console.warn(
+              `Resend validation failed for ${invitationId}:`,
+              error.message,
+            );
+            // Don't show error to user as the resend operation itself succeeded
+          }
+        }, 3000); // Increased to 3 seconds to allow for database write
       }
 
       return result;

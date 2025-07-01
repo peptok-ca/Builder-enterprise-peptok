@@ -12,6 +12,7 @@ import Pricing from "./pages/Pricing";
 import CoachDirectory from "./pages/CoachDirectory";
 import EnterpriseDashboard from "./pages/EnterpriseDashboard";
 import CompanyDashboard from "./pages/CompanyDashboard";
+import CompanyDashboardEnhanced from "./pages/CompanyDashboardEnhanced";
 import CoachProfile from "./pages/CoachProfile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -73,6 +74,14 @@ const App: React.FC = () => {
               />
               <Route
                 path="/company/dashboard"
+                element={
+                  <ProtectedRoute requiredUserType="company_admin">
+                    <CompanyDashboardEnhanced />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/company/dashboard/basic"
                 element={
                   <ProtectedRoute requiredUserType="company_admin">
                     <EnterpriseDashboard />

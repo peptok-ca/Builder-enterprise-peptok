@@ -145,19 +145,31 @@ export class EmailService {
   ): Promise<boolean> {
     try {
       const emailContent = this.generateProgramDetailsEmail(data);
+      const emailTemplate: EmailTemplate = {
+        to: recipientEmail,
+        subject: emailContent.subject,
+        htmlContent: emailContent.htmlContent,
+        textContent: this.htmlToText(emailContent.htmlContent),
+      };
 
-      // Log the email content for development/demo purposes
-      console.log(`
-📧 PROGRAM DETAILS EMAIL SENT TO: ${recipientEmail}
+      // Send email through the main sendEmail method
+      const success = await this.sendEmail(emailTemplate);
+
+      if (success) {
+        // In mock mode, show user-friendly notification
+        if (import.meta.env.DEV || import.meta.env.VITE_MOCK_EMAIL === "true") {
+          console.log(`
+🔧 DEVELOPMENT MODE: Program details email simulated
+📧 TO: ${recipientEmail}
 📧 SUBJECT: ${emailContent.subject}
-📧 CONTENT:
-${emailContent.htmlContent}
-      `);
+💡 In production, this email would be sent via your configured email service.
+          `);
+        } else {
+          console.log(`✅ Program details email sent to: ${recipientEmail}`);
+        }
+      }
 
-      // Simulate email sending delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      return true;
+      return success;
     } catch (error) {
       console.error("Failed to send program details email:", error);
       return false;

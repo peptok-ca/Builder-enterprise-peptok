@@ -31,6 +31,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { SessionRatingModal } from "@/components/sessions/SessionRatingModal";
 import { api } from "@/services/api";
 import { toast } from "sonner";
+import { invitationService } from "@/services/invitationService";
 
 interface TeamMemberSession {
   id: string;
@@ -179,25 +180,62 @@ const TeamMemberDashboard = () => {
                 },
               ];
 
-        const mockPrograms: TeamMemberProgram[] = [
-          {
-            id: "program-1",
-            title: "Leadership Development Program",
+        // Load program information from accepted invitations
+        let programsFromInvitations: TeamMemberProgram[] = [];
+        if (user?.email) {
+          const acceptedInvitations = invitationService
+            .getInvitations({
+              companyId: user.companyId,
+            })
+            .filter(
+              (inv) => inv.email === user.email && inv.status === "accepted",
+            );
+
+          programsFromInvitations = acceptedInvitations.map((inv) => ({
+            id: inv.programId,
+            title: inv.programTitle,
             description:
-              "A comprehensive program focused on building leadership skills and strategic thinking",
+              inv.metadata?.programDescription ||
+              `Join the ${inv.programTitle} mentorship program`,
             coach: {
-              name: "Sarah Johnson",
-              title: "Senior Leadership Coach",
-              avatar: "https://avatar.vercel.sh/sarah@example.com",
+              name: "Assigned Coach", // This would come from API in real app
+              title: "Professional Coach",
+              avatar: "https://avatar.vercel.sh/coach@example.com",
             },
-            role: (user?.role as "participant" | "observer") || "participant",
-            status: "active",
-            progress: 60,
-            totalSessions: 10,
-            completedSessions: 6,
+            role: inv.role,
+            status: "active" as const,
+            progress: 0, // This would be calculated from actual sessions
+            totalSessions: inv.metadata?.sessionCount || 8,
+            completedSessions: 0,
             nextSession: mockSessions.find((s) => s.status === "upcoming"),
-          },
-        ];
+          }));
+        }
+
+        const mockPrograms: TeamMemberProgram[] =
+          programsFromInvitations.length > 0
+            ? programsFromInvitations
+            : [
+                {
+                  id: "program-1",
+                  title: user?.programTitle || "Leadership Development Program",
+                  description:
+                    "A comprehensive program focused on building leadership skills and strategic thinking",
+                  coach: {
+                    name: "Sarah Johnson",
+                    title: "Senior Leadership Coach",
+                    avatar: "https://avatar.vercel.sh/sarah@example.com",
+                  },
+                  role:
+                    (user?.role as "participant" | "observer") || "participant",
+                  status: "active",
+                  progress: 60,
+                  totalSessions: 10,
+                  completedSessions: 6,
+                  nextSession: mockSessions.find(
+                    (s) => s.status === "upcoming",
+                  ),
+                },
+              ];
 
         setSessions(mockSessions);
         setPrograms(mockPrograms);

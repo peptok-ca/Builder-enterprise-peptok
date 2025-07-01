@@ -67,9 +67,14 @@ const EnterpriseDashboard = () => {
         console.log("Loaded mentorship requests:", requests);
         setMentorshipRequests(requests || []);
 
-        // Get connections
-        const connectionData = await api.getConnections();
-        setConnections(connectionData);
+        // Get connections (with fallback)
+        try {
+          const connectionData = (await (api as any).getConnections?.()) || [];
+          setConnections(connectionData);
+        } catch (error) {
+          console.warn("Connections API not available, using empty array");
+          setConnections([]);
+        }
       } catch (error) {
         console.error("Error loading dashboard data:", error);
         toast.error("Failed to load dashboard data");

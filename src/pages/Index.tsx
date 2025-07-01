@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import {
+  getDemoStatistics,
+  demoUsers,
+  demoReviews,
+  demoCompanies,
+} from "@/data/demoDatabase";
 import { Button } from "@/components/ui/button";
 import {
   Card,

@@ -378,17 +378,41 @@ export function TeamMemberManagementCard({
               <h3 className="font-semibold">
                 Program Team Members ({teamMembers.length})
               </h3>
-              <div className="text-sm text-muted-foreground">
-                {
-                  teamMembers.filter((member) => member.status === "accepted")
-                    .length
-                }{" "}
-                accepted,{" "}
-                {
-                  teamMembers.filter((member) => member.status === "invited")
-                    .length
-                }{" "}
-                pending
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-muted-foreground">
+                  {
+                    teamMembers.filter((member) => member.status === "accepted")
+                      .length
+                  }{" "}
+                  accepted,{" "}
+                  {
+                    teamMembers.filter((member) => member.status === "invited")
+                      .length
+                  }{" "}
+                  pending
+                </div>
+                {teamMembers.filter((member) => member.status === "invited")
+                  .length > 1 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={resendAllInvitations}
+                    disabled={resendingIds.size > 0}
+                    className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300"
+                  >
+                    {resendingIds.size > 0 ? (
+                      <>
+                        <div className="animate-spin rounded-full h-3 w-3 border-2 border-blue-600 border-t-transparent mr-2" />
+                        Resending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="w-3 h-3 mr-2" />
+                        Resend All
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
 

@@ -79,15 +79,33 @@ export default function PricingConfig() {
       }
     };
 
-    // Set up periodic sync to ensure ALL admins see the same data
-    // Only sync when user is not actively editing
+    // Set up cross-browser synchronization
+    let broadcastChannel: BroadcastChannel | null = null;
+
+    // BroadcastChannel for same-origin communication across browsers
+    if (typeof BroadcastChannel !== "undefined") {
+      broadcastChannel = new BroadcastChannel("peptok_config_sync");
+      broadcastChannel.addEventListener("message", (event) => {
+        if (event.data.type === "config_updated") {
+          const updatedConfig = event.data.config;
+          setConfig(updatedConfig);
+          setLastSyncTime(new Date().toLocaleString());
+          toast.info(
+            `Configuration updated by ${updatedConfig.updatedByName || "another admin"} in different browser`,
+          );
+        }
+      });
+    }
+
+    // Set up periodic sync to ensure ALL admins see the same data (cross-browser)
+    // More frequent checks for cross-browser sync
     const syncInterval = setInterval(() => {
       // Don't refresh if user has unsaved changes
       if (hasChangesRef.current) {
         return;
       }
 
-      // Silently check for updates every 10 seconds
+      // Check for cross-browser updates every 5 seconds
       fetchPricingConfig()
         .then(() => {
           // Update sync time only if data was actually refreshed
@@ -96,7 +114,7 @@ export default function PricingConfig() {
         .catch(() => {
           // Ignore errors in background sync
         });
-    }, 10000);
+    }, 5000);
 
     window.addEventListener(
       "globalConfigUpdated",

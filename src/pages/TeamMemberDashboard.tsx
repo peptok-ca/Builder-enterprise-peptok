@@ -357,10 +357,8 @@ const TeamMemberDashboard = () => {
           duration: 5000,
         });
 
-        // Remove from pending invitations
-        setPendingInvitations((prev) =>
-          prev.filter((inv) => inv.id !== invitation.id),
-        );
+        // Refresh pending invitations from service
+        refreshPendingInvitations();
 
         // Add to programs if not already there
         const newProgram: TeamMemberProgram = {

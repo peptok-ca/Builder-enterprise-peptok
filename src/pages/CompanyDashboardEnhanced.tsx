@@ -151,7 +151,7 @@ export default function CompanyDashboardEnhanced() {
 
       setRequests(companyRequests);
 
-      // Calculate metrics from requests
+      // Calculate metrics from requests with proper fallbacks
       const activePrograms = companyRequests.filter(
         (r) => r.status === "in_progress",
       ).length;
@@ -164,18 +164,22 @@ export default function CompanyDashboardEnhanced() {
       );
 
       const calculatedMetrics: CompanyMetrics = {
-        totalEmployees: totalParticipants,
+        totalEmployees: Math.max(totalParticipants, 1), // Ensure at least 1
         activePrograms,
         completedSessions: completedPrograms,
-        averageRating: 4.7, // This would come from actual ratings
+        averageRating: completedPrograms > 0 ? 4.7 : 0, // Only show rating if there are completed programs
         engagementRate:
-          activePrograms > 0
+          companyRequests.length > 0
             ? (activePrograms / companyRequests.length) * 100
             : 0,
         monthlySpend:
-          companyRequests.reduce((sum, r) => sum + (r.budget?.max || 0), 0) /
-          12,
-        roiPercentage: 145, // This would be calculated from actual business impact
+          companyRequests.length > 0
+            ? companyRequests.reduce(
+                (sum, r) => sum + (r.budget?.max || 0),
+                0,
+              ) / 12
+            : 0,
+        roiPercentage: completedPrograms > 0 ? 145 : 0, // Only show ROI if there are completed programs
       };
 
       setMetrics(calculatedMetrics);

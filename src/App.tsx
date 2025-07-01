@@ -34,6 +34,7 @@ import PricingConfig from "./pages/admin/PricingConfig";
 import SecuritySettings from "./pages/admin/SecuritySettings";
 import AnalyticsSettings from "./pages/admin/AnalyticsSettings";
 import AnalyticsDashboard from "./components/analytics/AnalyticsDashboard";
+import PendingInvitations from "./pages/PendingInvitations";
 import Connections from "./pages/Connections";
 import ConnectionDetails from "./pages/ConnectionDetails";
 import NotFound from "./pages/NotFound";
@@ -192,6 +193,7 @@ const App: React.FC = () => {
                 }
               />
               <Route path="/invitation/accept" element={<InvitationAccept />} />
+              <Route path="/invitations" element={<PendingInvitations />} />
               <Route path="/test-permissions" element={<TestPermissions />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/admin/pricing-config" element={<PricingConfig />} />

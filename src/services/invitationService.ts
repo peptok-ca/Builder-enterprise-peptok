@@ -81,6 +81,9 @@ class InvitationService {
     role: "participant" | "observer";
     metadata?: TeamInvitation["metadata"];
   }): Promise<TeamInvitation> {
+    // Verify database connection first
+    await this.verifyDatabaseConnection();
+
     try {
       console.log("🗃️ Creating invitation in backend database only");
 

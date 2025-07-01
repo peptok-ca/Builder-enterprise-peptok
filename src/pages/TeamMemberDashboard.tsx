@@ -96,38 +96,44 @@ const TeamMemberDashboard = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        console.log("Loading team member dashboard data from API...");
+        console.log("Loading team member dashboard data...");
 
-        // Fetch user's sessions from backend
-        const sessionsData = await api.getUserSessions(
-          user?.id || "current-user",
-          undefined,
-        );
-        console.log("Fetched sessions:", sessionsData);
+        let transformedSessions: TeamMemberSession[] = [];
 
-        // Transform API data to match TeamMemberSession interface
-        const transformedSessions: TeamMemberSession[] = sessionsData.map(
-          (session) => ({
-            id: session.id,
-            title: session.title,
-            coach: {
-              name: session.coach?.name || "Coach",
-              avatar: session.coach?.avatar,
-              title: session.coach?.title || "Professional Coach",
-            },
-            date: session.startTime,
-            duration: session.duration || 60,
-            status: session.status as "upcoming" | "completed" | "cancelled",
-            type: session.type as "video" | "phone" | "in-person",
-            description: session.description || "",
-            programTitle: session.programId || "Coaching Program",
-            role: "participant" as const,
-            hasRated: false,
-            meetingLink: session.meetingLink,
-          }),
-        );
+        // Try to fetch user's sessions from backend, but don't fail if API is unavailable
+        try {
+          if (api.getUserSessions) {
+            const sessionsData = await api.getUserSessions(
+              user?.id || "current-user",
+              undefined,
+            );
+            console.log("Fetched sessions from API:", sessionsData);
 
-        // If no API sessions, fallback to sample data for demo
+            // Transform API data to match TeamMemberSession interface
+            transformedSessions = sessionsData.map((session) => ({
+              id: session.id,
+              title: session.title,
+              coach: {
+                name: session.coach?.name || "Coach",
+                avatar: session.coach?.avatar,
+                title: session.coach?.title || "Professional Coach",
+              },
+              date: session.startTime,
+              duration: session.duration || 60,
+              status: session.status as "upcoming" | "completed" | "cancelled",
+              type: session.type as "video" | "phone" | "in-person",
+              description: session.description || "",
+              programTitle: session.programId || "Coaching Program",
+              role: "participant" as const,
+              hasRated: false,
+              meetingLink: session.meetingLink,
+            }));
+          }
+        } catch (apiError) {
+          console.log("API not available, using mock data:", apiError);
+        }
+
+        // Use sample data for demo if no API data available
         const mockSessions: TeamMemberSession[] =
           transformedSessions.length > 0
             ? transformedSessions

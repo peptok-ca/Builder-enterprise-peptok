@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 import { User } from "../types";
+import { demoUsers } from "../data/demoDatabase";
 
 // OAuth Configuration
 const OAUTH_CONFIG = {
@@ -28,74 +29,18 @@ export interface AuthResponse {
   isNewUser?: boolean;
 }
 
-// Simulated user database for demo purposes
-const mockUsers: User[] = [
-  // Platform Admin - Manages entire platform
-  {
-    id: "platform-admin-1",
-    email: "platform@peptok.com",
-    name: "Platform Admin",
-    firstName: "Platform",
-    lastName: "Admin",
-    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=platform",
-    provider: "email",
-    userType: "platform_admin",
-  },
-  {
-    id: "demo-platform-admin",
-    email: "demo@platform.com",
-    name: "Demo Platform Admin",
-    firstName: "Demo",
-    lastName: "Platform Admin",
-    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=demoplatform",
-    provider: "email",
-    userType: "platform_admin",
-  },
-
-  // Company/SME Admin - Manages their company
-  {
-    id: "company-admin-1",
-    email: "admin@company.com",
-    name: "Company Admin",
-    firstName: "Company",
-    lastName: "Admin",
-    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=company",
-    provider: "email",
-    userType: "company_admin",
-  },
-  {
-    id: "demo-company-admin",
-    email: "demo@company.com",
-    name: "Demo Company Admin",
-    firstName: "Demo",
-    lastName: "Company Admin",
-    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=democompany",
-    provider: "email",
-    userType: "company_admin",
-  },
-
-  // Coaches - Individual mentors/coaches
-  {
-    id: "coach-1",
-    email: "coach@mentor.com",
-    name: "Sarah Coach",
-    firstName: "Sarah",
-    lastName: "Coach",
-    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
-    provider: "email",
-    userType: "coach",
-  },
-  {
-    id: "demo-coach",
-    email: "demo@coach.com",
-    name: "Demo Coach",
-    firstName: "Demo",
-    lastName: "Coach",
-    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=democoach",
-    provider: "email",
-    userType: "coach",
-  },
-];
+// Convert demo database users to auth service format
+const mockUsers: User[] = demoUsers.map((user) => ({
+  id: user.id,
+  email: user.email,
+  name: user.name,
+  firstName: user.firstName,
+  lastName: user.lastName,
+  picture: user.picture,
+  provider: user.provider,
+  userType: user.userType as any,
+  companyId: user.companyId,
+}));
 
 class AuthService {
   private currentUser: User | null = null;

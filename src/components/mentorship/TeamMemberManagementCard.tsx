@@ -55,6 +55,7 @@ export function TeamMemberManagementCard({
   readOnly = false,
 }: TeamMemberManagementCardProps) {
   const { user } = useAuth();
+  const { isOnline, executeOffline } = useOfflineSync();
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberRole, setNewMemberRole] = useState<

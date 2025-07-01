@@ -11,60 +11,66 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle, AlertTriangle, UserPlus, ArrowRight } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import {
+  CheckCircle,
+  AlertTriangle,
+  UserPlus,
+  ArrowRight,
+  Calendar,
+  Clock,
+  Users,
+  Building2,
+  Mail,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { toast } from "sonner";
-
-interface InvitationData {
-  email: string;
-  companyName: string;
-  inviterName: string;
-  role: "participant" | "observer";
-  expiresAt: Date;
-  isValid: boolean;
-}
+import {
+  invitationService,
+  type TeamInvitation,
+} from "@/services/invitationService";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function InvitationAccept() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [invitation, setInvitation] = useState<InvitationData | null>(null);
+  const { login } = useAuth();
+  const [invitation, setInvitation] = useState<TeamInvitation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAccepting, setIsAccepting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     password: "",
     confirmPassword: "",
+    acceptTerms: false,
   });
 
   useEffect(() => {
+    loadInvitation();
+  }, [searchParams]);
+
+  const loadInvitation = async () => {
     const token = searchParams.get("token");
     if (!token) {
       setIsLoading(false);
       return;
     }
 
-    // Decode the invitation token (in a real app, this would be validated server-side)
     try {
-      const decoded = atob(token);
-      const [email, timestamp] = decoded.split(":");
-      const invitedAt = new Date(parseInt(timestamp));
-      const expiresAt = new Date(invitedAt.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
-      const isValid = new Date() < expiresAt;
-
-      setInvitation({
-        email,
-        companyName: "Your Company", // In real app, get from server
-        inviterName: "Team Admin", // In real app, get from server
-        role: "participant", // In real app, get from server
-        expiresAt,
-        isValid,
-      });
+      const invitationData =
+        await invitationService.getInvitationByToken(token);
+      setInvitation(invitationData);
     } catch (error) {
-      console.error("Invalid invitation token:", error);
+      console.error("Failed to load invitation:", error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-  }, [searchParams]);
+  };
 
   const handleAcceptInvitation = async () => {
     if (!invitation) return;
@@ -128,12 +134,20 @@ export default function InvitationAccept() {
   };
 
   const handleDeclineInvitation = async () => {
+    if (!invitation) return;
+
     try {
-      // In a real app, this would mark the invitation as declined
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success("Invitation declined");
+      const success = await invitationService.declineInvitation(
+        invitation.token,
+      );
+      if (success) {
+        toast.success("Invitation declined");
+      } else {
+        toast.error("Failed to decline invitation");
+      }
       navigate("/");
     } catch (error) {
+      console.error("Failed to decline invitation:", error);
       toast.error("Failed to decline invitation");
     }
   };

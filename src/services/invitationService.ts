@@ -191,35 +191,32 @@ class InvitationService {
    */
   async resendInvitation(invitationId: string): Promise<boolean> {
     try {
-      const invitations = this.getAllInvitations();
-      const invitation = invitations.find((inv) => inv.id === invitationId);
+      // Use backend API for resending invitations
+      const success = await apiEnhanced.resendTeamInvitation(invitationId);
 
-      if (!invitation || invitation.status !== "pending") {
-        return false;
+      if (success) {
+        // Get updated invitation to send email
+        const invitations = this.getAllInvitations();
+        const invitation = invitations.find((inv) => inv.id === invitationId);
+
+        if (invitation) {
+          const invitationLink = `${window.location.origin}/invitation/accept?token=${invitation.token}`;
+
+          const emailData = {
+            inviterName: invitation.inviterName,
+            companyName: invitation.companyName,
+            role: invitation.role,
+            invitationLink,
+            expiresAt: new Date(invitation.expiresAt),
+            programTitle: invitation.programTitle,
+            programDescription: invitation.metadata?.programDescription,
+          };
+
+          await emailService.sendTeamInvitation(invitation.email, emailData);
+        }
       }
 
-      // Update expiry and resend
-      invitation.expiresAt = new Date(
-        Date.now() + 7 * 24 * 60 * 60 * 1000,
-      ).toISOString();
-      invitation.lastReminderSent = new Date().toISOString();
-
-      const invitationLink = `${window.location.origin}/invitation/accept?token=${invitation.token}`;
-
-      const emailData = {
-        inviterName: invitation.inviterName,
-        companyName: invitation.companyName,
-        role: invitation.role,
-        invitationLink,
-        expiresAt: new Date(invitation.expiresAt),
-        programTitle: invitation.programTitle,
-        programDescription: invitation.metadata?.programDescription,
-      };
-
-      await emailService.sendTeamInvitation(invitation.email, emailData);
-      await this.storeInvitation(invitation);
-
-      return true;
+      return success;
     } catch (error) {
       console.error("Failed to resend invitation:", error);
       return false;

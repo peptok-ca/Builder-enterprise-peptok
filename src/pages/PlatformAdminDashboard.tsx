@@ -295,8 +295,18 @@ export default function PlatformAdminDashboard() {
       );
       setUsers(updatedUsers);
       toast.success("User suspended successfully");
+
+      analytics.trackAction({
+        action: "user_suspended",
+        component: "platform_admin_dashboard",
+        metadata: { suspendedUserId: userId, adminId: user?.id },
+      });
     } catch (error) {
       toast.error("Failed to suspend user");
+      analytics.trackError(
+        error instanceof Error ? error : new Error("User suspension failed"),
+        { component: "platform_admin_dashboard", userId, adminId: user?.id },
+      );
     }
   };
 
@@ -307,8 +317,18 @@ export default function PlatformAdminDashboard() {
       );
       setUsers(updatedUsers);
       toast.success("User activated successfully");
+
+      analytics.trackAction({
+        action: "user_activated",
+        component: "platform_admin_dashboard",
+        metadata: { activatedUserId: userId, adminId: user?.id },
+      });
     } catch (error) {
       toast.error("Failed to activate user");
+      analytics.trackError(
+        error instanceof Error ? error : new Error("User activation failed"),
+        { component: "platform_admin_dashboard", userId, adminId: user?.id },
+      );
     }
   };
 

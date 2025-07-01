@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { apiEnhanced } from "@/services/apiEnhanced";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/layout/Header";
+import { validatePricingConfiguration } from "@/utils/validatePricingConfig";
 
 interface PricingConfiguration {
   companyServiceFee: number;

@@ -175,20 +175,11 @@ class InvitationService {
   /**
    * Get pending invitations for a user by email
    */
-  getPendingInvitations(email: string): TeamInvitation[] {
+  async getPendingInvitations(email: string): Promise<TeamInvitation[]> {
     try {
-      const pendingInvitations = localStorage.getItem(
-        this.PENDING_INVITATIONS_KEY,
-      );
-      if (!pendingInvitations) return [];
-
-      const invitations: Record<string, TeamInvitation[]> =
-        JSON.parse(pendingInvitations);
-      const userInvitations = invitations[email.toLowerCase()] || [];
-
-      // Filter out expired invitations
-      const now = new Date();
-      return userInvitations.filter((inv) => new Date(inv.expiresAt) > now);
+      // Use backend API for pending invitations
+      const invitations = await apiEnhanced.getPendingInvitations(email);
+      return invitations;
     } catch (error) {
       console.error("Failed to get pending invitations:", error);
       return [];

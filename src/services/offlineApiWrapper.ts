@@ -3,6 +3,7 @@
 
 import { offlineSync, SyncOperation } from "./offlineSync";
 import { apiEnhanced } from "./apiEnhanced";
+import { databaseValidation } from "./databaseValidation";
 
 interface OfflineApiOptions {
   priority?: "high" | "medium" | "low";

@@ -83,13 +83,66 @@ export const CoachDashboard: React.FC = () => {
 
       console.log("Loading coach dashboard data for user:", user.id);
 
-      // Fetch pending requests from backend
-      const pendingRequestsData = await api.getCoachPendingRequests(user.id);
-      console.log("Fetched pending requests:", pendingRequestsData);
+      // Track page view
+      analytics.pageView({
+        page: "coach_dashboard",
+        userId: user.id,
+        userType: user.userType,
+      });
 
-      // Fetch coach stats from backend
-      const statsData = await api.getCoachStats(user.id);
-      console.log("Fetched coach stats:", statsData);
+      // Fetch coach-specific matches and requests
+      const coachMatches = await apiEnhanced.getCoachMatches(user.id);
+      console.log("Fetched coach matches:", coachMatches);
+
+      // Convert matches to pending requests format
+      const pendingRequestsData = coachMatches
+        .filter((match) => match.status === "pending")
+        .map((match) => ({
+          id: match.id,
+          title: match.title,
+          company: match.companyId, // This would be resolved to company name in real API
+          description: match.description,
+          goals: match.goals?.map((g) => g.title) || [],
+          teamSize: match.participants || 1,
+          urgency: match.priority as "low" | "medium" | "high",
+          budget: match.budget?.max,
+          preferredSchedule: match.timeline || "TBD",
+          submittedAt: new Date(match.createdAt),
+        }));
+
+      // Generate coach stats from matches
+      const completedMatches = coachMatches.filter(
+        (m) => m.status === "completed",
+      );
+      const inProgressMatches = coachMatches.filter(
+        (m) => m.status === "in_progress",
+      );
+
+      const statsData: CoachStats = {
+        totalSessions: coachMatches.length,
+        completedSessions: completedMatches.length,
+        averageRating: 4.8, // This would come from actual ratings
+        totalEarnings: completedMatches.length * 150, // Estimated
+        upcomingSessions: inProgressMatches.length,
+        responseTime: 2.5, // Hours
+        successRate:
+          completedMatches.length > 0
+            ? (completedMatches.length / coachMatches.length) * 100
+            : 0,
+      };
+
+      console.log("Generated coach stats:", statsData);
+
+      analytics.trackAction({
+        action: "coach_dashboard_loaded",
+        component: "coach_dashboard",
+        metadata: {
+          coachId: user.id,
+          totalMatches: coachMatches.length,
+          pendingMatches: pendingRequestsData.length,
+          completedMatches: completedMatches.length,
+        },
+      });
 
       const mockSessions = [
         {

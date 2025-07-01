@@ -94,9 +94,14 @@ export default function PricingConfig() {
       const pricingConfig = await apiEnhanced.getPricingConfig();
       setConfig(pricingConfig);
       setHasChanges(false);
+      setLastSyncTime(new Date().toLocaleString());
+
+      // Determine storage source based on API response
+      setStorageSource(pricingConfig.version ? "local" : "backend");
     } catch (error) {
       console.error("Failed to fetch pricing config:", error);
       toast.error("Failed to load pricing configuration");
+      setStorageSource("local");
     } finally {
       setLoading(false);
     }

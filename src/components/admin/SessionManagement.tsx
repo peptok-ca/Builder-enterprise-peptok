@@ -114,6 +114,7 @@ const mockCoaches: Coach[] = [
 const ADMIN_PRICING = {
   serviceChargePercentage: 15, // 15% service charge
   commissionPercentage: 10, // 10% commission from coach fee
+  minCommissionAmount: 5, // Minimum $5 commission per session
   additionalParticipantFee: 25, // $25 per additional participant
   maxParticipantsIncluded: 1, // First participant included
 };

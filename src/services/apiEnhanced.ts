@@ -770,5 +770,4 @@ class EnhancedApiService {
 
 // Export singleton instance
 export const apiEnhanced = new EnhancedApiService();
-export { setCurrentUser };
 export default apiEnhanced;

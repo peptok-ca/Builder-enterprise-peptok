@@ -407,139 +407,49 @@ class InvitationService {
     }
   }
 
-  // Private helper methods
-  private generateInvitationToken(email: string, invitationId: string): string {
-    const data = `${email}:${invitationId}:${Date.now()}`;
-    return btoa(data);
-  }
+  // Backend Database Only - No localStorage Methods
 
-  private getAllInvitations(): TeamInvitation[] {
+  /**
+   * Store new user in backend database (called during invitation acceptance)
+   */
+  private async storeNewUser(user: any): Promise<void> {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  }
+      console.log("🗃️ Storing new user in backend database");
 
-  private async storeInvitation(invitation: TeamInvitation): Promise<void> {
-    try {
-      const invitations = this.getAllInvitations();
-      const existingIndex = invitations.findIndex(
-        (inv) => inv.id === invitation.id,
-      );
+      const backendEndpoints = ["/api/users", "/api/team-members", "/users"];
 
-      if (existingIndex >= 0) {
-        invitations[existingIndex] = invitation;
-      } else {
-        invitations.push(invitation);
-      }
+      for (const endpoint of backendEndpoints) {
+        try {
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Database-Write": "required",
+            },
+            body: JSON.stringify({
+              ...user,
+              createdViaInvitation: true,
+              requiresDatabaseStorage: true,
+            }),
+          });
 
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(invitations));
-    } catch (error) {
-      console.error("Failed to store invitation:", error);
-      throw error;
-    }
-  }
-
-  private async updateInvitationStatus(
-    invitationId: string,
-    status: TeamInvitation["status"],
-    updates?: Partial<TeamInvitation>,
-  ): Promise<void> {
-    try {
-      const invitations = this.getAllInvitations();
-      const invitationIndex = invitations.findIndex(
-        (inv) => inv.id === invitationId,
-      );
-
-      if (invitationIndex >= 0) {
-        invitations[invitationIndex] = {
-          ...invitations[invitationIndex],
-          status,
-          ...updates,
-        };
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(invitations));
-      }
-    } catch (error) {
-      console.error("Failed to update invitation status:", error);
-      throw error;
-    }
-  }
-
-  private addPendingInvitation(
-    email: string,
-    invitation: TeamInvitation,
-  ): void {
-    try {
-      const pendingInvitations = localStorage.getItem(
-        this.PENDING_INVITATIONS_KEY,
-      );
-      const invitations: Record<string, TeamInvitation[]> = pendingInvitations
-        ? JSON.parse(pendingInvitations)
-        : {};
-
-      const userEmail = email.toLowerCase();
-      if (!invitations[userEmail]) {
-        invitations[userEmail] = [];
-      }
-
-      // Remove any existing invitation for the same program
-      invitations[userEmail] = invitations[userEmail].filter(
-        (inv) => inv.programId !== invitation.programId,
-      );
-
-      invitations[userEmail].push(invitation);
-      localStorage.setItem(
-        this.PENDING_INVITATIONS_KEY,
-        JSON.stringify(invitations),
-      );
-    } catch (error) {
-      console.error("Failed to add pending invitation:", error);
-    }
-  }
-
-  private removePendingInvitation(email: string, invitationId: string): void {
-    try {
-      const pendingInvitations = localStorage.getItem(
-        this.PENDING_INVITATIONS_KEY,
-      );
-      if (!pendingInvitations) return;
-
-      const invitations: Record<string, TeamInvitation[]> =
-        JSON.parse(pendingInvitations);
-      const userEmail = email.toLowerCase();
-
-      if (invitations[userEmail]) {
-        invitations[userEmail] = invitations[userEmail].filter(
-          (inv) => inv.id !== invitationId,
-        );
-
-        if (invitations[userEmail].length === 0) {
-          delete invitations[userEmail];
+          if (response.ok) {
+            const data = await response.json();
+            if (data.data?.id && !data.data.id.includes("temp_")) {
+              console.log(`✅ User ${data.data.id} stored in backend database`);
+              return;
+            }
+          }
+        } catch (error) {
+          console.warn(`Failed to store user via ${endpoint}:`, error);
+          continue;
         }
-
-        localStorage.setItem(
-          this.PENDING_INVITATIONS_KEY,
-          JSON.stringify(invitations),
-        );
       }
-    } catch (error) {
-      console.error("Failed to remove pending invitation:", error);
-    }
-  }
 
-  private storeNewUser(user: any): void {
-    try {
-      // In a real app, this would be handled by the backend
-      // For demo purposes, we'll store in localStorage
-      const existingUsers = JSON.parse(
-        localStorage.getItem("peptok_users") || "[]",
-      );
-      existingUsers.push(user);
-      localStorage.setItem("peptok_users", JSON.stringify(existingUsers));
+      throw new Error("Failed to store user in backend database");
     } catch (error) {
-      console.error("Failed to store new user:", error);
+      console.error("❌ Failed to store new user in backend database:", error);
+      throw error;
     }
   }
 }

@@ -182,23 +182,51 @@ export class EmailService {
   ): Promise<boolean> {
     try {
       const emailContent = this.generateCoachAcceptanceEmail(data);
+      const emailTemplate: EmailTemplate = {
+        to: recipientEmail,
+        subject: emailContent.subject,
+        htmlContent: emailContent.htmlContent,
+        textContent: this.htmlToText(emailContent.htmlContent),
+      };
 
-      // Log the email content for development/demo purposes
-      console.log(`
-📧 COACH ACCEPTANCE EMAIL SENT TO: ${recipientEmail}
+      // Send email through the main sendEmail method
+      const success = await this.sendEmail(emailTemplate);
+
+      if (success) {
+        // In mock mode, show user-friendly notification
+        if (import.meta.env.DEV || import.meta.env.VITE_MOCK_EMAIL === "true") {
+          console.log(`
+🔧 DEVELOPMENT MODE: Coach acceptance email simulated
+📧 TO: ${recipientEmail}
 📧 SUBJECT: ${emailContent.subject}
-📧 CONTENT:
-${emailContent.htmlContent}
-      `);
+💡 In production, this email would be sent via your configured email service.
+          `);
+        } else {
+          console.log(`✅ Coach acceptance email sent to: ${recipientEmail}`);
+        }
+      }
 
-      // Simulate email sending delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      return true;
+      return success;
     } catch (error) {
       console.error("Failed to send coach acceptance email:", error);
       return false;
     }
+  }
+
+  /**
+   * Convert HTML content to plain text for email text content
+   */
+  private htmlToText(html: string): string {
+    return html
+      .replace(/<[^>]*>/g, "") // Remove HTML tags
+      .replace(/&nbsp;/g, " ") // Replace non-breaking spaces
+      .replace(/&amp;/g, "&") // Replace HTML entities
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/\s+/g, " ") // Collapse multiple spaces
+      .trim();
   }
 
   private generateTeamInvitationEmail(data: TeamInvitationData): {

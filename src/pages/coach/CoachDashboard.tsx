@@ -58,6 +58,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { apiEnhanced } from "@/services/apiEnhanced";
 import { analytics } from "@/services/analytics";
 import { toast } from "sonner";
+import { crossBrowserSync, SYNC_CONFIGS } from "@/services/crossBrowserSync";
 
 interface CoachProfile {
   id: string;

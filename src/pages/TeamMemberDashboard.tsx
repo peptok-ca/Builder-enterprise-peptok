@@ -386,8 +386,26 @@ const TeamMemberDashboard = () => {
       },
     };
 
-    // Add to pending invitations in localStorage
+    // Add to both localStorage locations for proper token validation
     try {
+      // 1. Add to main invitations storage (for token lookup)
+      const mainInvitations = localStorage.getItem("peptok_team_invitations");
+      const allInvitations: TeamInvitation[] = mainInvitations
+        ? JSON.parse(mainInvitations)
+        : [];
+
+      // Remove any existing test invitations
+      const filteredInvitations = allInvitations.filter(
+        (inv) => !inv.id.startsWith("test-invitation-"),
+      );
+      filteredInvitations.push(testInvitation);
+
+      localStorage.setItem(
+        "peptok_team_invitations",
+        JSON.stringify(filteredInvitations),
+      );
+
+      // 2. Add to pending invitations storage (for user-specific lookup)
       const pendingInvitations = localStorage.getItem(
         "peptok_pending_invitations",
       );
@@ -400,7 +418,7 @@ const TeamMemberDashboard = () => {
         invitations[userEmail] = [];
       }
 
-      // Remove any existing test invitations
+      // Remove any existing test invitations for this user
       invitations[userEmail] = invitations[userEmail].filter(
         (inv) => !inv.id.startsWith("test-invitation-"),
       );
@@ -412,7 +430,10 @@ const TeamMemberDashboard = () => {
         "peptok_pending_invitations",
         JSON.stringify(invitations),
       );
-      console.log("Created test invitation:", testInvitation);
+      console.log(
+        "Created test invitation in both storage locations:",
+        testInvitation,
+      );
 
       // Refresh the UI
       refreshPendingInvitations();

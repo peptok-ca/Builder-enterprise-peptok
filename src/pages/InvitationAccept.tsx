@@ -469,8 +469,13 @@ export default function InvitationAccept() {
               </Button>
             </div>
 
-            <div className="text-center text-sm text-gray-500">
-              Expires on {invitation.expiresAt.toLocaleDateString()}
+            <div className="text-center text-sm text-gray-500 space-y-1">
+              <div>
+                Expires on {new Date(invitation.expiresAt).toLocaleDateString()}
+              </div>
+              <div className="text-xs">
+                Invited by {invitation.inviterName} • {invitation.companyName}
+              </div>
             </div>
           </CardContent>
         </Card>

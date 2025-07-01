@@ -623,7 +623,7 @@ export function TeamMemberManagementCard({
         )}
 
         {/* Helper Text */}
-        <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
+        <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3 space-y-3">
           <div className="flex items-start gap-2">
             <Mail className="w-4 h-4 mt-0.5" />
             <div>
@@ -635,6 +635,24 @@ export function TeamMemberManagementCard({
               </p>
             </div>
           </div>
+
+          {teamMembers.filter((member) => member.status === "invited").length >
+            0 && (
+            <div className="flex items-start gap-2 pt-2 border-t border-muted-foreground/20">
+              <Clock className="w-4 h-4 mt-0.5 text-blue-600" />
+              <div>
+                <p className="font-medium mb-1 text-blue-700">
+                  Pending Invitations
+                </p>
+                <p>
+                  Invitations expire after 7 days. You can resend individual
+                  invitations or use "Resend All" for multiple pending
+                  invitations. Team members will receive a fresh 7-day link when
+                  you resend.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

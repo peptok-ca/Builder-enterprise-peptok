@@ -26,12 +26,18 @@ import {
   User,
   CheckCircle,
   PlayCircle,
+  Mail,
+  UserPlus,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { SessionRatingModal } from "@/components/sessions/SessionRatingModal";
 import { api } from "@/services/api";
 import { toast } from "sonner";
-import { invitationService } from "@/services/invitationService";
+import {
+  invitationService,
+  TeamInvitation,
+} from "@/services/invitationService";
 
 interface TeamMemberSession {
   id: string;

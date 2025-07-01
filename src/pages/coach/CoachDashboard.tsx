@@ -215,24 +215,23 @@ export const CoachDashboard: React.FC = () => {
       // Load all data in parallel
       const [profileData, statsData, matchesData, sessionsData, activityData] =
         await Promise.all([
-          apiEnhanced.request<CoachProfile>(`/coaches/${user.id}/profile`),
-          apiEnhanced.request<CoachStats>(`/coaches/${user.id}/stats`),
+          apiEnhanced.getCoachProfile(user.id),
+          apiEnhanced.getCoachStats(user.id),
           apiEnhanced.getCoachMatches(user.id),
-          apiEnhanced.request<CoachSession[]>(
-            `/coaches/${user.id}/sessions?status=upcoming&limit=10`,
-          ),
-          apiEnhanced.request<ActivityItem[]>(
-            `/coaches/${user.id}/activity?limit=20`,
-          ),
+          apiEnhanced.getCoachSessions(user.id, {
+            status: "upcoming",
+            limit: 10,
+          }),
+          apiEnhanced.getCoachActivity(user.id, { limit: 20 }),
         ]);
 
-      setProfile(profileData.data);
-      setStats(statsData.data);
+      setProfile(profileData);
+      setStats(statsData);
       setPendingMatches(
         matchesData.filter((match) => match.status === "pending"),
       );
-      setUpcomingSessions(sessionsData.data);
-      setRecentActivity(activityData.data);
+      setUpcomingSessions(sessionsData);
+      setRecentActivity(activityData);
 
       analytics.trackAction({
         action: "dashboard_loaded",

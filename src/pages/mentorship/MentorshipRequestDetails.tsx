@@ -48,14 +48,25 @@ export default function MentorshipRequestDetails() {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const handleUpdateTeamMembers = (updatedMembers: any[]) => {
+  const handleUpdateTeamMembers = async (updatedMembers: any[]) => {
     setTeamMembers(updatedMembers);
-    // In a real app, this would also update the backend
+
+    // Update the request object
     if (request) {
-      setRequest({
+      const updatedRequest = {
         ...request,
         teamMembers: updatedMembers,
-      });
+      };
+      setRequest(updatedRequest);
+
+      // Persist team members to backend database
+      try {
+        await api.updateMentorshipRequest(request.id, updatedRequest);
+        console.log("✅ Team members updated in backend database");
+      } catch (error) {
+        console.error("Failed to update team members in backend:", error);
+        // Don't show error toast as team members are still updated in UI
+      }
     }
   };
 

@@ -1225,6 +1225,88 @@ class EnhancedApiService {
     }
   }
 
+  private updateSharedPlatformConfig(config: any, user: any): any {
+    const SHARED_CONFIG_KEY = "peptok_platform_global_config";
+
+    const enhancedConfig = {
+      ...config,
+      lastUpdated: new Date().toISOString(),
+      updatedBy: user.id,
+      updatedByName: user.name,
+      version: "1.0",
+      syncToken: Date.now().toString(), // Unique token for this update
+    };
+
+    // Store in THE SINGLE SOURCE OF TRUTH that ALL admins will read from
+    localStorage.setItem(SHARED_CONFIG_KEY, JSON.stringify(enhancedConfig));
+
+    // Also store update in audit log
+    this.addToAuditLog({
+      id: `audit_${Date.now()}`,
+      timestamp: enhancedConfig.lastUpdated,
+      action: "pricing_config_updated",
+      adminId: user.id,
+      adminName: user.name,
+      details: "Updated platform pricing configuration",
+      changes: {
+        companyServiceFee: `${config.companyServiceFee * 100}%`,
+        coachCommission: `${config.coachCommission * 100}%`,
+        minCoachCommissionAmount: `$${config.minCoachCommissionAmount}`,
+        additionalParticipantFee: `$${config.additionalParticipantFee}`,
+        maxParticipantsIncluded: config.maxParticipantsIncluded,
+        currency: config.currency,
+      },
+    });
+
+    // Broadcast to ALL admin sessions immediately
+    try {
+      window.dispatchEvent(
+        new CustomEvent("globalConfigUpdated", {
+          detail: enhancedConfig,
+        }),
+      );
+
+      // Also dispatch the old event for backward compatibility
+      window.dispatchEvent(
+        new CustomEvent("platformConfigUpdated", {
+          detail: enhancedConfig,
+        }),
+      );
+    } catch (broadcastError) {
+      console.warn("Could not broadcast config update:", broadcastError);
+    }
+
+    analytics.trackAction({
+      action: "pricing_config_updated",
+      component: "api_enhanced",
+      metadata: {
+        source: "simulated_backend",
+        adminId: user.id,
+        currency: config.currency,
+        companyServiceFee: config.companyServiceFee,
+        coachCommission: config.coachCommission,
+        minCoachCommissionAmount: config.minCoachCommissionAmount,
+        syncToken: enhancedConfig.syncToken,
+      },
+    });
+
+    return enhancedConfig;
+  }
+
+  private addToAuditLog(entry: any): void {
+    const AUDIT_LOG_KEY = "peptok_platform_audit_log";
+    const auditLog = JSON.parse(localStorage.getItem(AUDIT_LOG_KEY) || "[]");
+
+    auditLog.unshift(entry); // Add to beginning
+
+    // Keep only last 100 entries
+    if (auditLog.length > 100) {
+      auditLog.splice(100);
+    }
+
+    localStorage.setItem(AUDIT_LOG_KEY, JSON.stringify(auditLog));
+  }
+
   // ===== PLATFORM SETTINGS MANAGEMENT =====
 
   async getAllPlatformSettings(): Promise<any> {

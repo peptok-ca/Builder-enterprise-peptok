@@ -131,15 +131,24 @@ export default function CompanyDashboardEnhanced() {
   const loadDashboardData = async () => {
     if (!user?.companyId) {
       toast.error("Company information not found");
+      setLoading(false);
       return;
     }
 
     setLoading(true);
     try {
-      // Load company-specific requests
+      // Clear any invalidated cache before loading
+      cacheInvalidation.clearInvalidatedCache(user.companyId, user.id);
+
+      // Load company-specific requests with proper error handling
       const companyRequests = await apiEnhanced.getCompanyRequests(
         user.companyId,
       );
+
+      if (!Array.isArray(companyRequests)) {
+        throw new Error("Invalid company requests data received");
+      }
+
       setRequests(companyRequests);
 
       // Calculate metrics from requests

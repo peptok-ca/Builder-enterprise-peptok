@@ -139,6 +139,18 @@ export function TeamMemberManagementCard({
       setNewMemberName("");
       setNewMemberRole("participant");
 
+      // Development helper
+      if (import.meta.env.DEV || import.meta.env.VITE_MOCK_EMAIL === "true") {
+        console.log("👥 Team Member Added Successfully:", {
+          email: newTeamMember.email,
+          name: newTeamMember.name,
+          role: newTeamMember.role,
+          programId: programId,
+          status: "invited",
+          note: "Email invitation simulated in development mode. Check console for email content.",
+        });
+      }
+
       // Check if emails are in mock mode
       const isMockEmail =
         import.meta.env.DEV || import.meta.env.VITE_MOCK_EMAIL === "true";

@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import { User } from "../types";
 import { demoUsers } from "../data/demoDatabase";
+import { backendStorage } from "./backendStorage";
 
 // OAuth Configuration
 const OAUTH_CONFIG = {

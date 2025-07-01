@@ -3,6 +3,7 @@
 
 import { toast } from "sonner";
 import { emailService } from "./email";
+import { apiEnhanced } from "./apiEnhanced";
 
 export interface TeamInvitation {
   id: string;

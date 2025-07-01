@@ -149,10 +149,13 @@ class AuthService {
   }
 
   // Check if user is authenticated
-  isAuthenticated(): boolean {
-    return (
-      this.currentUser !== null && localStorage.getItem("peptok_token") !== null
-    );
+  async isAuthenticated(): Promise<boolean> {
+    if (this.currentUser !== null) {
+      // Double-check with backend database
+      const session = await backendStorage.getUserSession(this.currentUser.id);
+      return session !== null;
+    }
+    return false;
   }
 
   // Email/Password Login

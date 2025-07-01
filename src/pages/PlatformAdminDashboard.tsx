@@ -381,7 +381,16 @@ export default function PlatformAdminDashboard() {
         revenue: 0,
       };
 
-      setUsers([...users, user]);
+      const updatedUsers = [...users, user];
+      setUsers(updatedUsers);
+
+      // Sync across browsers
+      crossBrowserSync.save(
+        SYNC_CONFIGS.USER_MANAGEMENT,
+        { users: updatedUsers },
+        { id: user?.id || "admin", name: user?.name || "Platform Admin" },
+      );
+
       setIsCreateUserOpen(false);
       setNewUser({
         firstName: "",

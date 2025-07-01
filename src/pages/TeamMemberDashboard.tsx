@@ -554,9 +554,20 @@ const TeamMemberDashboard = () => {
         )}
 
         <Tabs defaultValue="sessions" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="sessions">My Sessions</TabsTrigger>
             <TabsTrigger value="programs">My Programs</TabsTrigger>
+            <TabsTrigger value="invitations" className="relative">
+              Invitations
+              {pendingInvitations.length > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="ml-1 px-1 py-0 text-xs h-4 w-4 rounded-full"
+                >
+                  {pendingInvitations.length}
+                </Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="feedback">Feedback History</TabsTrigger>
           </TabsList>
 

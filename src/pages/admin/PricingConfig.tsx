@@ -399,6 +399,36 @@ export default function PricingConfig() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="minCoachCommissionAmount">
+                    Minimum Commission Amount
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500 w-8">
+                      {config.currency}$
+                    </span>
+                    <Input
+                      id="minCoachCommissionAmount"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={config.minCoachCommissionAmount}
+                      onChange={(e) =>
+                        handleConfigChange(
+                          "minCoachCommissionAmount",
+                          parseFloat(e.target.value),
+                        )
+                      }
+                      className="flex-1"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Minimum commission amount per session, regardless of
+                    percentage calculation
+                  </p>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="currency">Currency</Label>
                   <Input
                     id="currency"

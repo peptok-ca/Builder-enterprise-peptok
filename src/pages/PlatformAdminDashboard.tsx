@@ -634,7 +634,7 @@ export default function PlatformAdminDashboard() {
                       Total Users
                     </p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {stats.totalUsers.toLocaleString()}
+                      {stats.totalUsers?.toLocaleString() || "0"}
                     </p>
                   </div>
                 </div>
@@ -650,7 +650,7 @@ export default function PlatformAdminDashboard() {
                       Companies
                     </p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {stats.totalCompanies}
+                      {stats.totalCompanies || "0"}
                     </p>
                   </div>
                 </div>
@@ -664,7 +664,7 @@ export default function PlatformAdminDashboard() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Coaches</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {stats.totalCoaches}
+                      {stats.totalCoaches || "0"}
                     </p>
                   </div>
                 </div>
@@ -680,7 +680,7 @@ export default function PlatformAdminDashboard() {
                       Sessions
                     </p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {stats.totalSessions.toLocaleString()}
+                      {stats.totalSessions?.toLocaleString() || "0"}
                     </p>
                   </div>
                 </div>
@@ -696,7 +696,7 @@ export default function PlatformAdminDashboard() {
                       Monthly Revenue
                     </p>
                     <p className="text-2xl font-bold text-gray-900">
-                      ${stats.monthlyRevenue.toLocaleString()}
+                      ${stats.monthlyRevenue?.toLocaleString() || "0"}
                     </p>
                   </div>
                 </div>
@@ -712,7 +712,7 @@ export default function PlatformAdminDashboard() {
                       Active Subs
                     </p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {stats.activeSubscriptions}
+                      {stats.activeSubscriptions || "0"}
                     </p>
                   </div>
                 </div>

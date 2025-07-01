@@ -97,11 +97,33 @@ class OfflineApiWrapper {
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     };
 
-    return offlineSync.executeWithOfflineSupport(
-      () => apiEnhanced.createTeamInvitation(invitationData),
-      fallbackInvitation,
-      syncOperation,
-    );
+    try {
+      // Execute with database validation
+      const result = await offlineSync.executeWithOfflineSupport(
+        () => apiEnhanced.createTeamInvitation(invitationData),
+        fallbackInvitation,
+        syncOperation,
+      );
+
+      // Validate that the invitation was actually saved to the backend database
+      if (result.id && !result.id.includes("temp_")) {
+        setTimeout(async () => {
+          const validation = await databaseValidation.validateInvitationStorage(
+            result.id,
+            invitationData,
+          );
+          databaseValidation.showValidationResults(
+            "Team invitation",
+            validation,
+          );
+        }, 2000); // Validate after 2 seconds to allow for database write
+      }
+
+      return result;
+    } catch (error) {
+      console.error("Team invitation creation failed:", error);
+      throw error;
+    }
   }
 
   /**

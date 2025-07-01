@@ -34,6 +34,7 @@ export default function PricingConfig() {
   const [config, setConfig] = useState<PricingConfiguration>({
     companyServiceFee: 0.1,
     coachCommission: 0.2,
+    minCoachCommissionAmount: 5,
     additionalParticipantFee: 25,
     maxParticipantsIncluded: 1,
     currency: "CAD",

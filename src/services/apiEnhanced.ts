@@ -1106,12 +1106,31 @@ class EnhancedApiService {
       return response.data;
     } catch (error) {
       console.warn(
-        "API not available, using simulated backend database:",
+        "API not available, using cross-browser synchronized storage:",
         error,
       );
 
-      // Simulate backend database using a centralized key that all admins share
-      return this.getSharedPlatformConfig();
+      // Use centralized cross-browser sync service
+      const config = crossBrowserSync.load(SYNC_CONFIGS.PRICING_CONFIG);
+
+      if (config) {
+        return config;
+      }
+
+      // Default configuration if no data exists
+      const defaultConfig = {
+        companyServiceFee: 0.1,
+        coachCommission: 0.2,
+        minCoachCommissionAmount: 5,
+        additionalParticipantFee: 25,
+        maxParticipantsIncluded: 1,
+        currency: "CAD",
+        lastUpdated: new Date().toISOString(),
+        version: "1.0",
+        createdBy: "system",
+      };
+
+      return defaultConfig;
     }
   }
 

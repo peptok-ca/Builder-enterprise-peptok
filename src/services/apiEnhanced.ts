@@ -1786,6 +1786,365 @@ class EnhancedApiService {
       );
     }
   }
+
+  // ===== TEAM INVITATION METHODS =====
+
+  async createTeamInvitation(invitationData: {
+    email: string;
+    name?: string;
+    programId: string;
+    programTitle: string;
+    companyId: string;
+    companyName: string;
+    inviterName: string;
+    inviterEmail: string;
+    role: "participant" | "observer";
+    metadata?: any;
+  }): Promise<any> {
+    const user = checkAuthorization(["company_admin", "enterprise_admin"]);
+
+    try {
+      const response = await this.request<any>("/team/invitations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(invitationData),
+      });
+
+      analytics.trackAction({
+        action: "team_invitation_created",
+        component: "team_api",
+        metadata: {
+          programId: invitationData.programId,
+          inviteeEmail: invitationData.email,
+          role: invitationData.role,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn(
+        "Team invitation API not available, creating mock invitation:",
+        error,
+      );
+
+      // Fallback to local invitation creation
+      const invitationId = `inv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const token = btoa(
+        `${invitationData.email}:${invitationId}:${Date.now()}`,
+      );
+
+      const invitation = {
+        id: invitationId,
+        token,
+        ...invitationData,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+
+      // Store in both localStorage locations for compatibility
+      const existingInvitations = JSON.parse(
+        localStorage.getItem("peptok_team_invitations") || "[]",
+      );
+      existingInvitations.push(invitation);
+      localStorage.setItem(
+        "peptok_team_invitations",
+        JSON.stringify(existingInvitations),
+      );
+
+      // Also store in pending invitations
+      const pendingInvitations = localStorage.getItem(
+        "peptok_pending_invitations",
+      );
+      const invitations: Record<string, any[]> = pendingInvitations
+        ? JSON.parse(pendingInvitations)
+        : {};
+      const userEmail = invitationData.email.toLowerCase();
+      if (!invitations[userEmail]) {
+        invitations[userEmail] = [];
+      }
+      invitations[userEmail].push(invitation);
+      localStorage.setItem(
+        "peptok_pending_invitations",
+        JSON.stringify(invitations),
+      );
+
+      return invitation;
+    }
+  }
+
+  async getTeamInvitations(filters?: {
+    programId?: string;
+    companyId?: string;
+    status?: string;
+  }): Promise<any[]> {
+    const user = checkAuthorization([
+      "company_admin",
+      "enterprise_admin",
+      "team_member",
+    ]);
+
+    try {
+      const queryParams = new URLSearchParams();
+      if (filters?.programId)
+        queryParams.append("programId", filters.programId);
+      if (filters?.companyId)
+        queryParams.append("companyId", filters.companyId);
+      if (filters?.status) queryParams.append("status", filters.status);
+
+      const response = await this.request<any>(
+        `/team/invitations?${queryParams.toString()}`,
+      );
+
+      analytics.trackAction({
+        action: "team_invitations_fetched",
+        component: "team_api",
+        metadata: { filters },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn(
+        "Team invitations API not available, using local data:",
+        error,
+      );
+
+      // Fallback to localStorage
+      const allInvitations = JSON.parse(
+        localStorage.getItem("peptok_team_invitations") || "[]",
+      );
+      let filteredInvitations = allInvitations;
+
+      if (filters?.programId) {
+        filteredInvitations = filteredInvitations.filter(
+          (inv: any) => inv.programId === filters.programId,
+        );
+      }
+      if (filters?.companyId) {
+        filteredInvitations = filteredInvitations.filter(
+          (inv: any) => inv.companyId === filters.companyId,
+        );
+      }
+      if (filters?.status) {
+        filteredInvitations = filteredInvitations.filter(
+          (inv: any) => inv.status === filters.status,
+        );
+      }
+
+      return filteredInvitations;
+    }
+  }
+
+  async resendTeamInvitation(invitationId: string): Promise<boolean> {
+    const user = checkAuthorization(["company_admin", "enterprise_admin"]);
+
+    try {
+      const response = await this.request<any>(
+        `/team/invitations/${invitationId}/resend`,
+        {
+          method: "POST",
+        },
+      );
+
+      analytics.trackAction({
+        action: "team_invitation_resent",
+        component: "team_api",
+        metadata: { invitationId },
+      });
+
+      return response.success;
+    } catch (error) {
+      console.warn(
+        "Resend invitation API not available, using local fallback:",
+        error,
+      );
+
+      // Fallback to localStorage update
+      const allInvitations = JSON.parse(
+        localStorage.getItem("peptok_team_invitations") || "[]",
+      );
+      const invitationIndex = allInvitations.findIndex(
+        (inv: any) => inv.id === invitationId,
+      );
+
+      if (invitationIndex >= 0) {
+        allInvitations[invitationIndex].expiresAt = new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000,
+        ).toISOString();
+        allInvitations[invitationIndex].lastReminderSent =
+          new Date().toISOString();
+        localStorage.setItem(
+          "peptok_team_invitations",
+          JSON.stringify(allInvitations),
+        );
+
+        // Also update pending invitations
+        const pendingInvitations = localStorage.getItem(
+          "peptok_pending_invitations",
+        );
+        if (pendingInvitations) {
+          const invitations = JSON.parse(pendingInvitations);
+          Object.keys(invitations).forEach((email) => {
+            const userInvitations = invitations[email];
+            const pendingIndex = userInvitations.findIndex(
+              (inv: any) => inv.id === invitationId,
+            );
+            if (pendingIndex >= 0) {
+              userInvitations[pendingIndex].expiresAt =
+                allInvitations[invitationIndex].expiresAt;
+              userInvitations[pendingIndex].lastReminderSent =
+                allInvitations[invitationIndex].lastReminderSent;
+            }
+          });
+          localStorage.setItem(
+            "peptok_pending_invitations",
+            JSON.stringify(invitations),
+          );
+        }
+
+        return true;
+      }
+
+      return false;
+    }
+  }
+
+  async acceptTeamInvitation(
+    token: string,
+    acceptanceData: {
+      firstName: string;
+      lastName: string;
+      password: string;
+      acceptTerms: boolean;
+    },
+  ): Promise<{ success: boolean; user?: any; error?: string }> {
+    try {
+      const response = await this.request<any>("/team/invitations/accept", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, ...acceptanceData }),
+      });
+
+      analytics.trackAction({
+        action: "team_invitation_accepted",
+        component: "team_api",
+        metadata: { token: token.substring(0, 10) + "..." },
+      });
+
+      return response;
+    } catch (error) {
+      console.warn(
+        "Accept invitation API not available, using local fallback:",
+        error,
+      );
+
+      // Fallback to localStorage processing
+      const allInvitations = JSON.parse(
+        localStorage.getItem("peptok_team_invitations") || "[]",
+      );
+      const invitation = allInvitations.find((inv: any) => inv.token === token);
+
+      if (!invitation) {
+        return { success: false, error: "Invalid invitation token" };
+      }
+
+      if (invitation.status !== "pending") {
+        return { success: false, error: `Invitation is ${invitation.status}` };
+      }
+
+      if (new Date() > new Date(invitation.expiresAt)) {
+        return { success: false, error: "Invitation has expired" };
+      }
+
+      // Update invitation status
+      invitation.status = "accepted";
+      invitation.acceptedAt = new Date().toISOString();
+      localStorage.setItem(
+        "peptok_team_invitations",
+        JSON.stringify(allInvitations),
+      );
+
+      // Remove from pending invitations
+      const pendingInvitations = localStorage.getItem(
+        "peptok_pending_invitations",
+      );
+      if (pendingInvitations) {
+        const invitations = JSON.parse(pendingInvitations);
+        const userEmail = invitation.email.toLowerCase();
+        if (invitations[userEmail]) {
+          invitations[userEmail] = invitations[userEmail].filter(
+            (inv: any) => inv.id !== invitation.id,
+          );
+          if (invitations[userEmail].length === 0) {
+            delete invitations[userEmail];
+          }
+          localStorage.setItem(
+            "peptok_pending_invitations",
+            JSON.stringify(invitations),
+          );
+        }
+      }
+
+      // Create user object
+      const user = {
+        id: `user_${Date.now()}`,
+        email: invitation.email,
+        name: `${acceptanceData.firstName} ${acceptanceData.lastName}`,
+        firstName: acceptanceData.firstName,
+        lastName: acceptanceData.lastName,
+        userType: "team_member",
+        companyId: invitation.companyId,
+        companyName: invitation.companyName,
+        role: invitation.role,
+        programId: invitation.programId,
+        programTitle: invitation.programTitle,
+        invitedBy: invitation.inviterName,
+        joinedAt: new Date().toISOString(),
+        isAuthenticated: true,
+        picture: `https://api.dicebear.com/7.x/avataaars/svg?seed=${acceptanceData.firstName}`,
+        provider: "invitation",
+        status: "active",
+      };
+
+      return { success: true, user };
+    }
+  }
+
+  async getPendingInvitations(email: string): Promise<any[]> {
+    try {
+      const response = await this.request<any>(
+        `/team/invitations/pending?email=${encodeURIComponent(email)}`,
+      );
+
+      analytics.trackAction({
+        action: "pending_invitations_fetched",
+        component: "team_api",
+        metadata: { email: email.substring(0, 5) + "..." },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.warn(
+        "Pending invitations API not available, using local data:",
+        error,
+      );
+
+      // Fallback to localStorage
+      const pendingInvitations = localStorage.getItem(
+        "peptok_pending_invitations",
+      );
+      if (!pendingInvitations) return [];
+
+      const invitations = JSON.parse(pendingInvitations);
+      const userInvitations = invitations[email.toLowerCase()] || [];
+
+      // Filter out expired invitations
+      const now = new Date();
+      return userInvitations.filter(
+        (inv: any) => new Date(inv.expiresAt) > now,
+      );
+    }
+  }
 }
 
 // Export singleton instance

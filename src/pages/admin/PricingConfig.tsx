@@ -22,6 +22,7 @@ import Header from "@/components/layout/Header";
 interface PricingConfiguration {
   companyServiceFee: number;
   coachCommission: number;
+  minCoachCommissionAmount: number;
   additionalParticipantFee: number;
   maxParticipantsIncluded: number;
   currency: string;

@@ -244,6 +244,9 @@ const App: React.FC = () => {
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+
+            {/* Offline Sync Indicator */}
+            <OfflineIndicator />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

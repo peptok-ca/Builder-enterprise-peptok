@@ -985,15 +985,26 @@ const TeamMemberDashboard = () => {
                       Program invitations waiting for your response
                     </CardDescription>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={refreshPendingInvitations}
-                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                  >
-                    <Mail className="w-4 h-4 mr-2" />
-                    Refresh
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={refreshPendingInvitations}
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                      <Mail className="w-4 h-4 mr-2" />
+                      Refresh
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={createTestInvitation}
+                      className="text-green-600 border-green-200 hover:bg-green-50"
+                    >
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Test Invite
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>

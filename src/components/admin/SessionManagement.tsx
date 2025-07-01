@@ -471,7 +471,7 @@ export function SessionManagement({ matches = [] }: SessionManagementProps) {
                       </div>
                       <div className="flex justify-between">
                         <span>
-                          Commission ({ADMIN_PRICING.commissionPercentage}%):
+                          Commission (min ${ADMIN_PRICING.minCommissionAmount}):
                         </span>
                         <span>${currentCosts.commission.toFixed(2)}</span>
                       </div>

@@ -194,6 +194,22 @@ const App: React.FC = () => {
               <Route path="/terms" element={<Terms />} />
               <Route path="/admin/pricing-config" element={<PricingConfig />} />
               <Route
+                path="/admin/security-settings"
+                element={
+                  <ProtectedRoute requiredUserType="platform_admin">
+                    <SecuritySettings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/analytics-settings"
+                element={
+                  <ProtectedRoute requiredUserType="platform_admin">
+                    <AnalyticsSettings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/analytics"
                 element={
                   <ProtectedRoute

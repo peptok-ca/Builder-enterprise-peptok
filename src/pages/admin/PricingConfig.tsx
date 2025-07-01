@@ -15,7 +15,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "@/services/api";
+import { apiEnhanced } from "@/services/apiEnhanced";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/layout/Header";
 

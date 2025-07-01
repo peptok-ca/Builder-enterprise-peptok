@@ -1323,7 +1323,7 @@ class EnhancedApiService {
       },
     });
 
-    // Broadcast to ALL admin sessions immediately
+    // Broadcast to ALL admin sessions immediately (same browser tabs)
     try {
       window.dispatchEvent(
         new CustomEvent("globalConfigUpdated", {
@@ -1336,6 +1336,10 @@ class EnhancedApiService {
         new CustomEvent("platformConfigUpdated", {
           detail: enhancedConfig,
         }),
+      );
+
+      console.log(
+        "✅ Configuration saved and broadcasted to all admin sessions",
       );
     } catch (broadcastError) {
       console.warn("Could not broadcast config update:", broadcastError);

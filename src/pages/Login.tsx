@@ -447,28 +447,196 @@ const Login = () => {
           </Card>
 
           {/* Demo Credentials */}
-          {import.meta.env.DEV && (
-            <Card className="backdrop-blur-md bg-yellow-50/80 border-yellow-200/50">
-              <CardContent className="pt-6">
-                <h3 className="font-semibold text-yellow-800 mb-2">
-                  Demo Credentials
-                </h3>
-                <div className="text-sm text-yellow-700 space-y-1">
-                  <p>
-                    <strong>Enterprise:</strong> john.doe@company.com /
-                    password123
-                  </p>
-                  <p>
-                    <strong>Admin:</strong> admin@company.com / password123
-                  </p>
-                  <p>
-                    <strong>OAuth:</strong> Click Google/Microsoft buttons
-                    (simulated)
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {/* Demo Credentials Section */}
+          <Card className="backdrop-blur-md bg-blue-50/80 border-blue-200/50">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center text-blue-800">
+                <Users className="w-5 h-5 mr-2" />
+                Demo Accounts ({demoCredentials.length} users)
+              </CardTitle>
+              <CardDescription className="text-blue-700">
+                Use these sample accounts to explore different user roles and
+                features
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="platform" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 bg-white/60">
+                  <TabsTrigger value="platform" className="text-xs">
+                    <Crown className="w-4 h-4 mr-1" />
+                    Admins ({platformAdmins.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="company" className="text-xs">
+                    <Building className="w-4 h-4 mr-1" />
+                    Companies ({companyAdmins.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="coach" className="text-xs">
+                    <UserCheck className="w-4 h-4 mr-1" />
+                    Coaches ({coaches.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="team" className="text-xs">
+                    <Users className="w-4 h-4 mr-1" />
+                    Team ({teamMembers.length})
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="platform" className="space-y-3 mt-4">
+                  <div className="text-sm text-blue-700 mb-3">
+                    <Badge
+                      variant="outline"
+                      className="mr-2 border-blue-300 text-blue-700"
+                    >
+                      Platform Administrators
+                    </Badge>
+                    Full system access and user management
+                  </div>
+                  {platformAdmins.map((user, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-white/60 border border-blue-200/50 rounded-lg hover:bg-white/80 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium text-sm text-blue-900">
+                          {user.name}
+                        </p>
+                        <p className="text-xs text-blue-600">{user.email}</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          quickDemoLogin(user.email, user.password)
+                        }
+                        disabled={isLoading}
+                        className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                      >
+                        Login
+                      </Button>
+                    </div>
+                  ))}
+                </TabsContent>
+
+                <TabsContent value="company" className="space-y-3 mt-4">
+                  <div className="text-sm text-blue-700 mb-3">
+                    <Badge
+                      variant="outline"
+                      className="mr-2 border-blue-300 text-blue-700"
+                    >
+                      Company Administrators
+                    </Badge>
+                    Manage company programs and employees
+                  </div>
+                  {companyAdmins.map((user, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-white/60 border border-blue-200/50 rounded-lg hover:bg-white/80 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium text-sm text-blue-900">
+                          {user.name}
+                        </p>
+                        <p className="text-xs text-blue-600">{user.email}</p>
+                        <p className="text-xs text-blue-500">{user.company}</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          quickDemoLogin(user.email, user.password)
+                        }
+                        disabled={isLoading}
+                        className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                      >
+                        Login
+                      </Button>
+                    </div>
+                  ))}
+                </TabsContent>
+
+                <TabsContent value="coach" className="space-y-3 mt-4">
+                  <div className="text-sm text-blue-700 mb-3">
+                    <Badge
+                      variant="outline"
+                      className="mr-2 border-blue-300 text-blue-700"
+                    >
+                      Professional Coaches
+                    </Badge>
+                    View matches, manage sessions, track earnings
+                  </div>
+                  <div className="max-h-64 overflow-y-auto space-y-3">
+                    {coaches.map((user, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-white/60 border border-blue-200/50 rounded-lg hover:bg-white/80 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <p className="font-medium text-sm text-blue-900">
+                            {user.name}
+                          </p>
+                          <p className="text-xs text-blue-600">{user.email}</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            quickDemoLogin(user.email, user.password)
+                          }
+                          disabled={isLoading}
+                          className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                        >
+                          Login
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="team" className="space-y-3 mt-4">
+                  <div className="text-sm text-blue-700 mb-3">
+                    <Badge
+                      variant="outline"
+                      className="mr-2 border-blue-300 text-blue-700"
+                    >
+                      Team Members
+                    </Badge>
+                    Participate in coaching sessions and programs
+                  </div>
+                  {teamMembers.map((user, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-white/60 border border-blue-200/50 rounded-lg hover:bg-white/80 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium text-sm text-blue-900">
+                          {user.name}
+                        </p>
+                        <p className="text-xs text-blue-600">{user.email}</p>
+                        <p className="text-xs text-blue-500">{user.company}</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          quickDemoLogin(user.email, user.password)
+                        }
+                        disabled={isLoading}
+                        className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                      >
+                        Login
+                      </Button>
+                    </div>
+                  ))}
+                </TabsContent>
+              </Tabs>
+
+              <div className="mt-4 pt-3 border-t border-blue-200/50">
+                <p className="text-xs text-blue-600 text-center">
+                  All demo accounts use their listed passwords. Click "Login"
+                  next to any account to sign in instantly.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Footer */}
           <div className="text-center text-sm text-muted-foreground">

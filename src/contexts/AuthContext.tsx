@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, authService } from "@/services/auth";
+import { setCurrentUser } from "@/services/api";
+import { analytics } from "@/services/analytics";
 
 interface AuthContextType {
   user: User | null;
@@ -29,6 +31,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         const currentUser = authService.getCurrentUser();
         setUser(currentUser);
+        setCurrentUser(currentUser);
+
+        if (currentUser) {
+          analytics.setUser(currentUser.id, currentUser.userType, {
+            email: currentUser.email,
+            name: currentUser.name,
+          });
+        }
       } catch (error) {
         console.error("Failed to initialize auth:", error);
       } finally {
@@ -45,6 +55,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authService.loginWithEmail(email, password);
       if (response.success && response.user) {
         setUser(response.user);
+        setCurrentUser(response.user);
+        analytics.track("user_login", {
+          userType: response.user.userType,
+          loginMethod: "email",
+        });
         return { success: true };
       } else {
         return { success: false, error: response.error || "Login failed" };
@@ -61,9 +76,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await authService.logout();
       setUser(null);
+      setCurrentUser(null);
     } catch (error) {
       console.error("Logout error:", error);
       setUser(null);
+      setCurrentUser(null);
     }
   };
 

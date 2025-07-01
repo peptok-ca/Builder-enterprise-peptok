@@ -275,7 +275,10 @@ export default function CreateMentorshipRequest() {
 
   const clearDraft = () => {
     localStorage.removeItem("mentorship-request-draft");
+    localStorage.removeItem("current-program-id");
     setSavedDraft(null);
+    setTeamMembers([]);
+    setProgramId("");
     toast.success("Draft cleared");
   };
 

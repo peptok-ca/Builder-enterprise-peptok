@@ -75,18 +75,36 @@ export default function CompanyDashboardEnhanced() {
   const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
-    if (user?.userType !== "company_admin") {
+    // Enhanced authorization check
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    if (user.userType !== "company_admin") {
+      toast.error("Access denied. Company admin access required.");
+      navigate("/");
+      return;
+    }
+
+    if (!user.companyId) {
+      toast.error("Company information not found. Please contact support.");
+      analytics.trackError(new Error("Company admin without companyId"), {
+        component: "company_dashboard_enhanced",
+        userId: user.id,
+      });
       navigate("/");
       return;
     }
 
     loadDashboardData();
 
-    // Track page view
+    // Track page view with proper company context
     analytics.pageView({
       page: "company_dashboard_enhanced",
       userId: user.id,
       userType: user.userType,
+      metadata: { companyId: user.companyId },
     });
   }, [user, navigate]);
 

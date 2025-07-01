@@ -255,6 +255,17 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
+              {/* Cross-browser Sync Status (for platform admins) */}
+              {user?.userType === "platform_admin" &&
+                syncStatus.activeChannels.length > 0 && (
+                  <div className="flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span className="text-xs text-green-600 font-medium">
+                      Sync ({syncStatus.activeChannels.length})
+                    </span>
+                  </div>
+                )}
+
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

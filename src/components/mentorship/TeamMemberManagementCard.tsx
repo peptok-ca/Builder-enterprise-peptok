@@ -222,7 +222,7 @@ export function TeamMemberManagementCard({
 
     try {
       // Find the invitation and resend it
-      const invitations = invitationService.getInvitations({
+      const invitations = await invitationService.getInvitations({
         companyId: user?.companyId,
       });
       const invitation = invitations.find((inv) => inv.email === member.email);

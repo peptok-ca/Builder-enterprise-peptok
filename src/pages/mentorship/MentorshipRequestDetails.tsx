@@ -242,11 +242,12 @@ export default function MentorshipRequestDetails() {
     const sessionCost = hourlyRate * hoursPerSession;
     const baseSessionsCost = sessionCost * totalSessions;
 
-    // Additional participants cost (team members - 1, since first participant is included)
+    // Additional participants cost (beyond included participants)
     const teamMembersCount = request.teamMembers
       ? request.teamMembers.length
       : request.participants || 1;
-    const additionalParticipants = Math.max(0, teamMembersCount - 1);
+    const maxIncluded = pricingConfig.maxParticipantsIncluded || 1;
+    const additionalParticipants = Math.max(0, teamMembersCount - maxIncluded);
     const additionalParticipantsCost =
       additionalParticipants *
       pricingConfig.additionalParticipantFee *

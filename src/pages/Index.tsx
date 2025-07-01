@@ -180,6 +180,13 @@ const fallbackPricingPlans = [
 const Index = () => {
   const navigate = useNavigate();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [demoStats, setDemoStats] = useState<any>(null);
+
+  useEffect(() => {
+    // Load demo statistics
+    const stats = getDemoStatistics();
+    setDemoStats(stats);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">

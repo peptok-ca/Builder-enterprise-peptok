@@ -197,11 +197,33 @@ class OfflineApiWrapper {
       entityType: "team_invitation",
     };
 
-    return offlineSync.executeWithOfflineSupport(
-      () => apiEnhanced.acceptTeamInvitation(token, acceptanceData),
-      { success: false, error: "Offline - will process when reconnected" },
-      syncOperation,
-    );
+    try {
+      // Execute with database validation
+      const result = await offlineSync.executeWithOfflineSupport(
+        () => apiEnhanced.acceptTeamInvitation(token, acceptanceData),
+        { success: false, error: "Offline - will process when reconnected" },
+        syncOperation,
+      );
+
+      // Validate that the acceptance was actually saved to the backend database
+      if (result.success && result.user?.email) {
+        setTimeout(async () => {
+          const validation = await databaseValidation.validateAcceptanceStorage(
+            token,
+            result.user.email,
+          );
+          databaseValidation.showValidationResults(
+            "Invitation acceptance",
+            validation,
+          );
+        }, 2000); // Validate after 2 seconds to allow for database write
+      }
+
+      return result;
+    } catch (error) {
+      console.error("Team invitation acceptance failed:", error);
+      throw error;
+    }
   }
 
   /**

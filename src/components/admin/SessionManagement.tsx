@@ -144,7 +144,12 @@ export function SessionManagement({ matches = [] }: SessionManagementProps) {
     const coachAmount = (coach.hourlyRate * duration) / 60;
     const serviceCharge =
       (coachAmount * ADMIN_PRICING.serviceChargePercentage) / 100;
-    const commission = (coachAmount * ADMIN_PRICING.commissionPercentage) / 100;
+    const percentageCommission =
+      (coachAmount * ADMIN_PRICING.commissionPercentage) / 100;
+    const commission = Math.max(
+      percentageCommission,
+      ADMIN_PRICING.minCommissionAmount,
+    );
     const additionalParticipants = Math.max(
       0,
       participants - ADMIN_PRICING.maxParticipantsIncluded,

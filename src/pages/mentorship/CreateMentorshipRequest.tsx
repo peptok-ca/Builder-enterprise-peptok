@@ -388,8 +388,30 @@ export default function CreateMentorshipRequest() {
                 {/* Dedicated Team Member Management Card */}
                 <TeamMemberManagementCard
                   teamMembers={teamMembers}
-                  onUpdateTeamMembers={setTeamMembers}
+                  onUpdateTeamMembers={(updatedTeamMembers) => {
+                    setTeamMembers(updatedTeamMembers);
+                    // Auto-save team members to draft whenever they're updated
+                    const currentDraft = formData || {
+                      title: "",
+                      description: "",
+                      goals: [],
+                      metricsToTrack: [],
+                      teamMembers: [],
+                      preferredExpertise: [],
+                      timeline: {
+                        startDate: "",
+                        endDate: "",
+                        sessionFrequency: "bi-weekly",
+                      },
+                    };
+                    const updatedDraft = {
+                      ...currentDraft,
+                      teamMembers: updatedTeamMembers,
+                    };
+                    handleSaveDraft(updatedDraft);
+                  }}
                   programTitle={formData?.title || "New Mentorship Program"}
+                  programId={programId}
                 />
 
                 {/* Form Actions at Bottom */}

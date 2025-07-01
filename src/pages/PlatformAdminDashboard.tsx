@@ -152,9 +152,41 @@ export default function PlatformAdminDashboard() {
     }
   }, [user, navigate]);
 
-  // Load data
+  // Load data and initialize cross-browser sync
   useEffect(() => {
     loadPlatformData();
+
+    // Initialize cross-browser sync for platform admin data
+    crossBrowserSync.register(SYNC_CONFIGS.USER_MANAGEMENT);
+    crossBrowserSync.register(SYNC_CONFIGS.COMPANY_MANAGEMENT);
+    crossBrowserSync.register(SYNC_CONFIGS.PLATFORM_SETTINGS);
+
+    // Subscribe to user management updates
+    const unsubscribeUsers = crossBrowserSync.subscribe(
+      "peptok_user_management",
+      (data) => {
+        if (data.users) {
+          setUsers(data.users);
+          toast.info("User data synchronized across browsers");
+        }
+      },
+    );
+
+    // Subscribe to company management updates
+    const unsubscribeCompanies = crossBrowserSync.subscribe(
+      "peptok_company_management",
+      (data) => {
+        if (data.companies) {
+          setCompanies(data.companies);
+          toast.info("Company data synchronized across browsers");
+        }
+      },
+    );
+
+    return () => {
+      unsubscribeUsers();
+      unsubscribeCompanies();
+    };
   }, []);
 
   const loadPlatformData = async () => {

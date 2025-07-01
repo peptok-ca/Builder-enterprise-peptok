@@ -77,6 +77,49 @@ export default function MentorshipRequestDetails() {
         if (foundRequest) {
           setRequest(foundRequest);
           setTeamMembers(foundRequest.teamMembers || []);
+
+          // Also load any additional team members from backend invitations
+          try {
+            const { invitationService } = await import(
+              "@/services/invitationService"
+            );
+            const invitations = await invitationService.getInvitations({
+              programId: foundRequest.id,
+              companyId: user?.companyId,
+            });
+
+            // Convert invitations to team members and merge with existing
+            const teamMembersFromInvitations = invitations.map((inv) => ({
+              id: `member-${inv.id}`,
+              email: inv.email,
+              name: inv.name,
+              role: inv.role || "participant",
+              status: inv.status === "pending" ? "invited" : inv.status,
+              invitedAt: inv.createdAt,
+            }));
+
+            // Merge with existing team members, avoiding duplicates
+            const existingEmails = (foundRequest.teamMembers || []).map((m) =>
+              m.email?.toLowerCase(),
+            );
+            const newMembers = teamMembersFromInvitations.filter(
+              (inv) => !existingEmails.includes(inv.email?.toLowerCase()),
+            );
+
+            if (newMembers.length > 0) {
+              const allTeamMembers = [
+                ...(foundRequest.teamMembers || []),
+                ...newMembers,
+              ];
+              setTeamMembers(allTeamMembers);
+              console.log(
+                `✅ Loaded ${newMembers.length} additional team members from invitations`,
+              );
+            }
+          } catch (error) {
+            console.error("Failed to load team member invitations:", error);
+            // Don't show error as this is a background operation
+          }
         } else {
           // Always create a fallback request for any ID to ensure page works
           toast.info("Loading sample program data for demonstration");

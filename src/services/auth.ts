@@ -377,7 +377,9 @@ class AuthService {
         state: this.generateState(),
       });
 
-      localStorage.setItem("oauth_state", params.get("state") || "");
+      await backendStorage.setItem("oauth_state", params.get("state") || "", {
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(), // 10 minutes
+      });
 
       // In development, simulate OAuth response
       if (import.meta.env.DEV) {

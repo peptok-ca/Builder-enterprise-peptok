@@ -332,7 +332,8 @@ export function TeamMemberManagementCard({
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Add New Team Member */}
-        <div className="space-y-4 p-4 border rounded-lg bg-blue-50/50 border-blue-200">
+        {!readOnly && (
+          <div className="space-y-4 p-4 border rounded-lg bg-blue-50/50 border-blue-200">
           <div className="flex items-center gap-2">
             <UserPlus className="w-4 h-4 text-blue-600" />
             <h3 className="font-semibold text-blue-900">

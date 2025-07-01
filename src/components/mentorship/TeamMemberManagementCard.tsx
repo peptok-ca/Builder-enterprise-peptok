@@ -612,15 +612,17 @@ export function TeamMemberManagementCard({
                         </Badge>
                       )}
 
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeTeamMember(member.id)}
-                        className="text-destructive hover:text-destructive"
-                        title="Remove team member"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {!readOnly && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeTeamMember(member.id)}
+                          className="text-destructive hover:text-destructive"
+                          title="Remove team member"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

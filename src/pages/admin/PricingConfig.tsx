@@ -72,7 +72,7 @@ export default function PricingConfig() {
   const handleSave = async () => {
     try {
       setSaving(true);
-      await api.updatePricingConfig({
+      await apiEnhanced.updatePricingConfig({
         ...config,
         lastUpdated: new Date().toISOString(),
       });

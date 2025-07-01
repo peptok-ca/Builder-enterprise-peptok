@@ -268,7 +268,7 @@ export default function Pricing() {
                       costs.additionalParticipantsCost > 0 && (
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">
-                            Additional participants ({sessions} ��{" "}
+                            Additional participants ({sessions} ×{" "}
                             {participants - 1} × $
                             {pricingConfig.additionalParticipantFee})
                           </span>

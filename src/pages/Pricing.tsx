@@ -16,6 +16,7 @@ import {
 import { Link } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import { api } from "@/services/api";
+import { apiEnhanced } from "@/services/apiEnhanced";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Dynamic pricing - will be loaded from API

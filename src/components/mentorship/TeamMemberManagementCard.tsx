@@ -139,7 +139,7 @@ export function TeamMemberManagementCard({
       setNewMemberRole("participant");
 
       toast.success(
-        `✅ Team member invitation sent to ${newMemberEmail}! They will receive an email to join the program.`,
+        `✅ Team member invitation ${isOnline ? "sent" : "queued"} for ${newMemberEmail}! ${isOnline ? "They will receive an email to join the program." : "Will be sent when back online."}`,
         { duration: 5000 },
       );
     } catch (error) {

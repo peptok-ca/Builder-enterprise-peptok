@@ -43,9 +43,49 @@ export default function PricingConfig() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<string>("");
+  const [storageSource, setStorageSource] = useState<"backend" | "local">(
+    "local",
+  );
 
   useEffect(() => {
     fetchPricingConfig();
+
+    // Listen for configuration updates from other admin sessions
+    const handleConfigUpdate = (event: CustomEvent) => {
+      const updatedConfig = event.detail;
+      setConfig(updatedConfig);
+      setLastSyncTime(new Date().toLocaleString());
+      toast.info("Pricing configuration updated by another admin");
+    };
+
+    const handleSettingsUpdate = (event: CustomEvent) => {
+      if (event.detail.type === "pricing") {
+        setConfig(event.detail.settings);
+        setLastSyncTime(new Date().toLocaleString());
+        toast.info("Platform settings synchronized");
+      }
+    };
+
+    window.addEventListener(
+      "platformConfigUpdated",
+      handleConfigUpdate as EventListener,
+    );
+    window.addEventListener(
+      "platformSettingsUpdated",
+      handleSettingsUpdate as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "platformConfigUpdated",
+        handleConfigUpdate as EventListener,
+      );
+      window.removeEventListener(
+        "platformSettingsUpdated",
+        handleSettingsUpdate as EventListener,
+      );
+    };
   }, []);
 
   const fetchPricingConfig = async () => {

@@ -262,8 +262,8 @@ const TeamMemberDashboard = () => {
         try {
           if (user?.email) {
             console.log("Loading pending invitations for:", user.email);
-            let userPendingInvitations =
-              invitationService.getPendingInvitations(user.email);
+            const userPendingInvitations =
+              await invitationService.getPendingInvitations(user.email);
             console.log("Found pending invitations:", userPendingInvitations);
 
             setPendingInvitations(userPendingInvitations);

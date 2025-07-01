@@ -916,5 +916,3 @@ export default function SecuritySettings() {
     </div>
   );
 }
-
-export default SecuritySettings;

@@ -155,6 +155,7 @@ export default function PricingConfig() {
       [field]: value,
     }));
     setHasChanges(true);
+    hasChangesRef.current = true;
   };
 
   const handleSave = async () => {

@@ -169,6 +169,7 @@ export default function PricingConfig() {
 
       setConfig(result);
       setHasChanges(false);
+      hasChangesRef.current = false;
       setLastSyncTime(new Date().toLocaleString());
 
       // Provide feedback based on storage location

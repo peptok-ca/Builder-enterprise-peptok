@@ -742,6 +742,13 @@ export default function PricingConfig() {
                           : "Stored in centralized platform storage - accessible to all platform admins"}
                       </span>
                     </div>
+                    <div className="flex justify-center items-center gap-2 text-xs mt-1">
+                      <span className="inline-block w-2 h-2 rounded-full bg-orange-500"></span>
+                      <span className="text-orange-600">
+                        Cross-browser sync active - Changes visible in different
+                        browsers
+                      </span>
+                    </div>
                   </div>
                   <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <p className="text-sm text-yellow-800">

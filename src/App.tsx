@@ -248,6 +248,9 @@ const App: React.FC = () => {
 
             {/* Offline Sync Indicator */}
             <OfflineIndicator />
+
+            {/* Database Sync Monitor */}
+            <DatabaseSyncMonitor />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

@@ -100,6 +100,8 @@ class InvitationService {
    */
   async getInvitationByToken(token: string): Promise<TeamInvitation | null> {
     try {
+      // For token lookup, we still need to check localStorage since the backend
+      // fallback stores invitations there and token validation is immediate
       const invitations = this.getAllInvitations();
       const invitation = invitations.find((inv) => inv.token === token);
 

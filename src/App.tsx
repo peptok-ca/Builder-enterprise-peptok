@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import DashboardRouter from "@/components/auth/DashboardRouter";
 import OfflineIndicator from "@/components/common/OfflineIndicator";
 import DatabaseSyncMonitor from "@/components/common/DatabaseSyncMonitor";
+import DatabaseStatusIndicator from "@/components/common/DatabaseStatusIndicator";
 import Index from "./pages/Index";
 import Pricing from "./pages/Pricing";
 import CoachDirectory from "./pages/CoachDirectory";

@@ -75,14 +75,9 @@ export default function InvitationAccept() {
   const handleAcceptInvitation = async () => {
     if (!invitation) return;
 
-    // Validate form
+    // Validation
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
-      toast.error("Please enter your name");
-      return;
-    }
-
-    if (!formData.password || formData.password.length < 8) {
-      toast.error("Password must be at least 8 characters long");
+      toast.error("Please enter your first and last name");
       return;
     }
 
@@ -91,42 +86,42 @@ export default function InvitationAccept() {
       return;
     }
 
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return;
+    }
+
+    if (!formData.acceptTerms) {
+      toast.error("Please accept the terms and conditions");
+      return;
+    }
+
     setIsAccepting(true);
 
     try {
-      // Create team member account
-      const userData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: invitation.email,
-        password: formData.password,
-        userType: "team_member" as const,
-        role: invitation.role,
-        companyName: invitation.companyName,
-        invitedBy: invitation.inviterName,
-      };
-
-      // In a real app, this would call the API to create the user account
-      // and accept the invitation
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Store user data temporarily (in real app, this would come from API response)
-      localStorage.setItem(
-        "currentUser",
-        JSON.stringify({
-          id: `user-${Date.now()}`,
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: invitation.email,
-          userType: "team_member",
-          role: invitation.role,
-          companyName: invitation.companyName,
-          isAuthenticated: true,
-        }),
+      const result = await invitationService.acceptInvitation(
+        invitation.token,
+        {
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          password: formData.password,
+          acceptTerms: formData.acceptTerms,
+        },
       );
 
-      toast.success("Welcome to the team! Your account has been created.");
-      navigate("/team-member/dashboard");
+      if (result.success && result.user) {
+        // Auto-login the new user
+        await login(result.user.email, formData.password);
+
+        toast.success(
+          `Welcome to ${invitation.companyName}, ${formData.firstName}!`,
+        );
+        navigate("/team-member/dashboard");
+      } else {
+        toast.error(result.error || "Failed to accept invitation");
+      }
     } catch (error) {
+      console.error("Failed to accept invitation:", error);
       toast.error("Failed to accept invitation. Please try again.");
     } finally {
       setIsAccepting(false);

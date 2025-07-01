@@ -1115,13 +1115,36 @@ class EnhancedApiService {
   }
 
   private getSharedPlatformConfig(): any {
-    // Use a shared key that simulates a centralized database
+    // Use multiple storage mechanisms to simulate true backend database
     const SHARED_CONFIG_KEY = "peptok_platform_global_config";
+    const BROWSER_SYNC_KEY = "peptok_browser_sync";
 
     let config;
+
+    // Try to get from localStorage first
     const stored = localStorage.getItem(SHARED_CONFIG_KEY);
 
-    if (stored) {
+    // Also check for cross-browser updates via document.cookie (simulates backend polling)
+    const crossBrowserData = this.getCrossBrowserConfig();
+
+    if (crossBrowserData && stored) {
+      const storedConfig = JSON.parse(stored);
+      // Check if cross-browser data is newer
+      if (
+        new Date(crossBrowserData.lastUpdated) >
+        new Date(storedConfig.lastUpdated)
+      ) {
+        config = crossBrowserData;
+        // Update local storage with newer data
+        localStorage.setItem(SHARED_CONFIG_KEY, JSON.stringify(config));
+        console.log("🔄 Synced newer configuration from cross-browser storage");
+      } else {
+        config = storedConfig;
+      }
+    } else if (crossBrowserData) {
+      config = crossBrowserData;
+      localStorage.setItem(SHARED_CONFIG_KEY, JSON.stringify(config));
+    } else if (stored) {
       config = JSON.parse(stored);
     } else {
       // Default configuration - this will be the same for ALL platform admins
@@ -1139,12 +1162,10 @@ class EnhancedApiService {
         syncToken: Date.now().toString(),
       };
 
-      // Store with shared key that all admins will use
+      // Store in both local and cross-browser storage
       localStorage.setItem(SHARED_CONFIG_KEY, JSON.stringify(config));
+      this.setCrossBrowserConfig(config);
     }
-
-    // Always check for updates from other admin sessions
-    this.checkForConfigUpdates(config);
 
     analytics.trackAction({
       action: "pricing_config_retrieved",
@@ -1157,6 +1178,49 @@ class EnhancedApiService {
     });
 
     return config;
+  }
+
+  private getCrossBrowserConfig(): any | null {
+    try {
+      // Use document.cookie to simulate cross-browser synchronization
+      const cookies = document.cookie.split(";");
+      const configCookie = cookies.find((cookie) =>
+        cookie.trim().startsWith("peptok_config="),
+      );
+
+      if (configCookie) {
+        const configData = configCookie.split("=")[1];
+        const decodedData = decodeURIComponent(configData);
+        return JSON.parse(decodedData);
+      }
+
+      return null;
+    } catch (error) {
+      console.warn("Could not parse cross-browser config:", error);
+      return null;
+    }
+  }
+
+  private setCrossBrowserConfig(config: any): void {
+    try {
+      // Store in cookie for cross-browser access (simulates backend storage)
+      const configData = encodeURIComponent(JSON.stringify(config));
+      // Set cookie with 1 year expiration
+      document.cookie = `peptok_config=${configData}; max-age=31536000; path=/; SameSite=Lax`;
+
+      // Also try to use BroadcastChannel for same-origin communication
+      if (typeof BroadcastChannel !== "undefined") {
+        const channel = new BroadcastChannel("peptok_config_sync");
+        channel.postMessage({
+          type: "config_updated",
+          config: config,
+          timestamp: new Date().toISOString(),
+        });
+        channel.close();
+      }
+    } catch (error) {
+      console.warn("Could not set cross-browser config:", error);
+    }
   }
 
   private checkForConfigUpdates(currentConfig: any): void {

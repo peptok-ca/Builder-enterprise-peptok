@@ -748,6 +748,75 @@ export default function PlatformAdminDashboard() {
             </Card>
           </div>
 
+          {/* Platform Settings */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card
+              className="hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => navigate("/admin/pricing-config")}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <DollarSign className="h-8 w-8 text-green-600" />
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Pricing Configuration
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Manage platform pricing structure
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    Configure
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Shield className="h-8 w-8 text-blue-600" />
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Platform Security
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Security settings and access controls
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" disabled>
+                    Manage
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Activity className="h-8 w-8 text-purple-600" />
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Analytics Settings
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Configure analytics and reporting
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" disabled>
+                    Settings
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Users Management */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">

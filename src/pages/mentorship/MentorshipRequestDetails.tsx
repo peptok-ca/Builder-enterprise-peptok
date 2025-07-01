@@ -213,22 +213,31 @@ export default function MentorshipRequestDetails() {
   const calculateDetailedCosts = (hourlyRate: number) => {
     if (!request) return null;
 
-    const startDate = new Date(request.timeline.startDate);
-    const endDate = new Date(request.timeline.endDate);
-    const totalWeeks = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 7),
-    );
+    // Handle both old and new timeline formats
+    let totalSessions: number;
+    let hoursPerSession: number;
 
-    // Assume 2 hours per session based on typical coaching sessions
-    const hoursPerSession = 2;
-    const sessionsPerWeek =
-      request.timeline.sessionFrequency === "weekly"
-        ? 1
-        : request.timeline.sessionFrequency === "bi-weekly"
-          ? 0.5
-          : 1;
+    if (typeof request.timeline === "string") {
+      // Old format - estimate based on timeline string
+      const timelineStr = request.timeline.toLowerCase();
+      if (timelineStr.includes("week")) {
+        const weeks = parseInt(timelineStr.match(/(\d+)/)?.[0] || "4");
+        totalSessions = weeks;
+        hoursPerSession = 2; // Default assumption
+      } else if (timelineStr.includes("month")) {
+        const months = parseInt(timelineStr.match(/(\d+)/)?.[0] || "3");
+        totalSessions = months * 4; // Weekly sessions
+        hoursPerSession = 2;
+      } else {
+        totalSessions = 8; // Default fallback
+        hoursPerSession = 2;
+      }
+    } else {
+      // New detailed timeline format
+      totalSessions = request.timeline.totalSessions;
+      hoursPerSession = request.timeline.hoursPerSession;
+    }
 
-    const totalSessions = sessionsPerWeek * totalWeeks;
     const sessionCost = hourlyRate * hoursPerSession;
     const baseSessionsCost = sessionCost * totalSessions;
 

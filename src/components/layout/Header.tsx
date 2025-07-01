@@ -36,6 +36,7 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const syncStatus = useSyncStatus();
 
   // Use auth context user type if available, otherwise fall back to prop
   const userType = user?.userType || propUserType || "company_admin";

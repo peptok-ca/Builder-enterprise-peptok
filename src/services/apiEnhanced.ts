@@ -2014,25 +2014,60 @@ class EnhancedApiService {
       acceptTerms: boolean;
     },
   ): Promise<{ success: boolean; user?: any; error?: string }> {
-    try {
-      const response = await this.request<any>("/team/invitations/accept", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, ...acceptanceData }),
-      });
+    // Try multiple backend endpoints to ensure database storage
+    const backendEndpoints = [
+      "/api/team/invitations/accept",
+      "/api/invitations/accept",
+      "/team/invitations/accept"
+    ];
 
-      analytics.trackAction({
-        action: "team_invitation_accepted",
-        component: "team_api",
-        metadata: { token: token.substring(0, 10) + "..." },
-      });
+    let lastError: any = null;
 
-      return response;
-    } catch (error) {
-      console.warn(
-        "Accept invitation API not available, using local fallback:",
-        error,
-      );
+    for (const endpoint of backendEndpoints) {
+      try {
+        console.log(`Attempting to accept invitation via backend database: ${endpoint}`);
+
+        const response = await this.request<any>(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Database-Write": "required", // Signal that database write is required
+          },
+          body: JSON.stringify({
+            token,
+            ...acceptanceData,
+            acceptedAt: new Date().toISOString(),
+            requiresDatabaseStorage: true,
+          }),
+        });
+
+        // Verify the acceptance was saved to database
+        if (response.success && response.user?.id && !response.user.id.includes('temp_')) {
+          console.log(`✅ Successfully saved invitation acceptance to backend database`);
+
+          analytics.trackAction({
+            action: "team_invitation_accepted_database",
+            component: "team_api",
+            metadata: {
+              token: token.substring(0, 10) + "...",
+              savedToDatabase: true,
+              endpoint,
+            },
+          });
+
+          return response;
+        }
+      } catch (error) {
+        console.warn(`Backend endpoint ${endpoint} failed for invitation acceptance:`, error);
+        lastError = error;
+        continue;
+      }
+    }
+
+    // If all backend endpoints fail, throw error to trigger offline sync
+    console.error("❌ Failed to save invitation acceptance to backend database via all endpoints");
+    throw new Error(`Failed to save invitation acceptance to backend database: ${lastError?.message || 'All endpoints unavailable'}`);
+  }
 
       // Fallback to localStorage processing
       const allInvitations = JSON.parse(

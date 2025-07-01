@@ -385,20 +385,23 @@ class DatabaseValidationService {
     validation: DatabaseValidationResult,
   ): void {
     if (validation.isValid && validation.storedInDatabase) {
-      toast.success(`✅ ${operation} saved to database`, {
-        description: `Database ID: ${validation.databaseId?.substring(0, 8)}...`,
+      // Success case
+      toast.success(`✅ ${operation} confirmed in database`, {
+        description: validation.databaseId
+          ? `Database ID: ${validation.databaseId.substring(0, 8)}...`
+          : "Operation stored successfully",
         duration: 3000,
       });
     } else if (validation.errors.length > 0) {
+      // Only show errors for critical failures
       toast.error(`❌ ${operation} database validation failed`, {
         description: validation.errors[0],
         duration: 5000,
       });
-    } else if (validation.warnings.length > 0) {
-      toast.warning(`⚠️ ${operation} validation warnings`, {
-        description: validation.warnings[0],
-        duration: 4000,
-      });
+    } else if (validation.warnings.length > 0 && !validation.isValid) {
+      // Only show warnings if validation completely failed
+      console.warn(`⚠️ ${operation} validation warnings:`, validation.warnings);
+      // Don't show toast for warnings - they're not critical errors
     }
   }
 

@@ -31,6 +31,8 @@ import InvitationAccept from "./pages/InvitationAccept";
 import TestPermissions from "./pages/TestPermissions";
 import Terms from "./pages/Terms";
 import PricingConfig from "./pages/admin/PricingConfig";
+import SecuritySettings from "./pages/admin/SecuritySettings";
+import AnalyticsSettings from "./pages/admin/AnalyticsSettings";
 import AnalyticsDashboard from "./components/analytics/AnalyticsDashboard";
 import Connections from "./pages/Connections";
 import ConnectionDetails from "./pages/ConnectionDetails";

@@ -44,7 +44,8 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/layout/Header";
 import { useAuth } from "@/contexts/AuthContext";
-import { api } from "@/services/api";
+import { apiEnhanced } from "@/services/apiEnhanced";
+import { analytics } from "@/services/analytics";
 import { toast } from "sonner";
 import {
   Users,
@@ -157,11 +158,18 @@ export default function PlatformAdminDashboard() {
 
   const loadPlatformData = async () => {
     try {
+      // Track page view
+      analytics.pageView({
+        page: "platform_admin_dashboard",
+        userId: user?.id,
+        userType: user?.userType,
+      });
+
       // Try to get data from API first
       try {
-        const platformStats = await api.getPlatformStats();
-        const allUsers = await api.getAllUsers();
-        const allCompanies = await api.getAllCompanies();
+        const platformStats = await apiEnhanced.getPlatformStats();
+        const allUsers = await apiEnhanced.getAllUsers();
+        const allCompanies = await apiEnhanced.getAllCompanies();
 
         setStats(platformStats);
         setUsers(allUsers);

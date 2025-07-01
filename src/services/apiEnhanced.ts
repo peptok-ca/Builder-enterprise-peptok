@@ -1616,6 +1616,176 @@ class EnhancedApiService {
       return auditLog.slice(0, 50); // Return last 50 entries
     }
   }
+
+  // ===== SECURITY SETTINGS METHODS =====
+
+  async getSecuritySettings(): Promise<any> {
+    checkAuthorization(["platform_admin"]);
+
+    try {
+      const response = await this.request<any>("/admin/security-settings");
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using security service:", error);
+      return await securityService.getSecuritySettings();
+    }
+  }
+
+  async updateSecuritySettings(settings: any): Promise<void> {
+    checkAuthorization(["platform_admin"]);
+
+    try {
+      await this.request("/admin/security-settings", {
+        method: "PUT",
+        body: JSON.stringify(settings),
+      });
+
+      analytics.trackAction({
+        action: "security_settings_updated",
+        component: "api_enhanced",
+        metadata: { settingsCount: Object.keys(settings).length },
+      });
+    } catch (error) {
+      console.warn("API not available, using security service:", error);
+      await securityService.updateSecuritySettings(settings);
+    }
+  }
+
+  async getSecurityEvents(): Promise<any[]> {
+    checkAuthorization(["platform_admin"]);
+
+    try {
+      const response = await this.request<any[]>("/admin/security-events");
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using security service:", error);
+      return securityService.getSecurityEvents();
+    }
+  }
+
+  async resolveSecurityEvent(eventId: string): Promise<void> {
+    checkAuthorization(["platform_admin"]);
+
+    try {
+      await this.request(`/admin/security-events/${eventId}/resolve`, {
+        method: "POST",
+      });
+
+      analytics.trackAction({
+        action: "security_event_resolved",
+        component: "api_enhanced",
+        metadata: { eventId },
+      });
+    } catch (error) {
+      console.warn("API not available, using security service:", error);
+      securityService.resolveSecurityEvent(eventId);
+    }
+  }
+
+  // ===== ANALYTICS SETTINGS METHODS =====
+
+  async getAnalyticsSettings(): Promise<any> {
+    checkAuthorization(["platform_admin"]);
+
+    try {
+      const response = await this.request<any>("/admin/analytics-settings");
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using analytics service:", error);
+      return await analyticsService.getAnalyticsSettings();
+    }
+  }
+
+  async updateAnalyticsSettings(settings: any): Promise<void> {
+    checkAuthorization(["platform_admin"]);
+
+    try {
+      await this.request("/admin/analytics-settings", {
+        method: "PUT",
+        body: JSON.stringify(settings),
+      });
+
+      analytics.trackAction({
+        action: "analytics_settings_updated",
+        component: "api_enhanced",
+        metadata: { settingsCount: Object.keys(settings).length },
+      });
+    } catch (error) {
+      console.warn("API not available, using analytics service:", error);
+      await analyticsService.updateAnalyticsSettings(settings);
+    }
+  }
+
+  async generateAnalyticsReport(reportId: string): Promise<void> {
+    checkAuthorization(["platform_admin"]);
+
+    try {
+      await this.request(`/admin/analytics/reports/${reportId}/generate`, {
+        method: "POST",
+      });
+
+      analytics.trackAction({
+        action: "analytics_report_generated",
+        component: "api_enhanced",
+        metadata: { reportId },
+      });
+    } catch (error) {
+      console.warn("API not available, using analytics service:", error);
+      await analyticsService.generateReport(reportId);
+    }
+  }
+
+  async testWebhook(webhookId: string): Promise<void> {
+    checkAuthorization(["platform_admin"]);
+
+    try {
+      await this.request(`/admin/analytics/webhooks/${webhookId}/test`, {
+        method: "POST",
+      });
+
+      analytics.trackAction({
+        action: "webhook_tested",
+        component: "api_enhanced",
+        metadata: { webhookId },
+      });
+    } catch (error) {
+      console.warn("API not available, using analytics service:", error);
+      await analyticsService.testWebhook(webhookId);
+    }
+  }
+
+  async exportAnalyticsData(
+    metrics: string[],
+    format: string,
+    dateRange: { start: Date; end: Date },
+  ): Promise<string> {
+    checkAuthorization(["platform_admin"]);
+
+    try {
+      const response = await this.request<{ data: string }>(
+        "/admin/analytics/export",
+        {
+          method: "POST",
+          body: JSON.stringify({ metrics, format, dateRange }),
+        },
+      );
+
+      analytics.trackAction({
+        action: "analytics_data_exported",
+        component: "api_enhanced",
+        metadata: { format, metricsCount: metrics.length },
+      });
+
+      return response.data.data;
+    } catch (error) {
+      console.warn("API not available, using analytics service:", error);
+      return await analyticsService.exportData(
+        metrics,
+        format as any,
+        dateRange,
+      );
+    }
+  }
 }
 
 // Export singleton instance

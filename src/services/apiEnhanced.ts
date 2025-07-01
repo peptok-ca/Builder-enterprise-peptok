@@ -95,12 +95,19 @@ const checkAuthorization = (
 
 class EnhancedApiService {
   constructor() {
-    this.initializeLocalStorage();
+    console.log(
+      "🗃️ API Enhanced Service - Backend Database Only (No localStorage)",
+    );
   }
 
-  private initializeLocalStorage(): void {
-    // Initialize localStorage with role-appropriate sample data
-    if (!localStorage.getItem("mentorship_requests")) {
+  private async initializeBackendData(): Promise<void> {
+    // Initialize backend database with sample data if needed
+    console.log("🗃️ Checking backend database for initial data...");
+
+    const existingRequests = await backendStorage.getItem(
+      "mentorship_requests",
+    );
+    if (!existingRequests) {
       const sampleRequests: MentorshipRequest[] = [
         {
           id: "sample_request_1",

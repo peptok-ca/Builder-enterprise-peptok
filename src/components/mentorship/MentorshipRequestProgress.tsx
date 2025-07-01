@@ -281,13 +281,19 @@ export function MentorshipRequestProgress({
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>
                       Started{" "}
-                      {new Date(
-                        request.timeline.startDate,
-                      ).toLocaleDateString()}
+                      {request.timeline?.startDate
+                        ? new Date(
+                            request.timeline.startDate,
+                          ).toLocaleDateString()
+                        : "N/A"}
                     </span>
                     <span>
                       Ends{" "}
-                      {new Date(request.timeline.endDate).toLocaleDateString()}
+                      {request.timeline?.endDate
+                        ? new Date(
+                            request.timeline.endDate,
+                          ).toLocaleDateString()
+                        : "N/A"}
                     </span>
                   </div>
                 </div>

@@ -373,9 +373,9 @@ export function MentorshipRequestProgress({
                         .replace(/\b\w/g, (l) => l.toUpperCase())}
                     </Badge>
                   ))}
-                  {request.metricsToTrack.length > 2 && (
+                  {(request.metricsToTrack || []).length > 2 && (
                     <Badge variant="outline" className="text-xs">
-                      +{request.metricsToTrack.length - 2} more
+                      +{(request.metricsToTrack || []).length - 2} more
                     </Badge>
                   )}
                 </div>

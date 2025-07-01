@@ -494,11 +494,14 @@ class AuthService {
     state: string,
   ): Promise<AuthResponse> {
     try {
-      // Validate state parameter
-      const storedState = localStorage.getItem("oauth_state");
+      // Validate state parameter from backend database
+      const storedState = await backendStorage.getItem("oauth_state");
       if (state !== storedState) {
         throw new Error("Invalid state parameter");
       }
+
+      // Clean up state after validation
+      await backendStorage.removeItem("oauth_state");
 
       // In a real app, exchange code for token with your backend
       // const response = await fetch('/api/auth/oauth/callback', {

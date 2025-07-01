@@ -252,6 +252,9 @@ const App: React.FC = () => {
 
             {/* Database Sync Monitor */}
             <DatabaseSyncMonitor />
+
+            {/* Database Status Indicator */}
+            <DatabaseStatusIndicator />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

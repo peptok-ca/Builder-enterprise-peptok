@@ -819,6 +819,9 @@ class EnhancedApiService {
         request.title || "Untitled Request",
       );
 
+      // Invalidate company data cache
+      cacheInvalidation.invalidateCompanyData(user.companyId!, user.name);
+
       return response.data;
     } catch (error) {
       console.warn("API not available, storing request locally:", error);

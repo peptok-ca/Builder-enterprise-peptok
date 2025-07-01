@@ -76,6 +76,7 @@ export default function MentorshipRequestDetails() {
 
         if (foundRequest) {
           setRequest(foundRequest);
+          setTeamMembers(foundRequest.teamMembers || []);
         } else {
           // Always create a fallback request for any ID to ensure page works
           toast.info("Loading sample program data for demonstration");

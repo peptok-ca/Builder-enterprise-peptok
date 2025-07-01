@@ -1301,11 +1301,36 @@ class EnhancedApiService {
       return response.data;
     } catch (error) {
       console.warn(
-        "API not available, updating simulated backend database:",
+        "API not available, using cross-browser synchronized storage:",
         error,
       );
 
-      return this.updateSharedPlatformConfig(config, user);
+      // Use centralized cross-browser sync service
+      const enhancedConfig = {
+        ...config,
+        lastUpdated: new Date().toISOString(),
+        version: "1.0",
+      };
+
+      crossBrowserSync.save(SYNC_CONFIGS.PRICING_CONFIG, enhancedConfig, {
+        id: user.id,
+        name: user.name,
+      });
+
+      analytics.trackAction({
+        action: "pricing_config_updated",
+        component: "api_enhanced",
+        metadata: {
+          source: "cross_browser_sync",
+          adminId: user.id,
+          currency: config.currency,
+          companyServiceFee: config.companyServiceFee,
+          coachCommission: config.coachCommission,
+          minCoachCommissionAmount: config.minCoachCommissionAmount,
+        },
+      });
+
+      return enhancedConfig;
     }
   }
 

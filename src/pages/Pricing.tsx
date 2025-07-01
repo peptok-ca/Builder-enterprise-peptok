@@ -230,7 +230,7 @@ export default function Pricing() {
                       <Slider
                         value={[participants]}
                         onValueChange={(value) => setParticipants(value[0])}
-                        max={10}
+                        max={1000}
                         min={1}
                         step={1}
                         className="w-full"

@@ -107,28 +107,111 @@ class InvitationService {
   }
 
   /**
-   * Get invitation by token
+   * Get invitation by token - Backend Database Only
    */
   async getInvitationByToken(token: string): Promise<TeamInvitation | null> {
     try {
-      // For token lookup, we still need to check localStorage since the backend
-      // fallback stores invitations there and token validation is immediate
-      const invitations = this.getAllInvitations();
-      const invitation = invitations.find((inv) => inv.token === token);
+      console.log("🗃️ Looking up invitation by token in backend database");
 
-      if (!invitation) return null;
+      // Use backend API to get invitation by token - NO localStorage
+      const backendEndpoints = [
+        `/api/team/invitations/token/${encodeURIComponent(token)}`,
+        `/api/invitations/token/${encodeURIComponent(token)}`,
+        `/team/invitations/by-token?token=${encodeURIComponent(token)}`,
+      ];
 
-      // Check if expired
+      let invitation: TeamInvitation | null = null;
+
+      for (const endpoint of backendEndpoints) {
+        try {
+          const response = await fetch(endpoint, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Database-Read": "required",
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.data && data.data.id && !data.data.id.includes("temp_")) {
+              invitation = data.data;
+              console.log(
+                `✅ Found invitation ${invitation.id} in backend database`,
+              );
+              break;
+            }
+          }
+        } catch (error) {
+          console.warn(`Backend endpoint ${endpoint} failed:`, error);
+          continue;
+        }
+      }
+
+      if (!invitation) {
+        console.log("❌ Invitation not found in backend database");
+        return null;
+      }
+
+      // Check if expired and update in database
       if (new Date() > new Date(invitation.expiresAt)) {
+        console.log("⏰ Invitation expired, updating status in database");
         invitation.status = "expired";
-        await this.updateInvitationStatus(invitation.id, "expired");
+        await this.updateInvitationStatusInDatabase(invitation.id, "expired");
       }
 
       return invitation;
     } catch (error) {
-      console.error("Failed to get invitation:", error);
+      console.error(
+        "❌ Failed to get invitation from backend database:",
+        error,
+      );
       return null;
     }
+  }
+
+  /**
+   * Update invitation status in backend database
+   */
+  private async updateInvitationStatusInDatabase(
+    invitationId: string,
+    status: TeamInvitation["status"],
+    updates?: Partial<TeamInvitation>,
+  ): Promise<void> {
+    const backendEndpoints = [
+      `/api/team/invitations/${invitationId}`,
+      `/api/invitations/${invitationId}`,
+      `/team/invitations/${invitationId}`,
+    ];
+
+    for (const endpoint of backendEndpoints) {
+      try {
+        const response = await fetch(endpoint, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Database-Write": "required",
+          },
+          body: JSON.stringify({
+            status,
+            ...updates,
+            updatedAt: new Date().toISOString(),
+          }),
+        });
+
+        if (response.ok) {
+          console.log(
+            `✅ Updated invitation ${invitationId} status to ${status} in database`,
+          );
+          return;
+        }
+      } catch (error) {
+        console.warn(`Failed to update status via ${endpoint}:`, error);
+        continue;
+      }
+    }
+
+    throw new Error(`Failed to update invitation status in backend database`);
   }
 
   /**

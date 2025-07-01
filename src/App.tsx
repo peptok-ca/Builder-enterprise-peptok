@@ -259,6 +259,9 @@ const App: React.FC = () => {
 
             {/* Database Status Indicator */}
             <DatabaseStatusIndicator />
+
+            {/* localStorage Elimination Indicator */}
+            <LocalStorageEliminationIndicator />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

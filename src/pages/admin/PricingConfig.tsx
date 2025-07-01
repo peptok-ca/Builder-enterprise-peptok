@@ -23,6 +23,7 @@ interface PricingConfiguration {
   companyServiceFee: number;
   coachCommission: number;
   additionalParticipantFee: number;
+  maxParticipantsIncluded: number;
   currency: string;
   lastUpdated: string;
 }

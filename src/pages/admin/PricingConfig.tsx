@@ -47,6 +47,7 @@ export default function PricingConfig() {
   const [storageSource, setStorageSource] = useState<"backend" | "local">(
     "local",
   );
+  const hasChangesRef = useRef(false);
 
   useEffect(() => {
     fetchPricingConfig();

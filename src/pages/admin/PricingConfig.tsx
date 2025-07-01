@@ -428,6 +428,10 @@ export default function PricingConfig() {
                       {(150 * (1 - config.coachCommission)).toFixed(2)}{" "}
                       {config.currency}
                     </div>
+                    <div className="text-xs text-green-600 mt-2 pt-1 border-t border-green-300">
+                      Note: Coach earnings are per session, regardless of
+                      participant count.
+                    </div>
                   </div>
                 </div>
               </CardContent>

@@ -356,6 +356,77 @@ const TeamMemberDashboard = () => {
     setSelectedSession(null);
   };
 
+  const createTestInvitation = () => {
+    if (!user?.email) return;
+
+    const testInvitation: TeamInvitation = {
+      id: `test-invitation-${Date.now()}`,
+      token: btoa(`test:${user.email}:${Date.now()}`),
+      email: user.email,
+      name: user.name,
+      programId: "test-program-123",
+      programTitle: "Leadership Development Program",
+      companyId: user.companyId || "test-company",
+      companyName: user.companyName || "Sample Company",
+      inviterName: "Sarah Johnson",
+      inviterEmail: "sarah@company.com",
+      role: "participant",
+      status: "pending",
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days
+      metadata: {
+        programDescription:
+          "Join our comprehensive leadership development program to enhance your skills",
+        sessionCount: 8,
+        duration: "8 weeks",
+        startDate: new Date().toISOString(),
+        endDate: new Date(
+          Date.now() + 8 * 7 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+      },
+    };
+
+    // Add to pending invitations in localStorage
+    try {
+      const pendingInvitations = localStorage.getItem(
+        "peptok_pending_invitations",
+      );
+      const invitations: Record<string, TeamInvitation[]> = pendingInvitations
+        ? JSON.parse(pendingInvitations)
+        : {};
+
+      const userEmail = user.email.toLowerCase();
+      if (!invitations[userEmail]) {
+        invitations[userEmail] = [];
+      }
+
+      // Remove any existing test invitations
+      invitations[userEmail] = invitations[userEmail].filter(
+        (inv) => !inv.id.startsWith("test-invitation-"),
+      );
+
+      // Add new test invitation
+      invitations[userEmail].push(testInvitation);
+
+      localStorage.setItem(
+        "peptok_pending_invitations",
+        JSON.stringify(invitations),
+      );
+      console.log("Created test invitation:", testInvitation);
+
+      // Refresh the UI
+      refreshPendingInvitations();
+
+      toast.success("Test invitation created!", {
+        description: "Check the Invitations tab to see the test invitation.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to create test invitation:", error);
+      toast.error("Failed to create test invitation");
+    }
+  };
+
   const refreshPendingInvitations = () => {
     if (user?.email) {
       try {

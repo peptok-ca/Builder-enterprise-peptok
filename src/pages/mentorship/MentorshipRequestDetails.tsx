@@ -45,6 +45,7 @@ export default function MentorshipRequestDetails() {
   const { user } = useAuth();
   const [request, setRequest] = useState<MentorshipRequest | null>(null);
   const [matchedCoaches, setMatchedCoaches] = useState<MatchedCoach[]>([]);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

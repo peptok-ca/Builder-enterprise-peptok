@@ -765,6 +765,12 @@ export default function PlatformAdminDashboard() {
                       <p className="text-sm text-gray-600">
                         Manage platform pricing structure
                       </p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+                        <span className="text-xs text-green-600">
+                          All admins synchronized
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <Button variant="outline" size="sm">

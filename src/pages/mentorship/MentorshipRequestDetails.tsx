@@ -689,6 +689,16 @@ export default function MentorshipRequestDetails() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Team Member Management */}
+            {user?.userType === "company_admin" && (
+              <TeamMemberManagementCard
+                teamMembers={teamMembers}
+                onUpdateTeamMembers={handleUpdateTeamMembers}
+                programTitle={request.title}
+                programId={request.id}
+              />
+            )}
           </div>
 
           {/* Sidebar */}

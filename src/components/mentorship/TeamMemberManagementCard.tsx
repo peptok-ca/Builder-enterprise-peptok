@@ -32,6 +32,7 @@ import {
 import { TeamMember } from "@/types";
 import { toast } from "sonner";
 import { emailService } from "@/services/email";
+import { invitationService } from "@/services/invitationService";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface TeamMemberManagementCardProps {

@@ -230,6 +230,7 @@ class DatabaseValidationService {
         console.error(
           `❌ Invitation ${invitationId} not found in database for resend validation`,
         );
+        this.handleValidationFailure();
       } else if (!validation.isValid && validation.storedInDatabase) {
         // Invitation exists but validation failed - downgrade to warning instead of error
         validation.isValid = true; // Accept that invitation exists
@@ -239,10 +240,14 @@ class DatabaseValidationService {
         console.warn(
           `⚠️ Resend validation inconclusive for ${invitationId}, but invitation exists in database`,
         );
+        this.handleValidationSuccess();
+      } else if (validation.isValid) {
+        this.handleValidationSuccess();
       }
     } catch (error) {
       validation.errors.push(`Resend validation error: ${error.message}`);
       console.error(`Resend validation failed for ${invitationId}:`, error);
+      this.handleValidationFailure();
     }
 
     return validation;

@@ -518,34 +518,72 @@ export default function MentorshipRequestDetails() {
                           <div className="text-lg font-bold">
                             ${coach.hourlyRate}/hr
                           </div>
-                          <div className="text-sm font-semibold text-blue-600">
+                          <div className="text-sm space-y-1">
                             {user?.userType === "company" ? (
-                              <div className="text-sm space-y-1">
-                                <div>Coach Rate: ${coach.hourlyRate}/hr</div>
-                                <div>
-                                  Service Fee:{" "}
-                                  {(
-                                    pricingConfig.companyServiceFee * 100
-                                  ).toFixed(0)}
-                                  %
-                                </div>
-                                {request.teamMembers.length > 1 && (
-                                  <div>
-                                    Additional Participants: $
-                                    {pricingConfig.additionalParticipantFee} ×{" "}
-                                    {request.teamMembers.length - 1}
+                              (() => {
+                                const costs = calculateDetailedCosts(
+                                  coach.hourlyRate,
+                                );
+                                return costs ? (
+                                  <div className="space-y-1">
+                                    <div className="text-gray-600">
+                                      <span className="font-medium text-gray-800">
+                                        Session Cost:
+                                      </span>{" "}
+                                      ${costs.sessionCost}/session
+                                    </div>
+                                    <div className="text-gray-600">
+                                      <span className="font-medium text-gray-800">
+                                        Total Sessions:
+                                      </span>{" "}
+                                      {costs.totalSessions}
+                                    </div>
+                                    <div className="text-gray-600">
+                                      <span className="font-medium text-gray-800">
+                                        Program Cost:
+                                      </span>{" "}
+                                      ${costs.baseSessionsCost.toFixed(2)}
+                                    </div>
+                                    {costs.additionalParticipants > 0 && (
+                                      <div className="text-gray-600">
+                                        <span className="font-medium text-gray-800">
+                                          Additional Participants:
+                                        </span>{" "}
+                                        $
+                                        {costs.additionalParticipantsCost.toFixed(
+                                          2,
+                                        )}
+                                      </div>
+                                    )}
+                                    <div className="text-gray-600">
+                                      <span className="font-medium text-gray-800">
+                                        Service Fee (
+                                        {costs.serviceFeePct.toFixed(0)}%):
+                                      </span>{" "}
+                                      ${costs.serviceFee.toFixed(2)}
+                                    </div>
+                                    <div className="pt-1 border-t border-gray-200">
+                                      <div className="font-semibold text-blue-600">
+                                        Total Program: $
+                                        {costs.totalProgramCost.toFixed(2)}{" "}
+                                        {costs.currency}
+                                      </div>
+                                      <div className="text-xs text-gray-500">
+                                        ${costs.avgCostPerSession.toFixed(2)}
+                                        /session average
+                                      </div>
+                                    </div>
                                   </div>
-                                )}
-                                <div className="font-semibold">
-                                  Total: $
-                                  {calculateTotalCost(coach.hourlyRate).toFixed(
-                                    2,
-                                  )}{" "}
-                                  {pricingConfig.currency}
-                                </div>
-                              </div>
+                                ) : (
+                                  <div className="text-blue-600 font-semibold">
+                                    Rate: ${coach.hourlyRate}/hr
+                                  </div>
+                                );
+                              })()
                             ) : (
-                              <div>Rate: ${coach.hourlyRate}/hr</div>
+                              <div className="text-blue-600 font-semibold">
+                                Rate: ${coach.hourlyRate}/hr
+                              </div>
                             )}
                           </div>
                         </div>

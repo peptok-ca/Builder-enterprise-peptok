@@ -514,6 +514,27 @@ const TeamMemberDashboard = () => {
           </Card>
         </div>
 
+        {/* Pending Invitations Alert */}
+        {pendingInvitations.length > 0 && (
+          <Alert className="mb-6 border-orange-200 bg-orange-50">
+            <Mail className="h-4 w-4 text-orange-600" />
+            <AlertDescription>
+              You have {pendingInvitations.length} pending program invitation
+              {pendingInvitations.length > 1 ? "s" : ""}.
+              <Button
+                variant="link"
+                className="p-0 h-auto font-semibold text-orange-600 ml-1"
+                onClick={() => handleAcceptInvitation(pendingInvitations[0])}
+                disabled={acceptingInvitation === pendingInvitations[0].id}
+              >
+                {acceptingInvitation === pendingInvitations[0].id
+                  ? "Accepting..."
+                  : "Accept now"}
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Pending Ratings Alert */}
         {unratedSessions.length > 0 && (
           <Alert className="mb-6">

@@ -435,6 +435,9 @@ export default function PlatformAdminDashboard() {
         { id: user?.id || "admin", name: user?.name || "Platform Admin" },
       );
 
+      // Invalidate company-related cache for all users
+      cacheInvalidation.invalidatePlatformData(user?.name || "Platform Admin");
+
       setIsCreateCompanyOpen(false);
       setNewCompany({
         name: "",

@@ -59,12 +59,8 @@ class InvitationService {
     metadata?: TeamInvitation["metadata"];
   }): Promise<TeamInvitation> {
     try {
-      const invitationId = `inv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const token = this.generateInvitationToken(data.email, invitationId);
-
-      const invitation: TeamInvitation = {
-        id: invitationId,
-        token,
+      // Use backend API for invitation creation
+      const invitation = await apiEnhanced.createTeamInvitation({
         email: data.email.toLowerCase(),
         name: data.name,
         programId: data.programId,
@@ -74,17 +70,11 @@ class InvitationService {
         inviterName: data.inviterName,
         inviterEmail: data.inviterEmail,
         role: data.role,
-        status: "pending",
-        createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
         metadata: data.metadata,
-      };
-
-      // Store invitation
-      await this.storeInvitation(invitation);
+      });
 
       // Send invitation email
-      const invitationLink = `${window.location.origin}/invitation/accept?token=${token}`;
+      const invitationLink = `${window.location.origin}/invitation/accept?token=${invitation.token}`;
 
       const emailData = {
         inviterName: data.inviterName,
@@ -97,9 +87,6 @@ class InvitationService {
       };
 
       await emailService.sendTeamInvitation(data.email, emailData);
-
-      // Track for the invited user
-      this.addPendingInvitation(data.email, invitation);
 
       return invitation;
     } catch (error) {

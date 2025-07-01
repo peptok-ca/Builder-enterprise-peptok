@@ -4,6 +4,7 @@
 import { toast } from "sonner";
 import { emailService } from "./email";
 import { apiEnhanced } from "./apiEnhanced";
+import { databaseConfig } from "./databaseConfig";
 
 export interface TeamInvitation {
   id: string;

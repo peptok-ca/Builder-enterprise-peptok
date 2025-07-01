@@ -78,7 +78,13 @@ export default function PricingConfig() {
     };
 
     // Set up periodic sync to ensure ALL admins see the same data
+    // Only sync when user is not actively editing
     const syncInterval = setInterval(() => {
+      // Don't refresh if user has unsaved changes
+      if (hasChanges) {
+        return;
+      }
+
       // Silently check for updates every 10 seconds
       fetchPricingConfig()
         .then(() => {

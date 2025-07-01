@@ -293,24 +293,46 @@ const Index = () => {
                     </Button>
                   </div>
 
-                  {/* Enhanced Stats */}
+                  {/* Enhanced Stats - Real Demo Data */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8">
-                    {stats.map((stat, index) => {
-                      const Icon = stat.icon;
-                      return (
-                        <div key={index} className="text-center group">
-                          <div className="flex flex-col items-center space-y-2">
-                            <Icon className="h-6 w-6 text-blue-600 group-hover:scale-110 transition-transform duration-300" />
-                            <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
-                              {stat.value}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {stat.label}
+                    {demoStats &&
+                      [
+                        {
+                          value: `${demoStats.platformStats.totalCoaches}`,
+                          label: "Professional Coaches",
+                          icon: UserCheck,
+                        },
+                        {
+                          value: `${demoStats.platformStats.totalSessions}`,
+                          label: "Sessions Completed",
+                          icon: Target,
+                        },
+                        {
+                          value: `${demoStats.platformStats.averageRating}/5.0`,
+                          label: "Average Rating",
+                          icon: Star,
+                        },
+                        {
+                          value: `${demoStats.platformStats.totalCompanies}`,
+                          label: "Companies Served",
+                          icon: Building,
+                        },
+                      ].map((stat, index) => {
+                        const Icon = stat.icon;
+                        return (
+                          <div key={index} className="text-center group">
+                            <div className="flex flex-col items-center space-y-2">
+                              <Icon className="h-6 w-6 text-blue-600 group-hover:scale-110 transition-transform duration-300" />
+                              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                                {stat.value}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {stat.label}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
                   </div>
                 </div>
 

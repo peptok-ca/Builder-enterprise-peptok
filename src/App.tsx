@@ -50,6 +50,9 @@ if (import.meta.env.DEV) {
   import("./utils/emailDemo");
 }
 
+// Initialize localStorage elimination service
+import("./services/localStorageElimination");
+
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {

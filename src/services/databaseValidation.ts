@@ -1,0 +1,410 @@
+// Backend Database Validation Service
+// Ensures that invitation and resend operations are properly saved to the backend database
+
+import { toast } from "sonner";
+
+export interface DatabaseValidationResult {
+  isValid: boolean;
+  storedInDatabase: boolean;
+  errors: string[];
+  warnings: string[];
+  databaseId?: string;
+  lastUpdated?: string;
+}
+
+export interface InvitationValidation extends DatabaseValidationResult {
+  invitationStatus: "pending" | "accepted" | "declined" | "expired";
+  expiresAt: string;
+  resendCount: number;
+}
+
+class DatabaseValidationService {
+  private readonly VALIDATION_TIMEOUT = 10000; // 10 seconds
+
+  /**
+   * Validate that an invitation was properly saved to the backend database
+   */
+  async validateInvitationStorage(
+    invitationId: string,
+    expectedData: any,
+  ): Promise<InvitationValidation> {
+    console.log(`🔍 Validating invitation storage for ID: ${invitationId}`);
+
+    const validation: InvitationValidation = {
+      isValid: false,
+      storedInDatabase: false,
+      errors: [],
+      warnings: [],
+      invitationStatus: "pending",
+      expiresAt: "",
+      resendCount: 0,
+    };
+
+    try {
+      // Try multiple validation endpoints
+      const validationEndpoints = [
+        `/api/team/invitations/${invitationId}/validate`,
+        `/api/invitations/${invitationId}/validate`,
+        `/api/validate/invitation/${invitationId}`,
+      ];
+
+      for (const endpoint of validationEndpoints) {
+        try {
+          const response = await this.makeValidationRequest(endpoint);
+
+          if (response.success && response.data) {
+            const dbData = response.data;
+
+            // Verify the data exists in database with proper ID
+            if (dbData.id && !dbData.id.includes("temp_")) {
+              validation.isValid = true;
+              validation.storedInDatabase = true;
+              validation.databaseId = dbData.id;
+              validation.lastUpdated = dbData.updatedAt || dbData.createdAt;
+              validation.invitationStatus = dbData.status;
+              validation.expiresAt = dbData.expiresAt;
+              validation.resendCount = dbData.resendCount || 0;
+
+              // Validate data integrity
+              if (this.validateDataIntegrity(expectedData, dbData)) {
+                console.log(
+                  `✅ Invitation ${invitationId} successfully validated in database`,
+                );
+                return validation;
+              } else {
+                validation.warnings.push(
+                  "Data integrity check failed - stored data differs from expected",
+                );
+              }
+            } else {
+              validation.errors.push(
+                "Invalid database ID - appears to be temporary or mock data",
+              );
+            }
+            break;
+          }
+        } catch (error) {
+          console.warn(
+            `Validation endpoint ${endpoint} failed:`,
+            error.message,
+          );
+          continue;
+        }
+      }
+
+      if (!validation.storedInDatabase) {
+        validation.errors.push(
+          "Unable to validate database storage via any endpoint",
+        );
+        console.error(
+          `❌ Failed to validate invitation ${invitationId} in database`,
+        );
+      }
+    } catch (error) {
+      validation.errors.push(`Validation error: ${error.message}`);
+      console.error(`Database validation failed for ${invitationId}:`, error);
+    }
+
+    return validation;
+  }
+
+  /**
+   * Validate that a resend operation was properly saved to the backend database
+   */
+  async validateResendStorage(
+    invitationId: string,
+    resendTimestamp: string,
+  ): Promise<DatabaseValidationResult> {
+    console.log(`🔍 Validating resend storage for ID: ${invitationId}`);
+
+    const validation: DatabaseValidationResult = {
+      isValid: false,
+      storedInDatabase: false,
+      errors: [],
+      warnings: [],
+    };
+
+    try {
+      // Try multiple validation endpoints for resend
+      const validationEndpoints = [
+        `/api/team/invitations/${invitationId}/resend/validate`,
+        `/api/invitations/${invitationId}/resend/validate`,
+        `/api/validate/resend/${invitationId}`,
+      ];
+
+      for (const endpoint of validationEndpoints) {
+        try {
+          const response = await this.makeValidationRequest(endpoint);
+
+          if (response.success && response.data) {
+            const dbData = response.data;
+
+            // Check if resend was recorded in database
+            if (
+              dbData.lastReminderSent &&
+              new Date(dbData.lastReminderSent).getTime() >=
+                new Date(resendTimestamp).getTime() - 5000 // 5 second tolerance
+            ) {
+              validation.isValid = true;
+              validation.storedInDatabase = true;
+              validation.databaseId = dbData.id;
+              validation.lastUpdated = dbData.lastReminderSent;
+
+              console.log(
+                `✅ Resend operation for ${invitationId} successfully validated in database`,
+              );
+              return validation;
+            } else {
+              validation.warnings.push(
+                "Resend timestamp not found or outdated in database",
+              );
+            }
+            break;
+          }
+        } catch (error) {
+          console.warn(
+            `Resend validation endpoint ${endpoint} failed:`,
+            error.message,
+          );
+          continue;
+        }
+      }
+
+      if (!validation.storedInDatabase) {
+        validation.errors.push(
+          "Unable to validate resend database storage via any endpoint",
+        );
+        console.error(
+          `❌ Failed to validate resend for ${invitationId} in database`,
+        );
+      }
+    } catch (error) {
+      validation.errors.push(`Resend validation error: ${error.message}`);
+      console.error(`Resend validation failed for ${invitationId}:`, error);
+    }
+
+    return validation;
+  }
+
+  /**
+   * Validate that an acceptance operation was properly saved to the backend database
+   */
+  async validateAcceptanceStorage(
+    token: string,
+    userEmail: string,
+  ): Promise<DatabaseValidationResult> {
+    console.log(`🔍 Validating acceptance storage for user: ${userEmail}`);
+
+    const validation: DatabaseValidationResult = {
+      isValid: false,
+      storedInDatabase: false,
+      errors: [],
+      warnings: [],
+    };
+
+    try {
+      // Try multiple validation endpoints for acceptance
+      const validationEndpoints = [
+        `/api/team/invitations/acceptance/validate?email=${encodeURIComponent(userEmail)}`,
+        `/api/invitations/acceptance/validate?email=${encodeURIComponent(userEmail)}`,
+        `/api/validate/acceptance?email=${encodeURIComponent(userEmail)}`,
+      ];
+
+      for (const endpoint of validationEndpoints) {
+        try {
+          const response = await this.makeValidationRequest(endpoint);
+
+          if (response.success && response.data) {
+            const dbData = response.data;
+
+            // Check if user account was created and invitation marked as accepted
+            if (
+              dbData.user?.id &&
+              !dbData.user.id.includes("temp_") &&
+              dbData.invitation?.status === "accepted"
+            ) {
+              validation.isValid = true;
+              validation.storedInDatabase = true;
+              validation.databaseId = dbData.user.id;
+              validation.lastUpdated = dbData.invitation.acceptedAt;
+
+              console.log(
+                `✅ Acceptance for ${userEmail} successfully validated in database`,
+              );
+              return validation;
+            } else {
+              validation.warnings.push(
+                "User account not found or invitation not marked as accepted",
+              );
+            }
+            break;
+          }
+        } catch (error) {
+          console.warn(
+            `Acceptance validation endpoint ${endpoint} failed:`,
+            error.message,
+          );
+          continue;
+        }
+      }
+
+      if (!validation.storedInDatabase) {
+        validation.errors.push(
+          "Unable to validate acceptance database storage via any endpoint",
+        );
+        console.error(
+          `❌ Failed to validate acceptance for ${userEmail} in database`,
+        );
+      }
+    } catch (error) {
+      validation.errors.push(`Acceptance validation error: ${error.message}`);
+      console.error(`Acceptance validation failed for ${userEmail}:`, error);
+    }
+
+    return validation;
+  }
+
+  /**
+   * Batch validate multiple operations
+   */
+  async batchValidate(
+    validations: Array<{
+      type: "invitation" | "resend" | "acceptance";
+      id: string;
+      data?: any;
+    }>,
+  ): Promise<DatabaseValidationResult[]> {
+    console.log(
+      `🔍 Running batch validation for ${validations.length} operations`,
+    );
+
+    const results: DatabaseValidationResult[] = [];
+
+    for (const validation of validations) {
+      try {
+        let result: DatabaseValidationResult;
+
+        switch (validation.type) {
+          case "invitation":
+            result = await this.validateInvitationStorage(
+              validation.id,
+              validation.data,
+            );
+            break;
+          case "resend":
+            result = await this.validateResendStorage(
+              validation.id,
+              validation.data?.timestamp,
+            );
+            break;
+          case "acceptance":
+            result = await this.validateAcceptanceStorage(
+              validation.id,
+              validation.data?.email,
+            );
+            break;
+          default:
+            result = {
+              isValid: false,
+              storedInDatabase: false,
+              errors: [`Unknown validation type: ${validation.type}`],
+              warnings: [],
+            };
+        }
+
+        results.push(result);
+      } catch (error) {
+        results.push({
+          isValid: false,
+          storedInDatabase: false,
+          errors: [`Validation failed: ${error.message}`],
+          warnings: [],
+        });
+      }
+    }
+
+    const successCount = results.filter((r) => r.isValid).length;
+    console.log(
+      `✅ Batch validation completed: ${successCount}/${validations.length} successful`,
+    );
+
+    return results;
+  }
+
+  /**
+   * Show validation results to user
+   */
+  showValidationResults(
+    operation: string,
+    validation: DatabaseValidationResult,
+  ): void {
+    if (validation.isValid && validation.storedInDatabase) {
+      toast.success(`✅ ${operation} saved to database`, {
+        description: `Database ID: ${validation.databaseId?.substring(0, 8)}...`,
+        duration: 3000,
+      });
+    } else if (validation.errors.length > 0) {
+      toast.error(`❌ ${operation} database validation failed`, {
+        description: validation.errors[0],
+        duration: 5000,
+      });
+    } else if (validation.warnings.length > 0) {
+      toast.warning(`⚠️ ${operation} validation warnings`, {
+        description: validation.warnings[0],
+        duration: 4000,
+      });
+    }
+  }
+
+  // Private helper methods
+
+  private async makeValidationRequest(endpoint: string): Promise<any> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      this.VALIDATION_TIMEOUT,
+    );
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Validation-Request": "true",
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
+  }
+
+  private validateDataIntegrity(expected: any, actual: any): boolean {
+    if (!expected || !actual) return false;
+
+    // Check critical fields
+    const criticalFields = ["email", "programId", "companyId", "role"];
+
+    for (const field of criticalFields) {
+      if (expected[field] && expected[field] !== actual[field]) {
+        console.warn(`Data integrity check failed for field: ${field}`);
+        return false;
+      }
+    }
+
+    return true;
+  }
+}
+
+// Export singleton instance
+export const databaseValidation = new DatabaseValidationService();
+export default databaseValidation;

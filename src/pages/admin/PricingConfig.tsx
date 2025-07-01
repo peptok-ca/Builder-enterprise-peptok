@@ -82,7 +82,7 @@ export default function PricingConfig() {
     // Only sync when user is not actively editing
     const syncInterval = setInterval(() => {
       // Don't refresh if user has unsaved changes
-      if (hasChanges) {
+      if (hasChangesRef.current) {
         return;
       }
 

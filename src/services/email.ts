@@ -107,19 +107,32 @@ export class EmailService {
   ): Promise<boolean> {
     try {
       const emailContent = this.generateTeamInvitationEmail(data);
+      const emailTemplate: EmailTemplate = {
+        to: recipientEmail,
+        subject: emailContent.subject,
+        htmlContent: emailContent.htmlContent,
+        textContent: this.htmlToText(emailContent.htmlContent),
+      };
 
-      // Log the email content for development/demo purposes
-      console.log(`
-📧 EMPLOYEE INVITATION EMAIL SENT TO: ${recipientEmail}
+      // Send email through the main sendEmail method
+      const success = await this.sendEmail(emailTemplate);
+
+      if (success) {
+        // In mock mode, show user-friendly notification
+        if (import.meta.env.DEV || import.meta.env.VITE_MOCK_EMAIL === "true") {
+          console.log(`
+🔧 DEVELOPMENT MODE: Email invitation simulated
+📧 TO: ${recipientEmail}
 📧 SUBJECT: ${emailContent.subject}
-📧 CONTENT:
-${emailContent.htmlContent}
-      `);
+💡 In production, this email would be sent via your configured email service.
+💡 To enable real emails, set VITE_MOCK_EMAIL=false and configure email service.
+          `);
+        } else {
+          console.log(`✅ Team invitation email sent to: ${recipientEmail}`);
+        }
+      }
 
-      // Simulate email sending delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      return true;
+      return success;
     } catch (error) {
       console.error("Failed to send employee invitation email:", error);
       return false;
@@ -188,16 +201,16 @@ ${emailContent.htmlContent}
           <div style="text-align: center; margin-bottom: 30px;">
             <h1 style="color: #1e40af; margin: 0; font-size: 28px;">🎯 Mentorship Invitation</h1>
           </div>
-          
+
           <div style="margin-bottom: 25px;">
             <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
               Hi there! 👋
             </p>
-            
+
             <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
               <strong>${data.inviterName}</strong> has invited you to join <strong>${data.companyName}</strong>'s mentorship program as a <strong>${data.role}</strong>.
             </p>
-            
+
             <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
               This is an exciting opportunity to develop your skills, connect with experienced mentors, and accelerate your professional growth.
             </p>
@@ -214,8 +227,8 @@ ${emailContent.htmlContent}
           </div>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${data.invitationLink}" 
-               style="display: inline-block; background-color: #3b82f6; color: white; padding: 12px 30px; 
+            <a href="${data.invitationLink}"
+               style="display: inline-block; background-color: #3b82f6; color: white; padding: 12px 30px;
                       text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
               Accept Invitation
             </a>
@@ -248,14 +261,14 @@ ${emailContent.htmlContent}
           <div style="text-align: center; margin-bottom: 30px;">
             <h1 style="color: #059669; margin: 0; font-size: 28px;">🎯 Program Created Successfully!</h1>
           </div>
-          
+
           <div style="margin-bottom: 25px;">
             <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
               Hi there! 👋
             </p>
-            
+
             <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
-              Great news! <strong>${data.adminName}</strong> has created a new mentorship program: 
+              Great news! <strong>${data.adminName}</strong> has created a new mentorship program:
               <strong>"${data.programTitle}"</strong> at <strong>${data.companyName}</strong>.
             </p>
           </div>
@@ -332,14 +345,14 @@ ${emailContent.htmlContent}
           <div style="text-align: center; margin-bottom: 30px;">
             <h1 style="color: #7c3aed; margin: 0; font-size: 28px;">🎉 Your Coach is Ready!</h1>
           </div>
-          
+
           <div style="margin-bottom: 25px;">
             <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
               Hi ${data.employeeName}! 👋
             </p>
-            
+
             <p style="font-size: 16px; line-height: 1.6; color: #374151; margin: 0 0 15px 0;">
-              Exciting news! Your coach for the <strong>"${data.programTitle}"</strong> program at 
+              Exciting news! Your coach for the <strong>"${data.programTitle}"</strong> program at
               <strong>${data.companyName}</strong> has been confirmed and is ready to start working with you.
             </p>
           </div>
@@ -388,8 +401,8 @@ ${emailContent.htmlContent}
           </div>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="#" 
-               style="display: inline-block; background-color: #7c3aed; color: white; padding: 12px 30px; 
+            <a href="#"
+               style="display: inline-block; background-color: #7c3aed; color: white; padding: 12px 30px;
                       text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
               View Program Dashboard
             </a>

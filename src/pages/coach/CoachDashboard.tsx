@@ -277,20 +277,43 @@ export const CoachDashboard: React.FC = () => {
       }
 
       console.log("Accepting request:", requestId);
-      const result = await api.acceptCoachingRequest(
-        requestId,
-        user.id,
-        "Thank you for choosing me as your coach. I'm excited to work with your team!",
-      );
+      const result = await apiEnhanced.acceptMatch(requestId);
 
-      setPendingRequests((prev) => prev.filter((req) => req.id !== requestId));
-      toast.success("Coaching request accepted successfully!");
+      if (result.success) {
+        setPendingRequests((prev) =>
+          prev.filter((req) => req.id !== requestId),
+        );
+        toast.success(
+          result.message || "Coaching request accepted successfully!",
+        );
 
-      // Reload dashboard data to get updated stats
-      loadDashboardData();
+        // Update stats
+        setStats((prev) => ({
+          ...prev,
+          upcomingSessions: prev.upcomingSessions + 1,
+        }));
+
+        analytics.trackAction({
+          action: "request_accepted_dashboard",
+          component: "coach_dashboard",
+          metadata: { requestId, coachId: user.id },
+        });
+
+        // Reload dashboard data to get updated stats
+        loadDashboardData();
+      } else {
+        toast.error("Failed to accept request");
+      }
     } catch (error) {
       console.error("Error accepting request:", error);
-      toast.error("Failed to accept request");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to accept request",
+      );
+
+      analytics.trackError(
+        error instanceof Error ? error : new Error("Request accept failed"),
+        { component: "coach_dashboard", requestId, coachId: user.id },
+      );
     }
   };
 
@@ -302,20 +325,38 @@ export const CoachDashboard: React.FC = () => {
       }
 
       console.log("Declining request:", requestId);
-      const result = await api.declineCoachingRequest(
+      const result = await apiEnhanced.declineMatch(
         requestId,
-        user.id,
         "Thank you for your interest. Unfortunately, I'm not available for this project at the moment.",
       );
 
-      setPendingRequests((prev) => prev.filter((req) => req.id !== requestId));
-      toast.success("Request declined");
+      if (result.success) {
+        setPendingRequests((prev) =>
+          prev.filter((req) => req.id !== requestId),
+        );
+        toast.success(result.message || "Request declined");
 
-      // Reload dashboard data to get updated stats
-      loadDashboardData();
+        analytics.trackAction({
+          action: "request_declined_dashboard",
+          component: "coach_dashboard",
+          metadata: { requestId, coachId: user.id },
+        });
+
+        // Reload dashboard data to get updated stats
+        loadDashboardData();
+      } else {
+        toast.error("Failed to decline request");
+      }
     } catch (error) {
       console.error("Error rejecting request:", error);
-      toast.error("Failed to decline request");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to decline request",
+      );
+
+      analytics.trackError(
+        error instanceof Error ? error : new Error("Request decline failed"),
+        { component: "coach_dashboard", requestId, coachId: user.id },
+      );
     }
   };
 

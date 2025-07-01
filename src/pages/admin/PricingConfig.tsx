@@ -121,12 +121,25 @@ export default function PricingConfig() {
   const handleSave = async () => {
     try {
       setSaving(true);
-      await apiEnhanced.updatePricingConfig({
+      const result = await apiEnhanced.updatePricingConfig({
         ...config,
         lastUpdated: new Date().toISOString(),
       });
+
+      setConfig(result);
       setHasChanges(false);
-      toast.success("Pricing configuration updated successfully");
+      setLastSyncTime(new Date().toLocaleString());
+
+      // Provide feedback based on storage location
+      if (result.version) {
+        toast.success(
+          "Pricing configuration saved to centralized platform storage",
+        );
+        setStorageSource("local");
+      } else {
+        toast.success("Pricing configuration saved to backend database");
+        setStorageSource("backend");
+      }
     } catch (error) {
       console.error("Failed to save pricing config:", error);
       toast.error("Failed to save pricing configuration");

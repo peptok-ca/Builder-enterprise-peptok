@@ -249,24 +249,81 @@ export default function InvitationAccept() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-md mx-auto">
+      <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader className="text-center">
             <UserPlus className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-            <CardTitle>You're Invited!</CardTitle>
+            <CardTitle className="text-2xl">You're Invited!</CardTitle>
             <CardDescription>
               Join {invitation.companyName} on Peptok
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <Alert>
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>{invitation.inviterName}</strong> has invited you to
-                join as a <strong>{invitation.role}</strong> at{" "}
-                {invitation.companyName}.
-              </AlertDescription>
-            </Alert>
+            {/* Invitation Details */}
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Building2 className="w-5 h-5 text-blue-600" />
+                  </div>
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm text-blue-700">
+                      <strong>{invitation.inviterName}</strong> has invited you
+                      to join
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-blue-900">
+                    {invitation.programTitle}
+                  </h3>
+                  <div className="flex items-center gap-4 text-sm text-blue-700">
+                    <div className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      <span>
+                        Role: <strong>{invitation.role}</strong>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Building2 className="w-4 h-4" />
+                      <span>{invitation.companyName}</span>
+                    </div>
+                  </div>
+                  {invitation.metadata?.programDescription && (
+                    <p className="text-sm text-blue-700 mt-2">
+                      {invitation.metadata.programDescription}
+                    </p>
+                  )}
+                  {invitation.metadata && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {invitation.metadata.startDate && (
+                        <Badge variant="secondary" className="text-xs">
+                          <Calendar className="w-3 h-3 mr-1" />
+                          Starts{" "}
+                          {new Date(
+                            invitation.metadata.startDate,
+                          ).toLocaleDateString()}
+                        </Badge>
+                      )}
+                      {invitation.metadata.duration && (
+                        <Badge variant="secondary" className="text-xs">
+                          <Clock className="w-3 h-3 mr-1" />
+                          {invitation.metadata.duration}
+                        </Badge>
+                      )}
+                      {invitation.metadata.sessionCount && (
+                        <Badge variant="secondary" className="text-xs">
+                          {invitation.metadata.sessionCount} sessions
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <Separator />
 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">

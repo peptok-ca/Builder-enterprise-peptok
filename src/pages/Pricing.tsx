@@ -38,7 +38,7 @@ export default function Pricing() {
   useEffect(() => {
     const fetchPricingConfig = async () => {
       try {
-        const config = await api.getPricingConfig();
+        const config = await apiEnhanced.getPricingConfig();
         setPricingConfig(config);
         PLATFORM_SERVICE_FEE = config.companyServiceFee;
         ADDITIONAL_PARTICIPANT_FEE = config.additionalParticipantFee;

@@ -316,6 +316,20 @@ const TeamMemberDashboard = () => {
     setSelectedSession(null);
   };
 
+  const refreshPendingInvitations = () => {
+    if (user?.email) {
+      try {
+        const userPendingInvitations = invitationService.getPendingInvitations(
+          user.email,
+        );
+        setPendingInvitations(userPendingInvitations);
+        console.log("Refreshed pending invitations:", userPendingInvitations);
+      } catch (error) {
+        console.error("Failed to refresh pending invitations:", error);
+      }
+    }
+  };
+
   const handleAcceptInvitation = async (invitation: TeamInvitation) => {
     if (!user) {
       toast.error("Please log in to accept invitations");

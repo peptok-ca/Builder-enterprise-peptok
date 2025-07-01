@@ -499,9 +499,41 @@ export function TeamMemberManagementCard({
                         </div>
                       )}
                       {member.status === "invited" && (
-                        <div className="text-xs text-muted-foreground">
-                          Invited{" "}
-                          {new Date(member.invitedAt).toLocaleDateString()}
+                        <div className="text-xs text-muted-foreground space-y-1">
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            Invited{" "}
+                            {new Date(member.invitedAt).toLocaleDateString()}
+                            {(() => {
+                              const daysSince = Math.floor(
+                                (Date.now() -
+                                  new Date(member.invitedAt).getTime()) /
+                                  (1000 * 60 * 60 * 24),
+                              );
+                              const daysLeft = Math.max(0, 7 - daysSince);
+
+                              if (daysLeft === 0) {
+                                return (
+                                  <span className="text-red-600 font-medium ml-1">
+                                    (Expired)
+                                  </span>
+                                );
+                              } else if (daysLeft <= 2) {
+                                return (
+                                  <span className="text-orange-600 font-medium ml-1">
+                                    (Expires in {daysLeft} day
+                                    {daysLeft > 1 ? "s" : ""})
+                                  </span>
+                                );
+                              } else {
+                                return (
+                                  <span className="text-gray-500 ml-1">
+                                    ({daysLeft} days left)
+                                  </span>
+                                );
+                              }
+                            })()}
+                          </div>
                         </div>
                       )}
                     </div>

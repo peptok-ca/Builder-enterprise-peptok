@@ -21,6 +21,7 @@ import {
 
 import { Environment } from "../utils/environment";
 import { analytics } from "./analytics";
+import { backendStorage } from "./backendStorage";
 import {
   demoUsers,
   demoCompanies,

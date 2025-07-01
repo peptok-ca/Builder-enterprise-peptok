@@ -1,53 +1,41 @@
 #!/bin/bash
 
-# Peptok Docker Quick Start Script
+echo "🧹 Cleaning up existing containers..."
 
-echo "🐳 Starting Peptok with Docker..."
+# Stop and remove existing containers
+docker compose down
 
-# Check if Docker is running
-if ! docker info &> /dev/null; then
-    echo "❌ Docker is not running. Please start Docker and try again."
-    exit 1
+# Remove any containers that might be using the ports
+docker stop $(docker ps -q --filter "publish=8080" --filter "publish=3001" --filter "publish=5433") 2>/dev/null || true
+docker rm $(docker ps -aq --filter "publish=8080" --filter "publish=3001" --filter "publish=5433") 2>/dev/null || true
+
+# Kill any processes using the ports (if needed)
+echo "🔍 Checking for processes using ports 8080, 3001, 5433..."
+
+# Check and kill processes on port 8080
+if lsof -Pi :8080 -sTCP:LISTEN -t >/dev/null ; then
+    echo "⚠️  Port 8080 is in use, attempting to free it..."
+    lsof -ti :8080 | xargs kill -9 2>/dev/null || true
 fi
 
-# Check if .env file exists, if not copy from example
-if [ ! -f .env ]; then
-    echo "📋 Creating .env file from .env.docker..."
-    cp .env.docker .env
+# Check and kill processes on port 3001
+if lsof -Pi :3001 -sTCP:LISTEN -t >/dev/null ; then
+    echo "⚠️  Port 3001 is in use, attempting to free it..."
+    lsof -ti :3001 | xargs kill -9 2>/dev/null || true
 fi
 
-# Stop any existing containers
-echo "🛑 Stopping existing containers..."
-docker-compose down
+# Check and kill processes on port 5433 (our custom PostgreSQL port)
+if lsof -Pi :5433 -sTCP:LISTEN -t >/dev/null ; then
+    echo "⚠️  Port 5433 is in use, attempting to free it..."
+    lsof -ti :5433 | xargs kill -9 2>/dev/null || true
+fi
 
-# Build and start the services
-echo "🏗️  Building and starting services..."
-docker-compose up --build -d
+echo "🚀 Starting containers..."
 
-# Wait a moment for services to start
-sleep 5
+# Start the containers
+docker compose up --build
 
-# Check if services are running
-echo "🔍 Checking service status..."
-docker-compose ps
-
-# Show logs
-echo "📋 Recent logs:"
-docker-compose logs --tail=10
-
-echo ""
-echo "🎉 Peptok is now running!"
-echo ""
-echo "📱 Frontend (React App): http://localhost:8080"
-echo "🔧 Backend API: http://localhost:3001"
-echo "🗄️  Database: localhost:5432"
-echo ""
-echo "🔧 Useful commands:"
-echo "  View logs: docker-compose logs -f"
-echo "  Stop services: docker-compose down"
-echo "  Restart: docker-compose restart"
-echo "  Shell into frontend: docker-compose exec frontend sh"
-echo "  Shell into backend: docker-compose exec backend sh"
-echo ""
-echo "💡 The app works with mock data, so you can start using it immediately!"
-echo "   Create mentorship requests, invite team members, and explore all features."
+echo "✅ Docker environment should be running!"
+echo "🌐 Frontend: http://localhost:8080"
+echo "🔗 Backend API: http://localhost:3001"
+echo "🗄️  Database: localhost:5433"

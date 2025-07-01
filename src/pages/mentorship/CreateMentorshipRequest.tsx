@@ -64,18 +64,75 @@ export default function CreateMentorshipRequest() {
     null,
   );
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [programId, setProgramId] = useState<string>("");
 
-  // Load draft from localStorage on component mount
+  // Load draft from localStorage and generate/load program ID
   useEffect(() => {
+    // Generate a unique program ID for this session if not exists
+    let storedProgramId = localStorage.getItem("current-program-id");
+    if (!storedProgramId) {
+      storedProgramId = `program-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem("current-program-id", storedProgramId);
+    }
+    setProgramId(storedProgramId);
+
     const draft = localStorage.getItem("mentorship-request-draft");
     if (draft) {
       try {
-        setSavedDraft(JSON.parse(draft));
+        const parsedDraft = JSON.parse(draft);
+        setSavedDraft(parsedDraft);
+        // Load team members from draft if available
+        if (parsedDraft.teamMembers && parsedDraft.teamMembers.length > 0) {
+          setTeamMembers(parsedDraft.teamMembers);
+        }
       } catch (error) {
         console.error("Failed to load draft:", error);
       }
     }
   }, []);
+
+  // Load existing team members/invitations for this program
+  useEffect(() => {
+    const loadExistingTeamMembers = async () => {
+      if (!programId || !user?.companyId) return;
+
+      try {
+        // Load invitations for this program from backend database
+        const { invitationService } = await import(
+          "@/services/invitationService"
+        );
+        const invitations = await invitationService.getInvitations({
+          programId: programId,
+          companyId: user.companyId,
+        });
+
+        // Convert invitations to team members
+        const teamMembersFromInvitations: TeamMember[] = invitations.map(
+          (inv) => ({
+            id: `member-${inv.id}`,
+            email: inv.email,
+            name: inv.name,
+            role: inv.role || "participant",
+            status: inv.status === "pending" ? "invited" : inv.status,
+            invitedAt: inv.createdAt,
+          }),
+        );
+
+        // Only update if we found invitations and don't already have team members loaded
+        if (teamMembersFromInvitations.length > 0 && teamMembers.length === 0) {
+          setTeamMembers(teamMembersFromInvitations);
+          console.log(
+            `✅ Loaded ${teamMembersFromInvitations.length} existing team members for program ${programId}`,
+          );
+        }
+      } catch (error) {
+        console.error("Failed to load existing team members:", error);
+        // Don't show error toast as this is a background operation
+      }
+    };
+
+    loadExistingTeamMembers();
+  }, [programId, user?.companyId]); // Don't include teamMembers in deps to avoid infinite loop
 
   const handleSubmitRequest = async (data: MentorshipRequestFormData) => {
     setIsSubmitting(true);

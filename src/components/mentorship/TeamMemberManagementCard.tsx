@@ -374,6 +374,9 @@ export function TeamMemberManagementCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Email Service Status */}
+        <EmailServiceStatus />
+
         {/* Add New Team Member */}
         {!readOnly && (
           <div className="space-y-4 p-4 border rounded-lg bg-blue-50/50 border-blue-200">

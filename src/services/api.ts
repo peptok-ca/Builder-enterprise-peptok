@@ -1165,6 +1165,11 @@ class ApiService {
       status?: string;
     } = {},
   ): MentorshipRequest[] {
+    // Initialize with user context if empty
+    if (!localStorage.getItem("mentorship_requests")) {
+      this.initializeLocalStorageForUser(filters.companyId);
+    }
+
     const stored = localStorage.getItem("mentorship_requests");
     let requests: MentorshipRequest[] = stored ? JSON.parse(stored) : [];
 

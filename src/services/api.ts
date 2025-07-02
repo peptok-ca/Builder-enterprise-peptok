@@ -269,8 +269,14 @@ class ApiService {
 
   // Coach-related methods
   async getAllCoaches(): Promise<Coach[]> {
-    const response = await this.request<Coach[]>("/coaches");
-    return response.data;
+    try {
+      const response = await this.request<Coach[]>("/coaches");
+      return response.data;
+    } catch (error) {
+      console.warn("API not available, using mock coaches:", error);
+      // Return mock coaches for demo
+      return this.getMockCoaches();
+    }
   }
 
   async getCoachById(id: string): Promise<Coach> {

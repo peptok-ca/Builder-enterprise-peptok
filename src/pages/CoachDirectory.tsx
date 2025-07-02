@@ -418,7 +418,19 @@ const CoachDirectory = () => {
 
             {/* Results Grid/List */}
             <div className="mb-8">
-              {filteredCoaches.length === 0 ? (
+              {loading ? (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      Loading coaches...
+                    </h3>
+                    <p className="text-gray-500">
+                      Please wait while we fetch the latest coach information.
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : filteredCoaches.length === 0 ? (
                 <Card>
                   <CardContent className="p-12 text-center">
                     <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />

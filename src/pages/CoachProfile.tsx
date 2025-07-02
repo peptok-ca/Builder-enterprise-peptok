@@ -342,20 +342,42 @@ const CoachProfile = () => {
                   <CardTitle className="text-lg">Contact Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm">San Francisco, CA</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Globe className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm">UTC-8 (PST)</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm">
-                      Usually responds within 2 hours
-                    </span>
-                  </div>
+                  {isAuthenticated ? (
+                    <>
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm">San Francisco, CA</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Globe className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm">UTC-8 (PST)</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Clock className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm">
+                          Usually responds within 2 hours
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-300">
+                      <div className="text-center">
+                        <Users className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-gray-600 text-sm font-medium">
+                          Contact details hidden
+                        </p>
+                        <p className="text-gray-500 text-xs mt-1">
+                          <a
+                            href="/login"
+                            className="text-blue-600 hover:underline"
+                          >
+                            Sign in
+                          </a>{" "}
+                          to view location, timezone, and response time
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 

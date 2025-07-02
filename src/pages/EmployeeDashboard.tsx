@@ -61,8 +61,8 @@ const EmployeeDashboard = () => {
       try {
         setIsLoading(true);
 
-        // Fetch mentorship requests for the user's company
-        const requests = await api.getMentorshipRequests();
+        // Fetch mentorship requests for the user's company with proper authorization
+        const requests = await apiEnhanced.getMentorshipRequests();
         const connections = [];
 
         setMentorshipRequests(requests || []);

@@ -167,7 +167,7 @@ const CoachDirectory = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header userType="company_admin" />
+      <Header />
 
       <main className="container mx-auto px-4 py-8">
         {/* Header Section */}

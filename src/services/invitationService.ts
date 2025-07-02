@@ -42,28 +42,64 @@ export interface AcceptInvitationData {
 
 class InvitationService {
   constructor() {
-    // Ensure database connection on service initialization
-    this.verifyDatabaseConnection();
+    // Ensure database connection on service initialization if API is configured
+    this.verifyDatabaseConnection().catch(() => {
+      console.log(
+        "🗃️ Database verification failed - will use fallback methods",
+      );
+    });
   }
 
   /**
    * Verify database connection before operations
    */
   private async verifyDatabaseConnection(): Promise<void> {
+    if (!this.isApiConfigured()) {
+      console.log(
+        "🗃️ Database service not configured - using mock/localStorage mode",
+      );
+      return; // Don't throw error, just log
+    }
+
     if (!databaseConfig.isDatabaseReady()) {
       console.log("🗃️ Database not ready, testing connection...");
       await databaseConfig.refreshDatabaseConnection();
 
       if (!databaseConfig.isDatabaseReady()) {
-        toast.error("❌ Backend database unavailable", {
-          description: "All invitation operations require database connection",
-          duration: 8000,
-        });
-        throw new Error(
-          "Backend database connection required for invitation operations",
+        console.warn(
+          "❌ Backend database unavailable - falling back to localStorage",
         );
+        // Don't throw error in production, just warn
+        if (this.isLocalDevelopment()) {
+          toast.warning("❌ Backend database unavailable", {
+            description: "Using localStorage fallback",
+            duration: 3000,
+          });
+        }
       }
     }
+  }
+
+  private isApiConfigured(): boolean {
+    const envApiUrl = import.meta.env.VITE_API_URL;
+    const isLocalDev = this.isLocalDevelopment();
+
+    // In production, require explicit API URL
+    if (!isLocalDev) {
+      return !!envApiUrl;
+    }
+
+    // In local development, allow if API URL is set
+    return !!envApiUrl;
+  }
+
+  private isLocalDevelopment(): boolean {
+    const hostname = window.location.hostname;
+    return (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0"
+    );
   }
 
   /**

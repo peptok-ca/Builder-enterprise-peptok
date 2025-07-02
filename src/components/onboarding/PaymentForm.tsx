@@ -487,11 +487,21 @@ export function PaymentForm({
                 className="text-sm font-normal leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 I agree to the{" "}
-                <a href="#" className="text-primary underline">
+                <a
+                  href="/terms"
+                  className="text-primary underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Terms of Service
                 </a>{" "}
                 and{" "}
-                <a href="#" className="text-primary underline">
+                <a
+                  href="/privacy"
+                  className="text-primary underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Privacy Policy
                 </a>
                 *

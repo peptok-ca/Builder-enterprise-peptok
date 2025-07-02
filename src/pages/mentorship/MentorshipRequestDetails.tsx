@@ -47,6 +47,7 @@ export default function MentorshipRequestDetails() {
   const [matchedCoaches, setMatchedCoaches] = useState<MatchedCoach[]>([]);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const handleUpdateTeamMembers = async (updatedMembers: any[]) => {
     setTeamMembers(updatedMembers);

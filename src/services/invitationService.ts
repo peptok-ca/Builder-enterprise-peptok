@@ -239,65 +239,111 @@ class InvitationService {
   }
 
   /**
-   * Get invitation by token - Backend Database Only
+   * Get invitation by token - Backend Database with localStorage fallback
    */
   async getInvitationByToken(token: string): Promise<TeamInvitation | null> {
+    // If API is not configured, use localStorage immediately
+    if (!this.isApiConfigured()) {
+      return this.getInvitationByTokenFromLocalStorage(token);
+    }
+
     try {
       console.log("🗃️ Looking up invitation by token in backend database");
 
-      // Use backend API to get invitation by token - NO localStorage
-      const backendEndpoints = [
-        `/api/team/invitations/token/${encodeURIComponent(token)}`,
-        `/api/invitations/token/${encodeURIComponent(token)}`,
-        `/team/invitations/by-token?token=${encodeURIComponent(token)}`,
-      ];
+      // Try backend first if available
+      if (databaseConfig.isDatabaseReady()) {
+        const backendEndpoints = [
+          `/api/team/invitations/token/${encodeURIComponent(token)}`,
+          `/api/invitations/token/${encodeURIComponent(token)}`,
+          `/team/invitations/by-token?token=${encodeURIComponent(token)}`,
+        ];
 
-      let invitation: TeamInvitation | null = null;
+        for (const endpoint of backendEndpoints) {
+          try {
+            const response = await fetch(endpoint, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Database-Read": "required",
+              },
+            });
 
-      for (const endpoint of backendEndpoints) {
-        try {
-          const response = await fetch(endpoint, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Database-Read": "required",
-            },
-          });
+            if (response.ok) {
+              const data = await response.json();
+              if (
+                data.data &&
+                data.data.id &&
+                !data.data.id.includes("temp_")
+              ) {
+                const invitation = data.data;
+                console.log(
+                  `✅ Found invitation ${invitation.id} in backend database`,
+                );
 
-          if (response.ok) {
-            const data = await response.json();
-            if (data.data && data.data.id && !data.data.id.includes("temp_")) {
-              invitation = data.data;
-              console.log(
-                `✅ Found invitation ${invitation.id} in backend database`,
-              );
-              break;
+                // Check if expired and update in database
+                if (new Date() > new Date(invitation.expiresAt)) {
+                  console.log(
+                    "⏰ Invitation expired, updating status in database",
+                  );
+                  invitation.status = "expired";
+                  await this.updateInvitationStatusInDatabase(
+                    invitation.id,
+                    "expired",
+                  );
+                }
+
+                return invitation;
+              }
             }
+          } catch (error) {
+            console.warn(`Backend endpoint ${endpoint} failed:`, error);
+            continue;
           }
-        } catch (error) {
-          console.warn(`Backend endpoint ${endpoint} failed:`, error);
-          continue;
         }
       }
 
+      // Fall back to localStorage
+      console.log("⚠️ Backend unavailable, checking localStorage");
+      return this.getInvitationByTokenFromLocalStorage(token);
+    } catch (error) {
+      console.warn(
+        "❌ Failed to get invitation from backend, using localStorage:",
+        error,
+      );
+      return this.getInvitationByTokenFromLocalStorage(token);
+    }
+  }
+
+  private getInvitationByTokenFromLocalStorage(
+    token: string,
+  ): TeamInvitation | null {
+    try {
+      const invitations = this.getInvitationsFromLocalStorage();
+      const invitation = invitations.find((inv) => inv.token === token);
+
       if (!invitation) {
-        console.log("❌ Invitation not found in backend database");
+        console.log("❌ Invitation not found in localStorage");
         return null;
       }
 
-      // Check if expired and update in database
+      // Check if expired
       if (new Date() > new Date(invitation.expiresAt)) {
-        console.log("⏰ Invitation expired, updating status in database");
+        console.log("⏰ Invitation expired");
         invitation.status = "expired";
-        await this.updateInvitationStatusInDatabase(invitation.id, "expired");
+        // Update in localStorage
+        const updatedInvitations = invitations.map((inv) =>
+          inv.id === invitation.id ? invitation : inv,
+        );
+        localStorage.setItem(
+          "team_invitations",
+          JSON.stringify(updatedInvitations),
+        );
       }
 
+      console.log(`✅ Found invitation ${invitation.id} in localStorage`);
       return invitation;
     } catch (error) {
-      console.error(
-        "❌ Failed to get invitation from backend database:",
-        error,
-      );
+      console.error("Failed to get invitation from localStorage:", error);
       return null;
     }
   }

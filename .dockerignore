@@ -61,3 +61,14 @@ __tests__
 # Temporary files
 *.tmp
 *.temp
+
+# Windows-specific files
+*.bat
+*.cmd
+*.exe
+*.msi
+*.dll
+*.sys
+System Volume Information/
+pagefile.sys
+hiberfil.sys

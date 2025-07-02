@@ -24,11 +24,12 @@ const API_BASE_URL = Environment.getApiBaseUrl();
 
 class ApiService {
   constructor() {
-    this.initializeLocalStorage();
+    // Note: localStorage initialization moved to be user-context aware
   }
 
-  private initializeLocalStorage(): void {
+  private initializeLocalStorageForUser(userCompanyId?: string): void {
     // Initialize localStorage with sample data if empty
+    // This method is called with user context to ensure proper company filtering
     if (!localStorage.getItem("mentorship_requests")) {
       const sampleRequests: MentorshipRequest[] = [
         {

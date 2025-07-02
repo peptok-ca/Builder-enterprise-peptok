@@ -34,7 +34,7 @@ class ApiService {
       const sampleRequests: MentorshipRequest[] = [
         {
           id: "sample_request_1",
-          companyId: "default-company-id",
+          companyId: userCompanyId || "default-company-id",
           title: "React Development Training",
           description:
             "Help our team improve their React skills and best practices.",

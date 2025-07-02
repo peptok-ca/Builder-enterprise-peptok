@@ -47,7 +47,7 @@ class DatabaseConfigService {
   }
 
   private initializeConfig(): DatabaseConfig {
-    const baseUrl = window.location.origin;
+    const baseUrl = this.getApiBaseUrl();
 
     return {
       baseUrl,
@@ -69,6 +69,42 @@ class DatabaseConfigService {
       timeout: 10000, // 10 seconds
       retryAttempts: 3,
     };
+  }
+
+  private isApiConfigured(): boolean {
+    const envApiUrl = import.meta.env.VITE_API_URL;
+    const isLocalDev = this.isLocalDevelopment();
+
+    // In production, require explicit API URL
+    if (!isLocalDev) {
+      return !!envApiUrl;
+    }
+
+    // In local development, allow if API URL is set or localhost backend is expected
+    return !!envApiUrl || isLocalDev;
+  }
+
+  private isLocalDevelopment(): boolean {
+    const hostname = window.location.hostname;
+    return (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0"
+    );
+  }
+
+  private getApiBaseUrl(): string {
+    const envApiUrl = import.meta.env.VITE_API_URL;
+
+    if (envApiUrl) {
+      return envApiUrl.replace("/api", ""); // Remove /api suffix if present
+    }
+
+    if (this.isLocalDevelopment()) {
+      return "http://localhost:3001";
+    }
+
+    return window.location.origin;
   }
 
   /**

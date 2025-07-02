@@ -59,3 +59,5 @@ networks:
 
 volumes:
   postgres_data:
+  frontend_node_modules:
+  backend_node_modules:

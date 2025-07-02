@@ -434,6 +434,25 @@ export default function MentorshipRequestDetails() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <p className="font-bold">Error Loading Request</p>
+            <p className="text-sm">{error}</p>
+          </div>
+          <div className="space-x-2">
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Try Again
+            </Button>
+            <Button onClick={() => navigate(-1)}>Go Back</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!request) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">

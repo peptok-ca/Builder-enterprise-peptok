@@ -280,22 +280,57 @@ const CoachProfile = () => {
 
                     {/* Action Buttons */}
                     <div className="space-y-3">
-                      <Button className="w-full" size="lg">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        Book Session
-                      </Button>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" className="flex-1">
-                          <MessageSquare className="w-4 h-4 mr-2" />
-                          Message
-                        </Button>
-                        <Button variant="outline" size="icon">
-                          <Share className="w-4 h-4" />
-                        </Button>
-                        <Button variant="outline" size="icon">
-                          <Bookmark className="w-4 h-4" />
-                        </Button>
-                      </div>
+                      {isAuthenticated ? (
+                        <>
+                          <Button className="w-full" size="lg">
+                            <Calendar className="w-4 h-4 mr-2" />
+                            Book Session
+                          </Button>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" className="flex-1">
+                              <MessageSquare className="w-4 h-4 mr-2" />
+                              Message
+                            </Button>
+                            <Button variant="outline" size="icon">
+                              <Share className="w-4 h-4" />
+                            </Button>
+                            <Button variant="outline" size="icon">
+                              <Bookmark className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <Button asChild className="w-full" size="lg">
+                            <a href="/login">
+                              <Calendar className="w-4 h-4 mr-2" />
+                              Sign In to Book Session
+                            </a>
+                          </Button>
+                          <div className="flex space-x-2">
+                            <Button
+                              asChild
+                              variant="outline"
+                              className="flex-1"
+                            >
+                              <a href="/signup">
+                                <Users className="w-4 h-4 mr-2" />
+                                Create Account
+                              </a>
+                            </Button>
+                            <Button variant="outline" size="icon">
+                              <Share className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                            <p className="text-blue-800 text-sm">
+                              <strong>Sign in required:</strong> Create an
+                              account to message coaches, book sessions, and
+                              access full profiles.
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </CardContent>

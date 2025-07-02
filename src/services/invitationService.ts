@@ -605,49 +605,52 @@ class InvitationService {
   }
 
   /**
-   * Resend invitation - Backend Database Only
+   * Resend invitation - Backend Database with localStorage fallback
    */
   async resendInvitation(invitationId: string): Promise<boolean> {
     try {
-      console.log(
-        `🗃️ Resending invitation ${invitationId} via backend database`,
-      );
+      console.log(`🗃️ Resending invitation ${invitationId}`);
 
-      // Use backend API for resending invitations - NO localStorage
-      const success = await apiEnhanced.resendTeamInvitation(invitationId);
+      // Try backend API first if available
+      if (this.isApiConfigured() && databaseConfig.isDatabaseReady()) {
+        const success = await apiEnhanced.resendTeamInvitation(invitationId);
 
-      if (success) {
-        // Get updated invitation from backend database to send email
-        const invitation = await this.getInvitationFromDatabase(invitationId);
-
-        if (invitation) {
-          const invitationLink = `${window.location.origin}/invitation/accept?token=${invitation.token}`;
-
-          const emailData = {
-            inviterName: invitation.inviterName,
-            companyName: invitation.companyName,
-            role: invitation.role,
-            invitationLink,
-            expiresAt: new Date(invitation.expiresAt),
-            programTitle: invitation.programTitle,
-            programDescription: invitation.metadata?.programDescription,
-          };
-
-          await emailService.sendTeamInvitation(invitation.email, emailData);
-          console.log(`✅ Resent invitation ${invitationId} and sent email`);
-        } else {
-          console.warn(
-            `⚠️ Could not retrieve invitation ${invitationId} from database for email`,
-          );
+        if (success) {
+          const invitation = await this.getInvitationFromDatabase(invitationId);
+          if (invitation) {
+            await this.sendInvitationEmail(invitation, invitation);
+            console.log(`✅ Resent invitation ${invitationId} via backend`);
+            return true;
+          }
         }
       }
 
-      return success;
-    } catch (error) {
-      console.error(
-        "❌ Failed to resend invitation via backend database:",
-        error,
+      // Fall back to localStorage
+      console.log("⚠️ Backend unavailable, resending via localStorage");
+      const invitations = this.getInvitationsFromLocalStorage();
+      const invitation = invitations.find((inv) => inv.id === invitationId);
+
+      if (!invitation) {
+        console.error(`❌ Invitation ${invitationId} not found`);
+        return false;
+      }
+
+      // Update last reminder sent timestamp
+      invitation.lastReminderSent = new Date().toISOString();
+      const updatedInvitations = invitations.map((inv) =>
+        inv.id === invitationId ? invitation : inv,
       );
+      localStorage.setItem(
+        "team_invitations",
+        JSON.stringify(updatedInvitations),
+      );
+
+      // Send email
+      await this.sendInvitationEmail(invitation, invitation);
+      console.log(`✅ Resent invitation ${invitationId} via localStorage`);
+      return true;
+    } catch (error) {
+      console.error("❌ Failed to resend invitation:", error);
       return false;
     }
   }

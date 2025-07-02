@@ -45,6 +45,7 @@ interface SearchFilters {
 }
 
 const CoachDirectory = () => {
+  const { user, isAuthenticated } = useAuth();
   const [allCoaches, setAllCoaches] = useState<Coach[]>([]);
   const [filteredCoaches, setFilteredCoaches] = useState<Coach[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");

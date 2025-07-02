@@ -16,8 +16,10 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { api } from "@/services/api";
 import { Coach } from "@/types";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Filter,
   Grid,
@@ -29,6 +31,7 @@ import {
   Users,
   Award,
   TrendingUp,
+  Info,
 } from "lucide-react";
 
 interface SearchFilters {

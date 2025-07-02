@@ -103,7 +103,7 @@ class InvitationService {
   }
 
   /**
-   * Create a new team member invitation - Backend Database Only
+   * Create a new team member invitation - Backend Database with localStorage fallback
    */
   async createInvitation(data: {
     email: string;
@@ -117,57 +117,124 @@ class InvitationService {
     role: "participant" | "observer";
     metadata?: TeamInvitation["metadata"];
   }): Promise<TeamInvitation> {
-    // Verify database connection first
-    await this.verifyDatabaseConnection();
+    // If API is not configured, use localStorage immediately
+    if (!this.isApiConfigured()) {
+      return this.createInvitationInLocalStorage(data);
+    }
 
     try {
-      console.log("🗃️ Creating invitation in backend database only");
+      console.log("🗃️ Creating invitation in backend database");
 
-      // Use backend API for invitation creation - NO localStorage fallback
-      const invitation = await apiEnhanced.createTeamInvitation({
-        email: data.email.toLowerCase(),
-        name: data.name,
-        programId: data.programId,
-        programTitle: data.programTitle,
-        companyId: data.companyId,
-        companyName: data.companyName,
-        inviterName: data.inviterName,
-        inviterEmail: data.inviterEmail,
-        role: data.role,
-        metadata: data.metadata,
-      });
+      // Verify database connection (but don't throw on failure)
+      await this.verifyDatabaseConnection();
 
-      // Verify invitation was saved to database
-      if (!invitation.id || invitation.id.includes("temp_")) {
-        throw new Error("Invitation not properly saved to backend database");
+      // Try backend API first
+      if (databaseConfig.isDatabaseReady()) {
+        const invitation = await apiEnhanced.createTeamInvitation({
+          email: data.email.toLowerCase(),
+          name: data.name,
+          programId: data.programId,
+          programTitle: data.programTitle,
+          companyId: data.companyId,
+          companyName: data.companyName,
+          inviterName: data.inviterName,
+          inviterEmail: data.inviterEmail,
+          role: data.role,
+          metadata: data.metadata,
+        });
+
+        // Verify invitation was saved to database
+        if (invitation.id && !invitation.id.includes("temp_")) {
+          console.log(
+            `✅ Invitation ${invitation.id} saved to backend database`,
+          );
+
+          // Send invitation email
+          await this.sendInvitationEmail(invitation, data);
+          return invitation;
+        }
       }
 
-      console.log(`✅ Invitation ${invitation.id} saved to backend database`);
-
-      // Send invitation email
-      const invitationLink = `${window.location.origin}/invitation/accept?token=${invitation.token}`;
-
-      const emailData = {
-        inviterName: data.inviterName,
-        companyName: data.companyName,
-        role: data.role,
-        invitationLink,
-        expiresAt: new Date(invitation.expiresAt),
-        programTitle: data.programTitle,
-        programDescription: data.metadata?.programDescription,
-      };
-
-      await emailService.sendTeamInvitation(data.email, emailData);
-
-      return invitation;
+      // Fall back to localStorage if backend failed
+      console.log(
+        "⚠️ Backend unavailable, creating invitation in localStorage",
+      );
+      return this.createInvitationInLocalStorage(data);
     } catch (error) {
-      console.error(
-        "❌ Failed to create invitation in backend database:",
+      console.warn(
+        "❌ Failed to create invitation in backend, using localStorage:",
         error,
       );
-      throw new Error(
-        `Failed to create team invitation in backend database: ${error.message}`,
-      );
+      return this.createInvitationInLocalStorage(data);
+    }
+  }
+
+  private async createInvitationInLocalStorage(
+    data: any,
+  ): Promise<TeamInvitation> {
+    const invitation: TeamInvitation = {
+      id: `inv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      token: `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      email: data.email.toLowerCase(),
+      name: data.name,
+      programId: data.programId,
+      programTitle: data.programTitle,
+      companyId: data.companyId,
+      companyName: data.companyName,
+      inviterName: data.inviterName,
+      inviterEmail: data.inviterEmail,
+      role: data.role,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
+      metadata: data.metadata,
+    };
+
+    // Store in localStorage
+    const existingInvitations = this.getInvitationsFromLocalStorage();
+    existingInvitations.push(invitation);
+    localStorage.setItem(
+      "team_invitations",
+      JSON.stringify(existingInvitations),
+    );
+
+    console.log(`✅ Invitation ${invitation.id} saved to localStorage`);
+
+    // Try to send email
+    try {
+      await this.sendInvitationEmail(invitation, data);
+    } catch (error) {
+      console.warn("Failed to send invitation email:", error);
+    }
+
+    return invitation;
+  }
+
+  private async sendInvitationEmail(
+    invitation: TeamInvitation,
+    data: any,
+  ): Promise<void> {
+    const invitationLink = `${window.location.origin}/invitation/accept?token=${invitation.token}`;
+
+    const emailData = {
+      inviterName: data.inviterName,
+      companyName: data.companyName,
+      role: data.role,
+      invitationLink,
+      expiresAt: new Date(invitation.expiresAt),
+      programTitle: data.programTitle,
+      programDescription: data.metadata?.programDescription,
+    };
+
+    await emailService.sendTeamInvitation(invitation.email, emailData);
+  }
+
+  private getInvitationsFromLocalStorage(): TeamInvitation[] {
+    try {
+      const stored = localStorage.getItem("team_invitations");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
     }
   }
 

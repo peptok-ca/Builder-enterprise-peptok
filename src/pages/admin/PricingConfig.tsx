@@ -98,24 +98,20 @@ export default function PricingConfig() {
       });
     }
 
-    // Set up periodic sync to ensure ALL admins see the same data (cross-browser)
-    // More frequent checks for cross-browser sync
-    const syncInterval = setInterval(() => {
-      // Don't refresh if user has unsaved changes
-      if (hasChangesRef.current) {
-        return;
-      }
-
-      // Check for cross-browser updates every 5 seconds
-      fetchPricingConfig()
-        .then(() => {
-          // Update sync time only if data was actually refreshed
-          setLastSyncTime(new Date().toLocaleString());
-        })
-        .catch(() => {
-          // Ignore errors in background sync
-        });
-    }, 5000);
+    // Periodic sync disabled to prevent page reloads
+    // Cross-browser sync is handled via BroadcastChannel and custom events
+    // const syncInterval = setInterval(() => {
+    //   if (hasChangesRef.current) {
+    //     return;
+    //   }
+    //   fetchPricingConfig()
+    //     .then(() => {
+    //       setLastSyncTime(new Date().toLocaleString());
+    //     })
+    //     .catch(() => {
+    //       // Ignore errors in background sync
+    //     });
+    // }, 5000);
 
     window.addEventListener(
       "globalConfigUpdated",

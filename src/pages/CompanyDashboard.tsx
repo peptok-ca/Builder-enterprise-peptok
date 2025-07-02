@@ -71,8 +71,8 @@ const CompanyDashboard = () => {
       try {
         setIsLoading(true);
 
-        // Fetch company's mentorship requests
-        const requests = await api.getMentorshipRequests();
+        // Fetch company's mentorship requests with proper authorization
+        const requests = await apiEnhanced.getMentorshipRequests();
         setMentorshipRequests(requests || []);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);

@@ -12,11 +12,14 @@ import {
   Calendar,
   Award,
   Users,
+  Lock,
 } from "lucide-react";
 import { Coach } from "@/types";
 
 interface CoachCardProps {
   coach: Coach;
+  isAuthenticated?: boolean;
+  showLimitedDetails?: boolean;
 }
 
 const CoachCard = ({ coach }: CoachCardProps) => {

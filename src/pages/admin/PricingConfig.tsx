@@ -127,7 +127,7 @@ export default function PricingConfig() {
     );
 
     return () => {
-      clearInterval(syncInterval);
+      // clearInterval(syncInterval); // No longer needed - interval disabled
       if (broadcastChannel) {
         broadcastChannel.close();
       }

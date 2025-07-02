@@ -173,6 +173,16 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
                 variant="ghost"
                 size="icon"
                 className="hidden sm:inline-flex"
+                onClick={() => {
+                  // For now, navigate to coaches page as a search destination
+                  // This could be enhanced with a search modal later
+                  const searchPath =
+                    userType === "platform_admin"
+                      ? "/platform-admin"
+                      : "/coaches";
+                  window.location.href = searchPath;
+                }}
+                title="Search mentors and programs"
               >
                 <Search className="h-4 w-4" />
               </Button>

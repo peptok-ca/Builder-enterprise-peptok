@@ -24,6 +24,9 @@ build
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
 
 # Logs
 *.log

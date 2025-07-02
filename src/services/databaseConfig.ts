@@ -111,6 +111,19 @@ class DatabaseConfigService {
    * Test database connection and identify working endpoints
    */
   async testDatabaseConnection(): Promise<DatabaseStatus> {
+    // Check if API is configured first
+    if (!this.isApiConfigured()) {
+      console.log("🗃️ Database service not configured - running in mock mode");
+      this.status = {
+        isConnected: false,
+        lastCheck: new Date().toISOString(),
+        responseTime: 0,
+        activeEndpoints: [],
+        failedEndpoints: [],
+      };
+      return this.status;
+    }
+
     console.log("🗃️ Testing backend database connection...");
 
     const startTime = performance.now();
@@ -129,7 +142,10 @@ class DatabaseConfigService {
         }
       } catch (error) {
         failedEndpoints.push(endpoint);
-        console.warn(`❌ Database validation endpoint failed: ${endpoint}`);
+        console.warn(
+          `❌ Database validation endpoint failed: ${endpoint}`,
+          error,
+        );
       }
     }
 
@@ -145,7 +161,10 @@ class DatabaseConfigService {
         }
       } catch (error) {
         failedEndpoints.push(endpoint);
-        console.warn(`❌ Database invitation endpoint failed: ${endpoint}`);
+        console.warn(
+          `❌ Database invitation endpoint failed: ${endpoint}`,
+          error,
+        );
       }
     }
 
@@ -164,16 +183,24 @@ class DatabaseConfigService {
       console.log(
         `✅ Backend database connected (${activeEndpoints.length} endpoints active)`,
       );
-      toast.success("🗃️ Backend database connected", {
-        description: `${activeEndpoints.length} endpoints active`,
-        duration: 3000,
-      });
+      // Only show success toast in development
+      if (this.isLocalDevelopment()) {
+        toast.success("🗃️ Backend database connected", {
+          description: `${activeEndpoints.length} endpoints active`,
+          duration: 3000,
+        });
+      }
     } else {
-      console.error("❌ Backend database connection failed");
-      toast.error("❌ Backend database connection failed", {
-        description: "All database endpoints are unavailable",
-        duration: 5000,
-      });
+      console.log(
+        "❌ Backend database connection failed - falling back to mock data",
+      );
+      // Only show error toast in development
+      if (this.isLocalDevelopment()) {
+        toast.warning("❌ Backend database unavailable", {
+          description: "Using mock data instead",
+          duration: 3000,
+        });
+      }
     }
 
     return this.status;

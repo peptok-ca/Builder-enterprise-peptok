@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/services/api";
+import { apiEnhanced } from "@/services/apiEnhanced";
 import { MentorshipRequest, Connection } from "@/types";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { toast } from "sonner";

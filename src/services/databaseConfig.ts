@@ -37,7 +37,13 @@ class DatabaseConfigService {
       failedEndpoints: [],
     };
 
-    this.testDatabaseConnection();
+    // Only test database connection if API is properly configured
+    if (this.isApiConfigured()) {
+      this.testDatabaseConnection();
+    } else {
+      console.log("🗃️ Database service disabled - no API configuration");
+      this.status.isConnected = false;
+    }
   }
 
   private initializeConfig(): DatabaseConfig {

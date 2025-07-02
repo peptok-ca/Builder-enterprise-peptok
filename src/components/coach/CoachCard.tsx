@@ -22,7 +22,13 @@ interface CoachCardProps {
   showLimitedDetails?: boolean;
 }
 
-const CoachCard = ({ coach }: CoachCardProps) => {
+const CoachCard = ({
+  coach,
+  isAuthenticated = false,
+  showLimitedDetails = false,
+}: CoachCardProps) => {
+  const shouldShowLimited = !isAuthenticated || showLimitedDetails;
+
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardContent className="p-6">
@@ -43,20 +49,32 @@ const CoachCard = ({ coach }: CoachCardProps) => {
             <p className="text-sm text-muted-foreground">{coach.title}</p>
             <p className="text-sm text-primary font-medium">{coach.company}</p>
           </div>
+          {shouldShowLimited && (
+            <Badge variant="outline" className="text-xs">
+              <Lock className="w-3 h-3 mr-1" />
+              Limited
+            </Badge>
+          )}
         </div>
 
         <div className="mt-4">
-          <p className="text-sm text-gray-600 line-clamp-2">{coach.bio}</p>
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {shouldShowLimited
+              ? `${coach.bio?.substring(0, 100)}${coach.bio?.length > 100 ? "..." : ""}`
+              : coach.bio}
+          </p>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          {coach.coaching.slice(0, 3).map((skill) => (
+          {coach.coaching.slice(0, shouldShowLimited ? 2 : 3).map((skill) => (
             <Badge key={skill} variant="secondary">
               {skill}
             </Badge>
           ))}
-          {coach.coaching.length > 3 && (
-            <Badge variant="outline">+{coach.coaching.length - 3} more</Badge>
+          {coach.coaching.length > (shouldShowLimited ? 2 : 3) && (
+            <Badge variant="outline">
+              +{coach.coaching.length - (shouldShowLimited ? 2 : 3)} more
+            </Badge>
           )}
         </div>
 
@@ -64,7 +82,9 @@ const CoachCard = ({ coach }: CoachCardProps) => {
           <div className="flex items-center space-x-1">
             <Star className="w-4 h-4 text-yellow-400 fill-current" />
             <span className="font-medium">{coach.rating}</span>
-            <span>({coach.totalSessions} sessions)</span>
+            {!shouldShowLimited && (
+              <span>({coach.totalSessions} sessions)</span>
+            )}
           </div>
           <div className="flex items-center space-x-1">
             <Clock className="w-4 h-4" />
@@ -72,18 +92,47 @@ const CoachCard = ({ coach }: CoachCardProps) => {
           </div>
         </div>
 
-        <div className="mt-2 flex items-center justify-between text-sm text-gray-600">
-          <div className="flex items-center space-x-1">
-            <Calendar className="w-4 h-4" />
-            <span>Next available: {coach.availableSlots[0]}</span>
+        {!shouldShowLimited && (
+          <div className="mt-2 flex items-center justify-between text-sm text-gray-600">
+            <div className="flex items-center space-x-1">
+              <Calendar className="w-4 h-4" />
+              <span>
+                Next available:{" "}
+                {coach.availableSlots?.[0] || "Contact for availability"}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
+
+        {shouldShowLimited && (
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center gap-2 text-blue-800 text-sm">
+              <Lock className="w-4 h-4" />
+              <span className="font-medium">Sign in to view full details</span>
+            </div>
+            <p className="text-blue-700 text-xs mt-1">
+              Contact information, availability, and booking options available
+              to authenticated users
+            </p>
+          </div>
+        )}
       </CardContent>
 
       <CardFooter className="p-6 pt-0">
-        <Button asChild className="w-full">
-          <Link to={`/coaches/${coach.id}`}>View Profile</Link>
-        </Button>
+        {isAuthenticated ? (
+          <Button asChild className="w-full">
+            <Link to={`/coaches/${coach.id}`}>View Full Profile</Link>
+          </Button>
+        ) : (
+          <div className="w-full space-y-2">
+            <Button asChild className="w-full" variant="outline">
+              <Link to="/login">Sign In to Contact</Link>
+            </Button>
+            <Button asChild className="w-full" size="sm" variant="ghost">
+              <Link to={`/coaches/${coach.id}`}>View Limited Profile</Link>
+            </Button>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );

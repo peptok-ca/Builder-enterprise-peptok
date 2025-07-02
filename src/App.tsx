@@ -235,7 +235,9 @@ const App: React.FC = () => {
               <Route
                 path="/connections"
                 element={
-                  <ProtectedRoute allowedRoles={["enterprise", "coach"]}>
+                  <ProtectedRoute
+                    allowedRoles={["company_admin", "coach", "platform_admin"]}
+                  >
                     <Connections />
                   </ProtectedRoute>
                 }

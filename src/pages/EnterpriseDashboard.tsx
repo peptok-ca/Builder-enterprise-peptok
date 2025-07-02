@@ -63,8 +63,8 @@ const EnterpriseDashboard = () => {
       try {
         setIsLoading(true);
 
-        // Fetch mentorship requests for the user's company
-        const requests = await api.getMentorshipRequests();
+        // Fetch mentorship requests for the user's company with proper authorization
+        const requests = await apiEnhanced.getMentorshipRequests();
         console.log("Loaded mentorship requests:", requests);
         setMentorshipRequests(requests || []);
 

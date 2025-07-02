@@ -460,7 +460,11 @@ const CoachDirectory = () => {
                       key={coach.id}
                       className={viewMode === "list" ? "w-full" : ""}
                     >
-                      <CoachCard coach={coach} />
+                      <CoachCard
+                        coach={coach}
+                        isAuthenticated={isAuthenticated}
+                        showLimitedDetails={!isAuthenticated}
+                      />
                     </div>
                   ))}
                 </div>

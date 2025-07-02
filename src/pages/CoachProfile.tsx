@@ -41,6 +41,7 @@ import { mockCoaches } from "@/data/mockData";
 
 const CoachProfile = () => {
   const { id } = useParams();
+  const { user, isAuthenticated } = useAuth();
   const coach = mockCoaches.find((e) => e.id === id) || mockCoaches[0];
 
   // Enhanced mock data for coach profile

@@ -1016,7 +1016,17 @@ class ApiService {
       return response.data;
     } catch (error) {
       // Fallback to localStorage if API is not available
-      console.warn("API not available, using localStorage fallback:", error);
+      const isApiConfigured = !!import.meta.env.VITE_API_URL;
+
+      if (isApiConfigured) {
+        console.warn(
+          "API request failed, using localStorage fallback:",
+          error.message,
+        );
+      } else {
+        console.log("📱 API not configured, using local data storage");
+      }
+
       return this.getMentorshipRequestsFromStorage(filters);
     }
   }

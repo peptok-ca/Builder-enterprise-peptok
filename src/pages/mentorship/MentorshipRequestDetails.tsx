@@ -276,7 +276,9 @@ export default function MentorshipRequestDetails() {
         setMatchedCoaches(mockMatchedCoaches);
       } catch (error) {
         console.error("Failed to fetch mentorship request:", error);
+        setError(error.message || "Failed to load mentorship request details");
         setRequest(null);
+        toast.error("Failed to load mentorship request details");
       } finally {
         setLoading(false);
       }

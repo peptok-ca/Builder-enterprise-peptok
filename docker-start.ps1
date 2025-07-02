@@ -1,7 +1,7 @@
 # PowerShell script to clean up and start Docker containers
 # Compatible with Windows PowerShell 5.1 and PowerShell Core 7+
 
-Write-Host "🧹 Cleaning up existing containers..." -ForegroundColor Green
+Write-Host "Cleaning up existing containers..." -ForegroundColor Green
 
 # Stop and remove existing containers
 try {
@@ -11,7 +11,7 @@ try {
 }
 
 # Remove any containers that might be using the ports
-Write-Host "🧹 Removing containers using our ports..." -ForegroundColor Yellow
+Write-Host "Removing containers using our ports..." -ForegroundColor Yellow
 try {
     $containers = docker ps -q --filter "publish=8080" --filter "publish=3001" --filter "publish=5433" 2>$null
     if ($containers -and $containers.Count -gt 0) {
@@ -22,7 +22,7 @@ try {
     Write-Host "No port-specific containers to remove" -ForegroundColor Yellow
 }
 
-Write-Host "🔍 Checking for processes using ports 8080, 3001, 5433..." -ForegroundColor Blue
+Write-Host "Checking for processes using ports 8080, 3001, 5433..." -ForegroundColor Blue
 
 # Function to kill process on port - compatible with different Windows versions
 function Kill-ProcessOnPort {
@@ -35,12 +35,12 @@ function Kill-ProcessOnPort {
             foreach ($connection in $connections) {
                 $processId = $connection.OwningProcess
                 if ($processId -and $processId -ne 0) {
-                    Write-Host "⚠️  Port $Port is in use by process $processId, attempting to free it..." -ForegroundColor Yellow
+                    Write-Host "WARNING: Port $Port is in use by process $processId, attempting to free it..." -ForegroundColor Yellow
                     try {
                         Stop-Process -Id $processId -Force -ErrorAction Stop
-                        Write-Host "✅ Process $processId stopped successfully" -ForegroundColor Green
+                        Write-Host "SUCCESS: Process $processId stopped successfully" -ForegroundColor Green
                     } catch {
-                        Write-Host "❌ Failed to stop process $processId" -ForegroundColor Red
+                        Write-Host "ERROR: Failed to stop process $processId" -ForegroundColor Red
                     }
                 }
             }
@@ -48,7 +48,7 @@ function Kill-ProcessOnPort {
             # Fallback using netstat for older Windows versions
             $netstatOutput = netstat -ano | findstr ":$Port "
             if ($netstatOutput) {
-                Write-Host "⚠️  Port $Port appears to be in use (detected via netstat)" -ForegroundColor Yellow
+                Write-Host "WARNING: Port $Port appears to be in use (detected via netstat)" -ForegroundColor Yellow
                 Write-Host "Please manually stop any processes using port $Port" -ForegroundColor Yellow
             }
         }
@@ -62,13 +62,13 @@ Kill-ProcessOnPort 8080
 Kill-ProcessOnPort 3001
 Kill-ProcessOnPort 5433
 
-Write-Host "🚀 Starting containers..." -ForegroundColor Green
+Write-Host "Starting containers..." -ForegroundColor Green
 
 # Check if Docker is running
 try {
     docker version | Out-Null
 } catch {
-    Write-Host "❌ Docker is not running or not accessible. Please start Docker Desktop." -ForegroundColor Red
+    Write-Host "ERROR: Docker is not running or not accessible. Please start Docker Desktop." -ForegroundColor Red
     Write-Host "Press any key to exit..." -ForegroundColor Yellow
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     exit 1
@@ -88,19 +88,19 @@ try {
     # Check if containers are running
     $runningContainers = docker compose ps --services --filter "status=running"
     if ($runningContainers) {
-        Write-Host "✅ Docker environment is running!" -ForegroundColor Green
-        Write-Host "🌐 Frontend: http://localhost:8080" -ForegroundColor Cyan
-        Write-Host "🔗 Backend API: http://localhost:3001" -ForegroundColor Cyan
-        Write-Host "🗄️  Database: localhost:5433" -ForegroundColor Cyan
+        Write-Host "SUCCESS: Docker environment is running!" -ForegroundColor Green
+        Write-Host "Frontend: http://localhost:8080" -ForegroundColor Cyan
+        Write-Host "Backend API: http://localhost:3001" -ForegroundColor Cyan
+        Write-Host "Database: localhost:5433" -ForegroundColor Cyan
         Write-Host ""
         Write-Host "To view logs: docker compose logs -f" -ForegroundColor Gray
         Write-Host "To stop: docker compose down" -ForegroundColor Gray
     } else {
-        Write-Host "❌ Some containers may not have started properly" -ForegroundColor Red
+        Write-Host "ERROR: Some containers may not have started properly" -ForegroundColor Red
         Write-Host "Run 'docker compose logs' to check for errors" -ForegroundColor Yellow
     }
 } catch {
-    Write-Host "❌ Error starting containers: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "ERROR: Error starting containers: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "Try running 'docker compose down' and run this script again" -ForegroundColor Yellow
     exit 1
 }

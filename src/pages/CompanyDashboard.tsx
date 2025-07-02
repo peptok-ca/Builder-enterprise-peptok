@@ -52,6 +52,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/services/api";
+import { apiEnhanced } from "@/services/apiEnhanced";
 import { MentorshipRequest } from "@/types";
 import { toast } from "sonner";
 import { DashboardDiagnostic } from "@/components/common/DashboardDiagnostic";

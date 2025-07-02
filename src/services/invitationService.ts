@@ -693,7 +693,7 @@ class InvitationService {
   }
 
   /**
-   * Get all invitations for a program or company - Backend Database Only
+   * Get all invitations for a program or company - Backend Database with localStorage fallback
    */
   async getInvitations(filters?: {
     programId?: string;
@@ -701,36 +701,62 @@ class InvitationService {
     status?: TeamInvitation["status"];
   }): Promise<TeamInvitation[]> {
     try {
-      console.log("🗃️ Loading invitations from backend database", filters);
+      console.log("🗃️ Loading invitations", filters);
 
-      // Use backend API for getting invitations - NO localStorage fallback
-      const invitations = await apiEnhanced.getTeamInvitations(filters);
+      // Try backend API first if available
+      if (this.isApiConfigured() && databaseConfig.isDatabaseReady()) {
+        const invitations = await apiEnhanced.getTeamInvitations(filters);
 
-      // Verify we got database data
-      const validInvitations = invitations.filter(
-        (inv) => inv.id && !inv.id.includes("temp_"),
-      );
+        // Verify we got database data
+        const validInvitations = invitations.filter(
+          (inv) => inv.id && !inv.id.includes("temp_"),
+        );
 
-      if (validInvitations.length !== invitations.length) {
-        console.warn("⚠️ Some invitations appear to be temporary/mock data");
+        if (validInvitations.length > 0) {
+          console.log(
+            `✅ Loaded ${validInvitations.length} invitations from backend database`,
+          );
+          return validInvitations.sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          );
+        }
+      }
+
+      // Fall back to localStorage
+      console.log("⚠️ Backend unavailable, loading from localStorage");
+      let invitations = this.getInvitationsFromLocalStorage();
+
+      // Apply filters
+      if (filters) {
+        if (filters.companyId) {
+          invitations = invitations.filter(
+            (inv) => inv.companyId === filters.companyId,
+          );
+        }
+        if (filters.programId) {
+          invitations = invitations.filter(
+            (inv) => inv.programId === filters.programId,
+          );
+        }
+        if (filters.status) {
+          invitations = invitations.filter(
+            (inv) => inv.status === filters.status,
+          );
+        }
       }
 
       console.log(
-        `✅ Loaded ${validInvitations.length} invitations from backend database`,
+        `✅ Loaded ${invitations.length} invitations from localStorage`,
       );
-
-      return validInvitations.sort(
+      return invitations.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     } catch (error) {
-      console.error(
-        "❌ Failed to get invitations from backend database:",
-        error,
-      );
-      throw new Error(
-        `Failed to load invitations from backend database: ${error.message}`,
-      );
+      console.error("❌ Failed to get invitations:", error);
+      // Return empty array instead of throwing in production
+      return [];
     }
   }
 

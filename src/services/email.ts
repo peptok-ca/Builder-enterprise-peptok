@@ -441,7 +441,7 @@ export class EmailService {
           </div>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="#"
+            <a href="${window.location.origin}/dashboard"
                style="display: inline-block; background-color: #7c3aed; color: white; padding: 12px 30px;
                       text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
               View Program Dashboard

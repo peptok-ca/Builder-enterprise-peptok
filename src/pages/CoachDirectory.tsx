@@ -173,8 +173,8 @@ const CoachDirectory = () => {
               Coach Directory
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Browse our network of {mockCoaches.length}+ experienced coaches
-              and find the perfect match for your development goals
+              Browse our network of {allCoaches.length}+ experienced coaches and
+              find the perfect match for your development goals
             </p>
           </div>
         </div>

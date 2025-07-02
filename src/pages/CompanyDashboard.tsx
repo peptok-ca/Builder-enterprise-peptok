@@ -365,6 +365,9 @@ const CompanyDashboard = () => {
               </div>
             </div>
 
+            {/* Dashboard Diagnostics */}
+            <DashboardDiagnostic />
+
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <Card className="backdrop-blur-md bg-white/80 border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">

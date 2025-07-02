@@ -101,6 +101,6 @@ try {
     }
 } catch {
     Write-Host "❌ Error starting containers: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "Try running ``docker compose down`` and run this script again" -ForegroundColor Yellow
+    Write-Host 'Try running "docker compose down" and run this script again' -ForegroundColor Yellow
     exit 1
 }

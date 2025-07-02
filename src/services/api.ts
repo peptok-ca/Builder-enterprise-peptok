@@ -224,6 +224,14 @@ class ApiService {
       throw new Error("API not configured for deployed environment");
     }
 
+    // Skip fetch requests if in development and API URL is not configured
+    if (
+      !import.meta.env.VITE_API_URL &&
+      API_BASE_URL === "http://localhost:3001/api"
+    ) {
+      throw new Error("API not configured - using local data");
+    }
+
     const token = localStorage.getItem("auth_token");
 
     const config: RequestInit = {

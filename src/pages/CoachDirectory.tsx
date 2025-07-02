@@ -188,6 +188,35 @@ const CoachDirectory = () => {
           <CoachSearch onSearch={handleSearch} />
         </div>
 
+        {/* Authentication Notice */}
+        {!isAuthenticated && (
+          <Alert className="mb-8 border-blue-200 bg-blue-50">
+            <Info className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-800">
+              <strong>Limited View:</strong> You're viewing limited coach
+              profiles.
+              <span className="ml-2">
+                <Button
+                  asChild
+                  variant="link"
+                  className="h-auto p-0 text-blue-600 underline"
+                >
+                  <a href="/login">Sign in</a>
+                </Button>
+                {" or "}
+                <Button
+                  asChild
+                  variant="link"
+                  className="h-auto p-0 text-blue-600 underline"
+                >
+                  <a href="/signup">create an account</a>
+                </Button>{" "}
+                to view full profiles, contact information, and book sessions.
+              </span>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
           {showFilters && (

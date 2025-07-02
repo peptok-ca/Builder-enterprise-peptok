@@ -79,7 +79,7 @@ export default function MentorshipRequestDetails() {
         let foundRequest = null;
 
         try {
-          const allRequests = await api.getMentorshipRequests();
+          const allRequests = await apiEnhanced.getMentorshipRequests();
           foundRequest = allRequests.find((req) => req.id === id);
         } catch (apiError) {
           console.warn("API call failed, using fallback data:", apiError);

@@ -393,6 +393,54 @@ class InvitationService {
   }
 
   /**
+   * Update invitation status
+   */
+  private async updateInvitationStatus(
+    invitationId: string,
+    status: TeamInvitation["status"],
+    updates?: Partial<TeamInvitation>,
+  ): Promise<void> {
+    // Try backend first if configured
+    if (this.isApiConfigured() && databaseConfig.isDatabaseReady()) {
+      try {
+        await this.updateInvitationStatusInDatabase(
+          invitationId,
+          status,
+          updates,
+        );
+        return;
+      } catch (error) {
+        console.warn(
+          "Failed to update status in backend, using localStorage:",
+          error,
+        );
+      }
+    }
+
+    // Fall back to localStorage
+    try {
+      const invitations = this.getInvitationsFromLocalStorage();
+      const updatedInvitations = invitations.map((inv) =>
+        inv.id === invitationId
+          ? { ...inv, status, ...updates, updatedAt: new Date().toISOString() }
+          : inv,
+      );
+      localStorage.setItem(
+        "team_invitations",
+        JSON.stringify(updatedInvitations),
+      );
+      console.log(
+        `✅ Updated invitation ${invitationId} status to ${status} in localStorage`,
+      );
+    } catch (error) {
+      console.error(
+        "Failed to update invitation status in localStorage:",
+        error,
+      );
+    }
+  }
+
+  /**
    * Accept an invitation
    */
   async acceptInvitation(
@@ -400,24 +448,92 @@ class InvitationService {
     acceptanceData: AcceptInvitationData,
   ): Promise<{ success: boolean; user?: any; error?: string }> {
     try {
-      // Use backend API for invitation acceptance
-      const result = await apiEnhanced.acceptTeamInvitation(
-        token,
-        acceptanceData,
-      );
+      // Try backend API first if available
+      if (this.isApiConfigured() && databaseConfig.isDatabaseReady()) {
+        const result = await apiEnhanced.acceptTeamInvitation(
+          token,
+          acceptanceData,
+        );
 
-      if (result.success && result.user) {
-        // Store user in localStorage for frontend state management
-        this.storeNewUser(result.user);
+        if (result.success && result.user) {
+          // Store user in localStorage for frontend state management
+          this.storeNewUser(result.user);
+        }
+
+        return result;
       }
 
-      return result;
+      // Fall back to localStorage handling
+      return this.acceptInvitationInLocalStorage(token, acceptanceData);
     } catch (error) {
       console.error("Failed to accept invitation:", error);
       return {
         success: false,
         error: "Failed to process invitation acceptance",
       };
+    }
+  }
+
+  private async acceptInvitationInLocalStorage(
+    token: string,
+    acceptanceData: AcceptInvitationData,
+  ): Promise<{ success: boolean; user?: any; error?: string }> {
+    try {
+      const invitation = await this.getInvitationByToken(token);
+
+      if (!invitation) {
+        return { success: false, error: "Invitation not found" };
+      }
+
+      if (invitation.status !== "pending") {
+        return { success: false, error: "Invitation is no longer valid" };
+      }
+
+      if (new Date() > new Date(invitation.expiresAt)) {
+        return { success: false, error: "Invitation has expired" };
+      }
+
+      // Create user object
+      const user = {
+        id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        email: invitation.email,
+        firstName: acceptanceData.firstName,
+        lastName: acceptanceData.lastName,
+        name: `${acceptanceData.firstName} ${acceptanceData.lastName}`,
+        role: "team_member",
+        companyId: invitation.companyId,
+        programId: invitation.programId,
+        createdAt: new Date().toISOString(),
+        acceptedInvitationId: invitation.id,
+      };
+
+      // Update invitation status
+      await this.updateInvitationStatus(invitation.id, "accepted", {
+        acceptedAt: new Date().toISOString(),
+      });
+
+      // Store user
+      this.storeUserInLocalStorage(user);
+
+      console.log(`✅ Invitation ${invitation.id} accepted in localStorage`);
+      return { success: true, user };
+    } catch (error) {
+      console.error("Failed to accept invitation in localStorage:", error);
+      return {
+        success: false,
+        error: "Failed to process invitation acceptance",
+      };
+    }
+  }
+
+  private storeUserInLocalStorage(user: any): void {
+    try {
+      const existingUsers = JSON.parse(localStorage.getItem("users") || "[]");
+      existingUsers.push(user);
+      localStorage.setItem("users", JSON.stringify(existingUsers));
+      console.log(`✅ User ${user.id} stored in localStorage`);
+    } catch (error) {
+      console.error("Failed to store user in localStorage:", error);
     }
   }
 

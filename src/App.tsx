@@ -204,6 +204,7 @@ const App: React.FC = () => {
               <Route path="/invitations" element={<PendingInvitations />} />
               <Route path="/test-permissions" element={<TestPermissions />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
               <Route path="/admin/pricing-config" element={<PricingConfig />} />
               <Route
                 path="/admin/security-settings"

@@ -43,6 +43,7 @@ import { api } from "@/services/api";
 import { MentorshipRequest, Connection } from "@/types";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
+import { DashboardDiagnostic } from "@/components/common/DashboardDiagnostic";
 
 const EmployeeDashboard = () => {
   const { user } = useAuth();

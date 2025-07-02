@@ -146,7 +146,7 @@ const CoachDirectory = () => {
       location: "",
     };
     setFilters(defaultFilters);
-    setFilteredCoaches(mockCoaches);
+    setFilteredCoaches(allCoaches);
   };
 
   const featuredCoaches = allCoaches

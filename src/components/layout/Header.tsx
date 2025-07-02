@@ -85,7 +85,12 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
     {
       label: userType === "platform_admin" ? "Platform Dashboard" : "Dashboard",
       path: getDashboardPath(userType),
-      roles: ["company_admin", "coach", "platform_admin"],
+      roles: ["company_admin", "coach", "platform_admin", "team_member"],
+    },
+    {
+      label: "New Program",
+      path: "/mentorship/new",
+      roles: ["company_admin", "platform_admin"],
     },
     {
       label: "Mentors",
@@ -97,11 +102,22 @@ const Header = ({ userType: propUserType }: HeaderProps) => {
       path: "/connections",
       roles: ["company_admin", "coach"],
     },
+    {
+      label: "Messages",
+      path: "/messages",
+      roles: ["company_admin", "coach", "team_member", "platform_admin"],
+    },
+    {
+      label: "Analytics",
+      path: "/analytics",
+      roles: ["company_admin", "platform_admin"],
+    },
   ];
 
-  const filteredItems = navigationItems.filter((item) =>
-    item.roles.includes(userType),
-  );
+  // Only show navigation if user is authenticated
+  const filteredItems = user
+    ? navigationItems.filter((item) => item.roles.includes(userType))
+    : [];
 
   const getUserInitials = () => {
     if (user?.firstName && user?.lastName) {

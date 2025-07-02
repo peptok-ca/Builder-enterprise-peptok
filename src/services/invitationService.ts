@@ -565,12 +565,42 @@ class InvitationService {
    */
   async getPendingInvitations(email: string): Promise<TeamInvitation[]> {
     try {
-      // Use backend API for pending invitations
-      const invitations = await apiEnhanced.getPendingInvitations(email);
-      return invitations;
+      // Try backend API first if available
+      if (this.isApiConfigured() && databaseConfig.isDatabaseReady()) {
+        const invitations = await apiEnhanced.getPendingInvitations(email);
+        return invitations;
+      }
+
+      // Fall back to localStorage
+      const invitations = this.getInvitationsFromLocalStorage();
+      return invitations.filter(
+        (inv) =>
+          inv.email.toLowerCase() === email.toLowerCase() &&
+          inv.status === "pending" &&
+          new Date() <= new Date(inv.expiresAt),
+      );
     } catch (error) {
       console.error("Failed to get pending invitations:", error);
       return [];
+    }
+  }
+
+  /**
+   * Remove pending invitation from localStorage
+   */
+  private removePendingInvitation(email: string, invitationId: string): void {
+    try {
+      const invitations = this.getInvitationsFromLocalStorage();
+      const updatedInvitations = invitations.filter(
+        (inv) => inv.id !== invitationId,
+      );
+      localStorage.setItem(
+        "team_invitations",
+        JSON.stringify(updatedInvitations),
+      );
+      console.log(`✅ Removed invitation ${invitationId} from localStorage`);
+    } catch (error) {
+      console.error("Failed to remove invitation from localStorage:", error);
     }
   }
 

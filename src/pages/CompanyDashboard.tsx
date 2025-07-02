@@ -72,6 +72,7 @@ const CompanyDashboard = () => {
         setIsLoading(true);
 
         // Fetch company's mentorship requests with proper authorization
+        // apiEnhanced automatically filters by user's company for company_admin users
         const requests = await apiEnhanced.getMentorshipRequests();
         setMentorshipRequests(requests || []);
       } catch (error) {

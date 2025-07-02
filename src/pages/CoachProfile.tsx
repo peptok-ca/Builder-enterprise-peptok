@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Card,
   CardContent,

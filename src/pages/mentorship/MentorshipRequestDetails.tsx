@@ -73,9 +73,20 @@ export default function MentorshipRequestDetails() {
 
   useEffect(() => {
     const fetchRequest = async () => {
-      if (!id) return;
+      if (!id) {
+        setError("Invalid request ID");
+        setLoading(false);
+        return;
+      }
+
+      if (!user) {
+        setError("Authentication required");
+        setLoading(false);
+        return;
+      }
 
       try {
+        setError(null);
         // First try to fetch from API
         let foundRequest = null;
 

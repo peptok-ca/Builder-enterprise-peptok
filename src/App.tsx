@@ -267,6 +267,9 @@ const App: React.FC = () => {
 
             {/* localStorage Elimination Indicator */}
             <LocalStorageEliminationIndicator />
+
+            {/* Page Validator */}
+            <PageValidator />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

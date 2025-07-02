@@ -1,5 +1,5 @@
 import express from "express";
-import { mentorMatchingService } from "../services/MentorMatchingService.js";
+import { mentorMatchingService } from "../services/MentorMatchingService.ts";
 import { authMiddleware } from "../middleware/auth.js";
 import { validateMentorFilters } from "../middleware/validation.js";
 import { logger } from "../config/logger.js";

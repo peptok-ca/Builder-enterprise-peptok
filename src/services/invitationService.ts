@@ -767,42 +767,52 @@ class InvitationService {
    */
   private async storeNewUser(user: any): Promise<void> {
     try {
-      console.log("🗃️ Storing new user in backend database");
+      // Try backend first if available
+      if (this.isApiConfigured() && databaseConfig.isDatabaseReady()) {
+        console.log("🗃️ Storing new user in backend database");
 
-      const backendEndpoints = ["/api/users", "/api/team-members", "/users"];
+        const backendEndpoints = ["/api/users", "/api/team-members", "/users"];
 
-      for (const endpoint of backendEndpoints) {
-        try {
-          const response = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Database-Write": "required",
-            },
-            body: JSON.stringify({
-              ...user,
-              createdViaInvitation: true,
-              requiresDatabaseStorage: true,
-            }),
-          });
+        for (const endpoint of backendEndpoints) {
+          try {
+            const response = await fetch(endpoint, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Database-Write": "required",
+              },
+              body: JSON.stringify({
+                ...user,
+                createdViaInvitation: true,
+                requiresDatabaseStorage: true,
+              }),
+            });
 
-          if (response.ok) {
-            const data = await response.json();
-            if (data.data?.id && !data.data.id.includes("temp_")) {
-              console.log(`✅ User ${data.data.id} stored in backend database`);
-              return;
+            if (response.ok) {
+              const data = await response.json();
+              if (data.data?.id && !data.data.id.includes("temp_")) {
+                console.log(
+                  `✅ User ${data.data.id} stored in backend database`,
+                );
+                return;
+              }
             }
+          } catch (error) {
+            console.warn(`Failed to store user via ${endpoint}:`, error);
+            continue;
           }
-        } catch (error) {
-          console.warn(`Failed to store user via ${endpoint}:`, error);
-          continue;
         }
       }
 
-      throw new Error("Failed to store user in backend database");
+      // Fall back to localStorage
+      console.log("⚠️ Backend unavailable, storing user in localStorage");
+      this.storeUserInLocalStorage(user);
     } catch (error) {
-      console.error("❌ Failed to store new user in backend database:", error);
-      throw error;
+      console.warn(
+        "❌ Failed to store new user in backend, using localStorage:",
+        error,
+      );
+      this.storeUserInLocalStorage(user);
     }
   }
 }

@@ -9,6 +9,7 @@
     "test": "vitest --run",
     "format.fix": "prettier --write .",
     "typecheck": "tsc",
+    "validate-ts": "find src -name '*.js' -o -name '*.jsx' | wc -l | grep -q '^0$' && echo 'All files are TypeScript ✓' || (echo 'JavaScript files found!' && find src -name '*.js' -o -name '*.jsx' && exit 1)",
     "postinstall": "if [ \"$(uname)\" = \"Linux\" ] && [ ! -f /etc/alpine-release ]; then npm install @rollup/rollup-linux-x64-gnu @swc/core-linux-x64-gnu; fi"
   },
   "dependencies": {

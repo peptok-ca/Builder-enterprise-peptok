@@ -110,20 +110,68 @@ try {
     # Wait a moment for containers to start
     Start-Sleep -Seconds 3
 
-    # Check if containers are running
-    $runningContainers = docker compose ps --services --filter "status=running"
-    if ($runningContainers) {
-        Write-Host "SUCCESS: Docker environment is running!" -ForegroundColor Green
-        Write-Host "Frontend: http://localhost:8080" -ForegroundColor Cyan
-        Write-Host "Backend API: http://localhost:3001" -ForegroundColor Cyan
-        Write-Host "Database: localhost:5433" -ForegroundColor Cyan
-        Write-Host ""
-        Write-Host "To view logs: docker compose logs -f" -ForegroundColor Gray
-        Write-Host "To stop: docker compose down" -ForegroundColor Gray
-    } else {
-        Write-Host "ERROR: Some containers may not have started properly" -ForegroundColor Red
-        Write-Host "Run 'docker compose logs' to check for errors" -ForegroundColor Yellow
+    # Check if containers are running and healthy
+    Start-Sleep -Seconds 5
+
+    Write-Host "Checking container health..." -ForegroundColor Blue
+    $frontendHealthy = $false
+    $backendHealthy = $false
+    $databaseHealthy = $false
+
+    # Check frontend
+    try {
+        $response = Invoke-WebRequest -Uri "http://localhost:8080" -TimeoutSec 10 -UseBasicParsing
+        if ($response.StatusCode -eq 200) {
+            $frontendHealthy = $true
+            Write-Host "  Frontend: HEALTHY" -ForegroundColor Green
+        }
+    } catch {
+        Write-Host "  Frontend: NOT RESPONDING" -ForegroundColor Yellow
     }
+
+    # Check backend
+    try {
+        $response = Invoke-WebRequest -Uri "http://localhost:3001/health" -TimeoutSec 10 -UseBasicParsing
+        if ($response.StatusCode -eq 200) {
+            $backendHealthy = $true
+            Write-Host "  Backend: HEALTHY" -ForegroundColor Green
+        }
+    } catch {
+        Write-Host "  Backend: NOT RESPONDING" -ForegroundColor Yellow
+    }
+
+    # Check database (simplified check)
+    try {
+        $dbCheck = docker compose exec -T database pg_isready -U peptok_user -d peptok_dev 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            $databaseHealthy = $true
+            Write-Host "  Database: HEALTHY" -ForegroundColor Green
+        }
+    } catch {
+        Write-Host "  Database: NOT RESPONDING" -ForegroundColor Yellow
+    }
+
+    Write-Host ""
+    if ($frontendHealthy -and $backendHealthy -and $databaseHealthy) {
+        Write-Host "SUCCESS: All services are healthy!" -ForegroundColor Green
+    } elseif ($frontendHealthy) {
+        Write-Host "PARTIAL SUCCESS: Frontend is running (backend/database may still be starting)" -ForegroundColor Yellow
+    } else {
+        Write-Host "WARNING: Some services are not responding yet" -ForegroundColor Yellow
+        Write-Host "Services may still be starting up. Check logs if issues persist." -ForegroundColor Yellow
+    }
+
+    Write-Host ""
+    Write-Host "Service URLs:" -ForegroundColor Cyan
+    Write-Host "  Frontend: http://localhost:8080" -ForegroundColor Cyan
+    Write-Host "  Backend API: http://localhost:3001" -ForegroundColor Cyan
+    Write-Host "  Database: localhost:5433" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Useful commands:" -ForegroundColor Gray
+    Write-Host "  View logs: docker compose logs -f" -ForegroundColor Gray
+    Write-Host "  View specific service: docker compose logs -f [frontend|backend|database]" -ForegroundColor Gray
+    Write-Host "  Stop services: docker compose down" -ForegroundColor Gray
+    Write-Host "  Restart service: docker compose restart [service]" -ForegroundColor Gray
 } catch {
     Write-Host "ERROR: Error starting containers: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "Try running 'docker compose down' and run this script again" -ForegroundColor Yellow

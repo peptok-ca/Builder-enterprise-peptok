@@ -1,97 +1,145 @@
 import { Request, Response, NextFunction } from "express";
-import { IAuthService } from "@/services/interfaces/IAuthService.js";
-import { UserType } from "@/models/User.js";
-import { logger } from "@/config/logger.js";
+import jwt from "jsonwebtoken";
+import { logger } from "../config/logger.js";
 
 export interface AuthenticatedRequest extends Request {
-  user?: any;
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    [key: string]: any;
+  };
 }
 
-export class AuthMiddleware {
-  constructor(private readonly authService: IAuthService) {}
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-key";
 
-  authenticate = async (
+/**
+ * Authentication middleware
+ * @param roles - Optional array of required roles
+ * @returns Express middleware function
+ */
+export function authMiddleware(roles: string[] = []) {
+  return (
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction,
-  ): Promise<void> => {
+  ): void => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      const token = extractToken(req);
+
+      if (!token) {
         res.status(401).json({
           success: false,
-          error: "Authorization token required",
+          message: "Authentication token required",
         });
         return;
       }
 
-      const token = authHeader.replace("Bearer ", "");
-      const user = await this.authService.verifyToken(token);
+      // Verify token
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      req.user = decoded;
 
-      req.user = user;
+      // Check roles if specified
+      if (roles.length > 0 && !roles.includes(decoded.role)) {
+        res.status(403).json({
+          success: false,
+          message: "Insufficient permissions",
+        });
+        return;
+      }
+
       next();
-    } catch (error) {
-      logger.error("Authentication middleware error:", error);
-      res.status(401).json({
+    } catch (error: any) {
+      logger.error("Authentication error:", error);
+
+      if (error.name === "JsonWebTokenError") {
+        res.status(401).json({
+          success: false,
+          message: "Invalid authentication token",
+        });
+        return;
+      }
+
+      if (error.name === "TokenExpiredError") {
+        res.status(401).json({
+          success: false,
+          message: "Authentication token expired",
+        });
+        return;
+      }
+
+      res.status(500).json({
         success: false,
-        error: "Invalid or expired token",
+        message: "Authentication error",
       });
     }
   };
+}
 
-  requireRole = (allowedRoles: UserType[]) => {
-    return (
-      req: AuthenticatedRequest,
-      res: Response,
-      next: NextFunction,
-    ): void => {
-      if (!req.user) {
-        res.status(401).json({
-          success: false,
-          error: "Authentication required",
-        });
-        return;
-      }
+/**
+ * Extract token from request headers or cookies
+ * @param req - Express request object
+ * @returns JWT token or null
+ */
+function extractToken(req: Request): string | null {
+  // Check Authorization header
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.substring(7);
+  }
 
-      if (!allowedRoles.includes(req.user.userType)) {
-        res.status(403).json({
-          success: false,
-          error: "Insufficient permissions",
-        });
-        return;
-      }
+  // Check cookies
+  if (req.cookies && req.cookies.token) {
+    return req.cookies.token;
+  }
 
-      next();
-    };
-  };
+  return null;
+}
 
-  requireAdmin = this.requireRole([UserType.ADMIN]);
-  requireExpert = this.requireRole([UserType.EXPERT]);
-  requireEnterprise = this.requireRole([UserType.ENTERPRISE]);
-  requireCoach = this.requireRole([UserType.COACH]);
-  requireAdminOrCoach = this.requireRole([UserType.ADMIN, UserType.COACH]);
-
-  optional = async (
+/**
+ * Optional authentication middleware (doesn't fail if no token)
+ * @returns Express middleware function
+ */
+export function optionalAuth() {
+  return (
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction,
-  ): Promise<void> => {
+  ): void => {
     try {
-      const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith("Bearer ")) {
-        const token = authHeader.replace("Bearer ", "");
-        try {
-          const user = await this.authService.verifyToken(token);
-          req.user = user;
-        } catch (error) {
-          // Token is invalid, but that's okay for optional auth
-          logger.debug("Optional auth failed:", error.message);
-        }
+      const token = extractToken(req);
+
+      if (token) {
+        const decoded = jwt.verify(token, JWT_SECRET) as any;
+        req.user = decoded;
       }
+
       next();
     } catch (error) {
-      logger.error("Optional auth middleware error:", error);
+      // Ignore auth errors for optional auth
       next();
     }
   };
+}
+
+/**
+ * Generate JWT token
+ * @param payload - Token payload
+ * @param expiresIn - Token expiration (default: 24h)
+ * @returns JWT token
+ */
+export function generateToken(
+  payload: object,
+  expiresIn: string = "24h",
+): string {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn });
+}
+
+/**
+ * Verify JWT token
+ * @param token - JWT token
+ * @returns Decoded token payload
+ */
+export function verifyToken(token: string): any {
+  return jwt.verify(token, JWT_SECRET);
 }

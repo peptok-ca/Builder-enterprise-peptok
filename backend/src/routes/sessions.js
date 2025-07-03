@@ -1,6 +1,6 @@
 import express from "express";
-import { sessionService } from "../services/SessionService.js";
-import { authMiddleware } from "../middleware/auth.js";
+import { sessionService } from "../services/SessionService.ts";
+import { authMiddleware } from "../middleware/auth.ts";
 import {
   validateSessionSchedule,
   validateSessionFeedback,

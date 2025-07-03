@@ -1,6 +1,6 @@
 import express from "express";
 import { mentorMatchingService } from "../services/MentorMatchingService.js";
-import { authMiddleware } from "../middleware/auth.js";
+import { authMiddleware } from "../middleware/auth.ts";
 import { validateMentorFilters } from "../middleware/validation.js";
 import { logger } from "../config/logger.js";
 

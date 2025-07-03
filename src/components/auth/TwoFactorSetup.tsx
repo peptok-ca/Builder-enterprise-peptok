@@ -123,7 +123,12 @@ export function TwoFactorSetup({
             </p>
             <div className="flex justify-center mb-4">
               <div className="p-4 bg-white border-2 border-gray-200 rounded-lg">
-                <QRCodeSVG value={qrCodeData} size={160} />
+                {/* Temporarily replaced with placeholder */}
+                <div className="w-40 h-40 bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+                  QR Code Placeholder
+                  <br />
+                  Manual setup available
+                </div>
               </div>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import express from "express";
-import { paymentService } from "../services/PaymentService.js";
-import { authMiddleware } from "../middleware/auth.js";
-import { logger } from "../config/logger.js";
+import { paymentService } from "../services/PaymentService.ts";
+import { authMiddleware } from "../middleware/auth.ts";
+import { logger } from "../config/logger.ts";
 
 const router = express.Router();
 

@@ -5,7 +5,7 @@ import {
   validateSessionSchedule,
   validateSessionFeedback,
 } from "../middleware/validation.ts";
-import { logger } from "../config/logger.js";
+import { logger } from "../config/logger.ts";
 
 const router = express.Router();
 

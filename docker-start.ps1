@@ -77,7 +77,32 @@ try {
 # Start the containers with clean build (no cache)
 try {
     Write-Host "Building containers..." -ForegroundColor Blue
-    docker compose build --no-cache
+
+    # Try building with retries for network issues
+    $buildSuccess = $false
+    $buildAttempts = 0
+    $maxBuildAttempts = 3
+
+    while (-not $buildSuccess -and $buildAttempts -lt $maxBuildAttempts) {
+        $buildAttempts++
+        Write-Host "Build attempt $buildAttempts of $maxBuildAttempts..." -ForegroundColor Yellow
+
+        try {
+            docker compose build --no-cache
+            $buildSuccess = $true
+            Write-Host "Build successful!" -ForegroundColor Green
+        } catch {
+            Write-Host "Build attempt $buildAttempts failed: $($_.Exception.Message)" -ForegroundColor Yellow
+            if ($buildAttempts -lt $maxBuildAttempts) {
+                Write-Host "Retrying in 10 seconds..." -ForegroundColor Yellow
+                Start-Sleep -Seconds 10
+            }
+        }
+    }
+
+    if (-not $buildSuccess) {
+        Write-Host "WARNING: Build failed after $maxBuildAttempts attempts. Trying to start with existing images..." -ForegroundColor Yellow
+    }
 
     Write-Host "Starting containers..." -ForegroundColor Blue
     docker compose up -d

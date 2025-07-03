@@ -1,6 +1,6 @@
 import express from "express";
-import { authService } from "../services/AuthService.ts";
-import { logger } from "../config/logger.ts";
+import { authService } from "../services/AuthService.js";
+import { logger } from "../config/logger.js";
 import mentorRoutes from "./mentors.js";
 import sessionRoutes from "./sessions.js";
 import paymentRoutes from "./payments.js";

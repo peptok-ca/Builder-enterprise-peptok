@@ -1,5 +1,5 @@
 import express, { Router, Request, Response } from "express";
-import { authService } from "../services/AuthService.js";
+import { authService } from "../services/SimpleAuthService.js";
 import { logger } from "../config/logger.js";
 import mentorRoutes from "./mentors.js";
 import sessionRoutes from "./sessions.js";

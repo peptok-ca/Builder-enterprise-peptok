@@ -20,7 +20,8 @@ import {
   AlertCircle,
   Download,
 } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
+// Temporarily commented out due to container build issue
+// import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 
 interface TwoFactorSetupProps {

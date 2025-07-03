@@ -4,7 +4,7 @@ import { authMiddleware } from "../middleware/auth.ts";
 import {
   validateSessionSchedule,
   validateSessionFeedback,
-} from "../middleware/validation.js";
+} from "../middleware/validation.ts";
 import { logger } from "../config/logger.js";
 
 const router = express.Router();

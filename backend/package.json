@@ -6,9 +6,11 @@
   "type": "module",
   "scripts": {
     "start": "node dist/server.js",
-    "dev": "node src/server.js",
-    "dev:watch": "tsx watch src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "dev:build": "tsc && node dist/server.js",
     "build": "tsc",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

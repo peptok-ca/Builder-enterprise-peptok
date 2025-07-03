@@ -11,15 +11,28 @@ RUN apk add --no-cache git
 COPY package*.json ./
 
 # Install dependencies with npm ci for reproducible builds
-RUN npm ci --only=production --no-audit --no-fund
+RUN npm ci --no-audit --no-fund
 
 # Copy source code (excluding files in .dockerignore)
 COPY . .
 
 # Ensure proper line endings for scripts (Windows compatibility)
-RUN find . -type f -name "*.sh" -exec dos2unix {} \; 2>/dev/null || true
+RUN find . -type f \( -name "*.sh" -o -name "*.ts" -o -name "*.tsx" \) -exec dos2unix {} \; 2>/dev/null || true
 
-# Build the app
+# Validate TypeScript-only codebase
+RUN echo "Validating TypeScript-only frontend..." && \
+    if find src -name "*.js" -o -name "*.jsx" | grep -q .; then \
+        echo "ERROR: JavaScript files found in TypeScript-only frontend!" && \
+        find src -name "*.js" -o -name "*.jsx" && \
+        exit 1; \
+    else \
+        echo "✓ All source files are TypeScript"; \
+    fi
+
+# Run TypeScript type checking before build
+RUN npm run typecheck
+
+# Build the app with TypeScript compilation
 RUN npm run build
 
 # Production stage

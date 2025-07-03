@@ -11,7 +11,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (including dev dependencies)
-RUN npm install --no-audit --no-fund
+RUN npm install --no-audit --no-fund && \
+    npm list qrcode.react || npm install qrcode.react
 
 # Copy source code
 COPY . .

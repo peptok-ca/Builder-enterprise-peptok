@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node dist/server.js",
-    "dev": "tsx src/server.ts",
+    "dev": "node src/server.js",
     "dev:watch": "tsx watch src/server.ts",
     "build": "tsc",
     "test": "jest",

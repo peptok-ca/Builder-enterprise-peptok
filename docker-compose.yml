@@ -18,7 +18,7 @@ services:
     networks:
       - peptok-network
 
-  # Backend API Server (Optional - app works with mock data)
+  # Backend API Server
   backend:
     build:
       context: ./backend
@@ -33,6 +33,72 @@ services:
       - PORT=3001
       - JWT_SECRET=your-dev-jwt-secret-key
       - CORS_ORIGIN=http://localhost:8080
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REDIS_HOST=redis
+    depends_on:
+      - kafka
+      - redis
+    networks:
+      - peptok-network
+
+  # Python Matching Service
+  matching-service:
+    build:
+      context: ./matching-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./matching-service:/app:cached
+    environment:
+      - FLASK_ENV=development
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - REDIS_HOST=redis
+      - BACKEND_API_URL=http://backend:3001/api
+      - SECRET_KEY=dev-secret-key-change-in-production
+    depends_on:
+      - kafka
+      - redis
+      - backend
+    networks:
+      - peptok-network
+
+  # Apache Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - peptok-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+    depends_on:
+      - zookeeper
+    networks:
+      - peptok-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
     networks:
       - peptok-network
 
@@ -57,5 +123,6 @@ networks:
 
 volumes:
   postgres_data:
+  redis_data:
   frontend_node_modules:
   backend_node_modules:

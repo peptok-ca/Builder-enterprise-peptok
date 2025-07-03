@@ -1,8 +1,8 @@
 import express from "express";
-import { mentorMatchingService } from "../services/MentorMatchingService.ts";
-import { authMiddleware } from "../middleware/auth.ts";
-import { validateMentorFilters } from "../middleware/validation.ts";
-import { logger } from "../config/logger.ts";
+import { mentorMatchingService } from "../services/MentorMatchingService.js";
+import { authMiddleware } from "../middleware/auth.js";
+import { validateMentorFilters } from "../middleware/validation.js";
+import { logger } from "../config/logger.js";
 
 const router = express.Router();
 

@@ -1,11 +1,11 @@
 import express from "express";
-import { sessionService } from "../services/SessionService.ts";
-import { authMiddleware } from "../middleware/auth.ts";
+import { sessionService } from "../services/SessionService.js";
+import { authMiddleware } from "../middleware/auth.js";
 import {
   validateSessionSchedule,
   validateSessionFeedback,
-} from "../middleware/validation.ts";
-import { logger } from "../config/logger.ts";
+} from "../middleware/validation.js";
+import { logger } from "../config/logger.js";
 
 const router = express.Router();
 

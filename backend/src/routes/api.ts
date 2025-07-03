@@ -4,6 +4,7 @@ import { logger } from "../config/logger.js";
 import mentorRoutes from "./mentors.js";
 import sessionRoutes from "./sessions.js";
 import paymentRoutes from "./payments.js";
+import matchingRoutes from "./matching.js";
 import {
   mockSkills,
   mockExperts,
@@ -25,6 +26,7 @@ const router: Router = express.Router();
 router.use("/mentors", mentorRoutes);
 router.use("/sessions", sessionRoutes);
 router.use("/payments", paymentRoutes);
+router.use("/matching", matchingRoutes);
 
 // Authentication routes
 router.post("/auth/login", async (req: Request, res: Response) => {

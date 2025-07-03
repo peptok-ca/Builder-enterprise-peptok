@@ -14,4 +14,20 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  esbuild: {
+    // Only allow TypeScript and TSX files
+    include: /\.(ts|tsx)$/,
+    // Exclude JavaScript files to enforce TypeScript-only
+    exclude: /\.(js|jsx)$/,
+  },
+  build: {
+    // Strict TypeScript checking during build
+    rollupOptions: {
+      input: {
+        main: "./index.html",
+      },
+    },
+    // Enforce smaller chunks for better performance
+    chunkSizeWarningLimit: 1000,
+  },
 }));
